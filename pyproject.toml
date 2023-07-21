@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "storyteller"
+version = "0.1.0"
+description = ""
+authors = ["tiltowait <208040+tiltowait@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+beanie = "^1.20.0"
+python-dotenv = "^1.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.1"
+mongomock-motor = "^0.0.20"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
