@@ -15,10 +15,7 @@ logger = logging.getLogger("db")
 logger.info("Initializing database connection")
 
 client = AsyncIOMotorClient(os.environ["MONGO_URL"])
-if "TESTING" in os.environ:
-    db = client["testing"]
-else:
-    db = client[os.environ["MONGO_DB"]]
+db = client[os.environ["MONGO_DB"]]
 
 
 async def init():
