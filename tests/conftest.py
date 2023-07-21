@@ -4,8 +4,9 @@ import asyncio
 
 import pytest
 from beanie import init_beanie
-from characters import Character
 from mongomock_motor import AsyncMongoMockClient
+
+from characters import Character
 
 
 @pytest.fixture(autouse=True)

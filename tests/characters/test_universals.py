@@ -1,8 +1,9 @@
 """Basic character tests."""
 
-import errors
 import pydantic
 import pytest
+
+import errors
 from characters import Character, Damage, Splat, Trait
 from tests.characters import gen_char
 

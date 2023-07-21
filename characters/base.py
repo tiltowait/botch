@@ -6,10 +6,11 @@ import copy
 from collections import Counter
 from enum import StrEnum
 
-import errors
 import pymongo
 from beanie import Document
 from pydantic import BaseModel, Field
+
+import errors
 
 
 class Damage(StrEnum):

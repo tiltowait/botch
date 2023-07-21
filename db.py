@@ -4,9 +4,10 @@ import logging
 import os
 
 from beanie import init_beanie
-from characters import Character
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
+
+from characters import Character
 
 load_dotenv()
 
