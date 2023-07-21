@@ -7,10 +7,7 @@ import errors
 from characters import Character, Damage, Splat, Trait
 from tests.characters import gen_char
 
-
-@pytest.fixture(params=list(Splat))
-def character(request):
-    return gen_char(request.param)
+# Using function-scoped fixture "character" from conftest
 
 
 @pytest.mark.parametrize("splat", list(Splat) + ["invalid"])
