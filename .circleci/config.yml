@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@2.1.1
+  codecov: codecov/codecov@3.2.4
 
 jobs:
   run-test-battery:
@@ -12,7 +13,21 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: poetry
-      - run: poetry run pytest
+      - run:
+          name: Run Tests
+          command: |
+            poetry run pytest --cov
+      - run:
+          name: Generate Coverage Report
+          command: |
+            poetry run coverage html
+            poetry run coverage xml
+      - run:
+          name: Compress Artifacts
+          command: tar -cvzf htmlcov.tar.gz htmlcov
+      - store_artifacts:
+          path: htmlcov.tar.gz
+      - codecov/upload
 
 workflows:
   tests:
