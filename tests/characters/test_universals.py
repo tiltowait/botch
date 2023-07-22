@@ -84,3 +84,34 @@ async def test_trait_basics(character: Character):
 
     assert character.find_traits("str") == [strength]
     assert character.is_changed
+
+
+def test_update_trait(skilled: Character):
+    updated = skilled.update_trait("Brawl", 5)
+    assert updated.name == "Brawl"
+    assert updated.rating == 5
+
+    found = skilled.find_traits("brawl")
+    assert updated == found[0]
+
+    with pytest.raises(errors.TraitNotFound):
+        skilled.update_trait("Fake", 2)
+
+
+def test_remove_trait(skilled: Character):
+    assert skilled.has_trait("Brawl")
+    removed = skilled.remove_trait("brawl")
+
+    assert removed == "Brawl"
+    assert not skilled.has_trait("Brawl")
+
+    with pytest.raises(errors.TraitNotFound):
+        skilled.remove_trait("Fake")
+
+
+def test_add_specialties_not_implemented():
+    char = gen_char(Splat.VTM)
+    char.add_trait("Brawl", 3)
+
+    with pytest.raises(NotImplementedError):
+        char.add_specialties("Brawl", ["Throws"])
