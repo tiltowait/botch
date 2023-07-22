@@ -4,7 +4,7 @@ subclasses."""
 import bisect
 import copy
 import itertools
-from collections import Counter, namedtuple
+from collections import Counter
 from enum import StrEnum
 
 import pymongo
