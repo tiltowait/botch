@@ -17,7 +17,11 @@ jobs:
           name: Run Tests
           command: |
             poetry run pytest --cov
+      - run:
+          name: Generate Coverage Report
+          command: |
             poetry run coverage html
+            poetry run coverage xml
       - run:
           name: Compress Artifacts
           command: tar -cvzf htmlcov.tar.gz htmlcov
