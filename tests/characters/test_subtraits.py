@@ -7,12 +7,6 @@ from characters.base import Character, Trait
 
 
 @pytest.fixture
-def skilled(character: Character):
-    character.add_trait("Brawl", 3)
-    return character
-
-
-@pytest.fixture
 def subtraits() -> list[str]:
     return ["Kindred", "StreetFighting", "Kine"]
 

@@ -22,6 +22,12 @@ def character(request):
     return gen_char(request.param)
 
 
+@pytest.fixture(scope="function")
+def skilled(character: Character):
+    character.add_trait("Brawl", 3)
+    return character
+
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an event loop to share between tests."""
