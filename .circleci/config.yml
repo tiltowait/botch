@@ -23,7 +23,6 @@ jobs:
           command: tar -cvzf htmlcov.tar.gz htmlcov
       - store_artifacts:
           path: htmlcov.tar.gz
-          destination: htmlcov
       - codecov/upload
 
 workflows:
