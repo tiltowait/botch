@@ -1,11 +1,11 @@
-"""Shared Storyteller errors."""
+"""Shared Botch errors."""
 
 
-class StorytellerError(Exception):
+class BotchError(Exception):
     """Base error class."""
 
 
-class TraitError(StorytellerError):
+class TraitError(BotchError):
     """Base trait-related errors."""
 
 
