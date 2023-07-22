@@ -283,20 +283,20 @@ class Character(Document):
 
         return copy.deepcopy(new_trait)
 
-    def update_trait(self, trait_name: str, new_rating: int) -> str:
+    def update_trait(self, trait_name: str, new_rating: int) -> Trait:
         """Update a trait.
         Args:
-            trait_name (str): The name of the trait to update
-            new_rating (int): The trait's new rating
+            trait_name (str): The name of the Trait to update
+            new_rating (int): The Trait's new rating
 
-        Returns the trait's name, properly capitalized.
+        Returns a copy of the updated Trait.
         Raises TraitNotFound.
         """
         trait_name = trait_name.casefold()
         for trait in self.traits:
             if trait.name.casefold() == trait_name:
                 trait.rating = new_rating
-                return trait.name
+                return copy.deepcopy(trait)
         raise errors.TraitNotFound(self, trait_name)
 
     def remove_trait(self, trait_name: str) -> str:
