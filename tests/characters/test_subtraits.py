@@ -17,12 +17,6 @@ def skill() -> Trait:
     return Trait(name="Brawl", rating=4, category=Trait.Category.ABILITY.value)
 
 
-@pytest.fixture
-def discipline() -> Trait:
-    """A basic trait."""
-    return Trait(name="Potence", rating=4, category=Trait.Category.DISCIPLINE.value)
-
-
 @pytest.mark.parametrize(
     "needle,exact,count,name,rating",
     [
@@ -186,6 +180,19 @@ def test_expansion(
 
     for expansion in expansions:
         assert expansion in expectations
+
+
+def test_duplicate_matching(skill, subtraits):
+    skill.add_subtraits(subtraits)
+    match = skill.matching(".k.k", False)
+    assert match[0].name == "Brawl (Kindred, Kine)"
+
+
+def test_incomplete_duplicate_matching(skill, subtraits):
+    skill.add_subtraits(subtraits)
+    skill.add_subtraits(["Knives", "Suplexing"])
+    matches = skill.matching(".s.k", False)
+    assert len(matches) == 6
 
 
 @pytest.mark.parametrize(

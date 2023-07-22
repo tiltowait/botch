@@ -115,3 +115,10 @@ def test_add_specialties_not_implemented():
 
     with pytest.raises(NotImplementedError):
         char.add_specialties("Brawl", ["Throws"])
+
+
+def test_trait_not_found_str_value(character: Character):
+    try:
+        character.remove_trait("Foo")
+    except errors.TraitNotFound as err:
+        assert str(err) == f"**{character.name}** has no trait named `Foo`."

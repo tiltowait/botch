@@ -283,23 +283,23 @@ class Character(Document):
 
         return copy.deepcopy(new_trait)
 
-    def update_trait(self, trait_name: str, new_rating: int) -> Trait:
+    def update_trait(self, name: str, new_rating: int) -> Trait:
         """Update a trait.
         Args:
-            trait_name (str): The name of the Trait to update
+            name (str): The name of the Trait to update
             new_rating (int): The Trait's new rating
 
         Returns a copy of the updated Trait.
         Raises TraitNotFound.
         """
-        trait_name = trait_name.casefold()
+        trait_name = name.casefold()
         for trait in self.traits:
             if trait.name.casefold() == trait_name:
                 trait.rating = new_rating
                 return copy.deepcopy(trait)
-        raise errors.TraitNotFound(self, trait_name)
+        raise errors.TraitNotFound(self, name)
 
-    def remove_trait(self, trait_name: str) -> str:
+    def remove_trait(self, name: str) -> str:
         """Remove a trait.
         Args:
             trait_name (str): The name of the trait to remove
@@ -307,19 +307,17 @@ class Character(Document):
         Returns the trait's name, properly capitalized.
         Raises TraitNotFound.
         """
-        trait_name = trait_name.casefold()
+        trait_name = name.casefold()
         for i, trait in enumerate(self.traits):
             if trait.name.casefold() == trait_name:
                 del self.traits[i]
                 return trait.name
-        raise errors.TraitNotFound(self, trait_name)
+        raise errors.TraitNotFound(self, name)
 
-    def add_specialties(
-        self, trait_name: str, subtraits: list[str] | str
-    ) -> tuple[Trait, set[str]]:
+    def add_specialties(self, name: str, subtraits: list[str] | str) -> tuple[Trait, set[str]]:
         """Add specialties to a trait.
         Args:
-            trait_name (str): The name of the trait to add to
+            name (str): The name of the trait to add to
             subtraits (list[str]): The specialties to add.
 
         Returns: A copy of the Trait with specialties added, and the set of
@@ -327,16 +325,16 @@ class Character(Document):
         Raises TraitNotFound."""
         raise NotImplementedError("This function is not implemented in the base class.")
 
-    def add_subtraits(self, trait_name: str, subtraits: list[str] | str) -> tuple[Trait, list[str]]:
+    def add_subtraits(self, name: str, subtraits: list[str] | str) -> tuple[Trait, list[str]]:
         """Add subtraits to a trait.
         Args:
-            trait_name (str): The exact name of the trait to add to
+            name (str): The exact name of the trait to add to
             subtraits (list[str]): The subtraits to add
 
         Returns: A copy of the trait with the subtraits added, and the set of
             the added subtraits.
         Raises: TraitNotFound if the character has no trait by that name."""
-        trait_name = trait_name.casefold()
+        trait_name = name.casefold()
         for trait in self.traits:
             if trait.name.casefold() == trait_name:
                 before = set(trait.subtraits)
@@ -346,13 +344,11 @@ class Character(Document):
 
                 return copy.deepcopy(trait), delta
 
-        raise errors.TraitNotFound(self, trait_name)
+        raise errors.TraitNotFound(self, name)
 
-    def remove_subtraits(
-        self, trait_name: str, subtraits: list[str] | str
-    ) -> tuple[Trait, list[str]]:
+    def remove_subtraits(self, name: str, subtraits: list[str] | str) -> tuple[Trait, list[str]]:
         """Remove subtraits from a trait."""
-        trait_name = trait_name.casefold()
+        trait_name = name.casefold()
         for trait in self.traits:
             if trait.name.casefold() == trait_name:
                 before = set(trait.subtraits)
@@ -362,7 +358,7 @@ class Character(Document):
 
                 return copy.deepcopy(trait), delta
 
-        raise errors.TraitNotFound(self, trait_name)
+        raise errors.TraitNotFound(self, name)
 
     class Settings:
         name = "characters"
