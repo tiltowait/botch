@@ -17,7 +17,7 @@ jobs:
           name: Run Tests
           command: |
             poetry run pytest --cov
-            poetry run coverate html
+            poetry run coverage html
       - store_artifacts:
           path: htmlcov
       - codecov/upload
