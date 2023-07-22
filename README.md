@@ -1,6 +1,7 @@
 <p align="center">
 	<img src="https://img.shields.io/github/license/tiltowait/botch" alt="MIT license" />
 	<img src="https://img.shields.io/circleci/build/github/tiltowait/botch/master" alt="Build status">
+	<img src="https://img.shields.io/codecov/c/github/tiltowait/botch" alt="Code coverage">
 </p>
 
 # Botch
