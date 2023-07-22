@@ -18,8 +18,12 @@ jobs:
           command: |
             poetry run pytest --cov
             poetry run coverage html
+      - run:
+          name: Compress Artifacts
+          command: tar -cvzf htmlcov.tar.gz htmlcov
       - store_artifacts:
-          path: htmlcov
+          path: htmlcov.tar.gz
+          destination: htmlcov
       - codecov/upload
 
 workflows:
