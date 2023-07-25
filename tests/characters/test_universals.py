@@ -1,13 +1,24 @@
 """Basic character tests."""
 
+import asyncio
+from urllib.parse import urlparse
+
 import pydantic
 import pytest
+import requests
 
+import api
 import errors
 from characters import Character, Damage, Splat, Trait
+from config import FC_BUCKET
 from tests.characters import gen_char
 
 # Using function-scoped fixture "character" from conftest
+
+
+@pytest.fixture
+def sample_image() -> str:
+    return "https://i.tiltowait.dev/avatar.jpg"
 
 
 @pytest.mark.parametrize("splat", list(Splat) + ["invalid"])
@@ -122,3 +133,78 @@ def test_trait_not_found_str_value(character: Character):
         character.remove_trait("Foo")
     except errors.TraitNotFound as err:
         assert str(err) == f"**{character.name}** has no trait named `Foo`."
+
+
+async def test_single_image_processing(sample_image):
+    char = gen_char(Splat.VTM)
+    await char.insert()
+
+    inserted = await char.add_image(sample_image)
+    assert urlparse(inserted).netloc == FC_BUCKET, f"{inserted} isn't in dev bucket"
+    assert requests.get(inserted).status_code == 200, "Image not found"
+
+    await char.delete_image(inserted)
+    assert not char.profile.images
+
+    wait_time = 10
+    deleted = False
+    for _ in range(wait_time):
+        await asyncio.sleep(1)
+        if requests.get(inserted).status_code == 404:
+            deleted = True
+            break
+    assert deleted, f"{inserted} was never deleted within {wait_time} seconds"
+
+    await char.delete()
+
+
+async def test_image_uploading_and_char_deletion(sample_image):
+    char = gen_char(Splat.VTM)
+    await char.insert()
+
+    inserted = await char.add_image(sample_image)
+    assert urlparse(inserted).netloc == FC_BUCKET, f"{inserted} isn't in dev bucket"
+    assert requests.get(inserted).status_code == 200, "Image not found"
+
+    # Try character deletion
+    images = [inserted]
+    for _ in range(2):
+        # Insert more images to make sure they're all deleted
+        url = await char.add_image(sample_image)
+        images.append(url)
+
+    assert len(char.profile.images) == 3
+    await char.delete()
+
+    wait_time = 15
+    for _ in range(wait_time):
+        await asyncio.sleep(1)
+        for url in images:
+            if requests.get(url).status_code == 404:
+                images.remove(url)
+        if not images:
+            break
+    assert not images, "The images weren't deleted with the character"
+
+
+async def test_image_deletion_flag(sample_image):
+    char = gen_char(Splat.VTM)
+    await char.insert()
+
+    for _ in range(3):
+        await char.add_image(sample_image)
+
+    assert len(char.profile.images) == 3
+    await char.delete_all_images()
+    assert not char.profile.images
+    assert not char.is_changed
+
+    await char.delete()
+
+
+@pytest.mark.parametrize(
+    "bad_url", ["https://example.com/test.webp", f"https://{FC_BUCKET}/test.png"]
+)
+async def test_bad_deletions(bad_url):
+    deleted = await api.delete_single_faceclaim(bad_url)
+    assert not deleted

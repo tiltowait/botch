@@ -6,11 +6,13 @@ import copy
 import itertools
 from collections import Counter
 from enum import StrEnum
+from typing import Optional
 
 import pymongo
-from beanie import Document
-from pydantic import BaseModel, Field
+from beanie import Delete, Document, before_event
+from pydantic import BaseModel, Field, HttpUrl
 
+import api
 import errors
 
 
@@ -36,6 +38,14 @@ class Grounding(BaseModel):
 class Tracker(StrEnum):
     HEALTH = "health"
     WILLPOWER = "willpower"
+
+
+class Profile(BaseModel):
+    """Contains the character's description, history, and image URLs."""
+
+    description: Optional[str] = Field(default=None, max_length=1024)
+    history: Optional[str] = Field(default=None, max_length=1024)
+    images: list[HttpUrl] = Field(default_factory=list)
 
 
 class Trait(BaseModel):
@@ -204,6 +214,7 @@ class Character(Document):
     Character.get_traits() instead."""
 
     name: str
+    profile: Profile = Field(default_factory=Profile, repr=False)
     splat: Splat
 
     guild: int
@@ -214,6 +225,14 @@ class Character(Document):
     grounding: Grounding
 
     traits: list[Trait] = Field(default_factory=list)
+
+    @before_event(Delete)
+    async def prep_delete(self):
+        """Special operations before deleting a character."""
+        try:
+            await self.delete_all_images(False)
+        except errors.ApiError:
+            pass
 
     def set_damage(self, tracker: Tracker, severity: Damage, count: int) -> str:
         """Set the tracker's new damage rating. Returns the new track."""
@@ -361,6 +380,29 @@ class Character(Document):
 
         raise errors.TraitNotFound(self, name)
 
+    # Image handling
+
+    async def add_image(self, discord_url: str) -> str:
+        """Upload a character image via URL. Premium feature."""
+        image_url = await api.upload_faceclaim(self, discord_url)
+        self.profile.images.append(image_url)
+        await self.save_changes()
+
+        return image_url
+
+    async def delete_image(self, url: str):
+        """Remove a profile image. Premium feature."""
+        if await api.delete_single_faceclaim(url):
+            self.profile.images.remove(url)
+            await self.save_changes()
+
+    async def delete_all_images(self, save_changes=True):
+        """Delete all the character's images."""
+        await api.delete_character_faceclaims(self)
+        del self.profile.images[:]
+        if save_changes:
+            await self.save_changes()
+
     class Settings:
         name = "characters"
         indexes = [
@@ -371,3 +413,4 @@ class Character(Document):
         ]
         is_root = True
         use_state_management = True
+        validate_on_save = True

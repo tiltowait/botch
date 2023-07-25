@@ -5,6 +5,10 @@ class BotchError(Exception):
     """Base error class."""
 
 
+class ApiError(BotchError):
+    """An exception raised when there's an error with the API."""
+
+
 class TraitError(BotchError):
     """Base trait-related errors."""
 
