@@ -1,3 +1,4 @@
 """The characters package defines various PC/NPC objects and functions."""
 
-from characters.base import Character, Damage, Grounding, Splat, Trait
+from characters import wod
+from characters.base import Character, Damage, GameLine, Grounding, Splat, Trait

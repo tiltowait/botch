@@ -7,6 +7,7 @@ from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
 
 from characters import Character, Splat
+from characters.wod import Mortal, Vampire
 from tests.characters import gen_char
 
 
@@ -14,7 +15,10 @@ from tests.characters import gen_char
 async def beanie_fixture():
     """Configures a mock beanie client for all tests."""
     client = AsyncMongoMockClient()
-    await init_beanie(database=client.get_database(name="db"), document_models=[Character])
+    await init_beanie(
+        database=client.get_database(name="db"),
+        document_models=[Character, Vampire, Mortal],
+    )
 
 
 @pytest.fixture(params=list(Splat), scope="function")
