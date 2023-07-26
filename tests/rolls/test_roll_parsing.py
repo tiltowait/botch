@@ -3,8 +3,13 @@
 import pytest
 
 import errors
-from characters import Character
+from characters import Character, GameLine
 from rolls.parse import RollParser
+
+
+@pytest.fixture(params=list(GameLine))
+def line(request):
+    return request.param
 
 
 @pytest.mark.parametrize(
@@ -92,3 +97,47 @@ def test_parse(syntax, pool, equation, error, dice, skilled: Character):
         p.parse()
         assert p.pool == pool
         assert p.equation == equation
+
+
+@pytest.mark.parametrize(
+    "syntax,willpower",
+    [
+        ("stren + br", False),
+        ("stren + br + wp", True),
+        ("3", False),
+    ],
+)
+def test_willpower_in_roll(syntax: str, willpower: bool, skilled: Character):
+    p = RollParser(syntax, skilled)
+    p.parse()
+    assert p.using_wp == willpower
+
+
+@pytest.mark.parametrize(
+    "syntax,willpower,expected",
+    [
+        ("strength + brawl", False, 5),
+        ("strength + brawl + wp", True, 5),
+        ("wp", True, 0),
+        ("3", False, 3),
+        ("3 + WP", True, 3),
+    ],
+)
+def test_willpower_roll_impact(
+    syntax: str, willpower: bool, expected: int, skilled: Character, line: GameLine
+):
+    skilled.line = line  # Safe to do only on the base class
+
+    wp = skilled.match_traits("WP", True)[0]
+    if line == GameLine.COFD:
+        assert wp.rating == 3
+        if willpower:
+            expected += 3
+    else:
+        assert wp.rating == 0
+
+    p = RollParser(syntax, skilled)
+    p.parse()
+
+    assert p.using_wp == willpower
+    assert p.dice == expected

@@ -28,6 +28,11 @@ class RollParser:
         self.dice = 0
 
     @property
+    def using_wp(self) -> bool:
+        """Whether the roll uses Willpower."""
+        return "wp" in map(str.casefold, map(str, self.pool))
+
+    @property
     def needs_character(self) -> bool:
         """Whether the roll syntax requires a character."""
         return re.search(r"[A-Za-z_.]", self.raw_syntax) is not None

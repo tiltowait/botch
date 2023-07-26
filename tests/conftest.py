@@ -6,7 +6,7 @@ import pytest
 from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
 
-from characters import Character, Splat
+from characters import Character, GameLine, Splat
 from characters.wod import Mortal, Vampire
 from tests.characters import gen_char
 
@@ -23,7 +23,7 @@ async def beanie_fixture():
 
 @pytest.fixture(params=list(Splat), scope="function")
 def character(request):
-    return gen_char(request.param)
+    return gen_char(GameLine.WOD, request.param)
 
 
 @pytest.fixture(scope="function")

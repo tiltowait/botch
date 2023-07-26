@@ -9,7 +9,7 @@ import requests
 
 import api
 import errors
-from characters import Character, Damage, Splat, Trait
+from characters import Character, Damage, GameLine, Splat, Trait
 from config import FC_BUCKET
 from tests.characters import gen_char
 
@@ -25,9 +25,9 @@ def sample_image() -> str:
 async def test_splat_constraints(splat: str):
     if splat not in list(Splat):
         with pytest.raises(pydantic.error_wrappers.ValidationError):
-            gen_char(splat)
+            gen_char(GameLine.WOD, splat)
     else:
-        gen_char(splat)
+        gen_char(GameLine.WOD, splat)
 
 
 async def test_char_saving(character):
@@ -121,7 +121,7 @@ def test_remove_trait(skilled: Character):
 
 
 def test_add_specialties_not_implemented():
-    char = gen_char(Splat.VAMPIRE)
+    char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     char.add_trait("Brawl", 3)
 
     with pytest.raises(NotImplementedError):
@@ -136,7 +136,7 @@ def test_trait_not_found_str_value(character: Character):
 
 
 async def test_single_image_processing(sample_image):
-    char = gen_char(Splat.VAMPIRE)
+    char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     await char.insert()
 
     inserted = await char.add_image(sample_image)
@@ -159,7 +159,7 @@ async def test_single_image_processing(sample_image):
 
 
 async def test_image_uploading_and_char_deletion(sample_image):
-    char = gen_char(Splat.VAMPIRE)
+    char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     await char.insert()
 
     inserted = await char.add_image(sample_image)
@@ -188,7 +188,7 @@ async def test_image_uploading_and_char_deletion(sample_image):
 
 
 async def test_image_deletion_flag(sample_image):
-    char = gen_char(Splat.VAMPIRE)
+    char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     await char.insert()
 
     for _ in range(3):

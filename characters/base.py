@@ -63,6 +63,7 @@ class Trait(BaseModel):
         ABILITY = "ability"
         VIRTUE = "virtue"
         SPECIAL = "special"
+        INNATE = "innate"
         CUSTOM = "custom"
 
     class Selection(BaseModel):
@@ -221,6 +222,7 @@ class Character(Document):
 
     name: str
     profile: Profile = Field(default_factory=Profile, repr=False)
+    line: GameLine
     splat: Splat
 
     guild: int
@@ -231,6 +233,25 @@ class Character(Document):
     grounding: Grounding
 
     traits: list[Trait] = Field(default_factory=list)
+
+    def _all_traits(self) -> list[Trait]:
+        """A copy of all the character's rollable traits, including innates."""
+        innate = Trait.Category.INNATE
+        if self.line == GameLine.COFD:
+            # In CofD, adding WP means you get +3 dice
+            wp = Trait(name="WP", rating=3, category=innate)
+        else:
+            # In WoD, WP simply guarantees a success
+            wp = Trait(name="WP", rating=0, category=innate)
+
+        traits = copy.deepcopy(self.traits)
+
+        traits.append(wp)
+        traits.append(Trait(name="Willpower", rating=len(self.willpower), category=innate))
+        traits.append(
+            Trait(name=self.grounding.path, rating=self.grounding.rating, category=innate)
+        )
+        return traits
 
     @before_event(Delete)
     async def prep_delete(self):
@@ -293,7 +314,7 @@ class Character(Document):
     def match_traits(self, search: str, exact=False) -> list[Trait.Selection]:
         """Match traits to user input. Used in rolls."""
         matches = []
-        for trait in self.traits:
+        for trait in self._all_traits():
             matches.extend(trait.matching(search, exact))
         return matches
 

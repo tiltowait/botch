@@ -1,12 +1,13 @@
 """Shared helper functions."""
 
-from characters import Character, Damage, Grounding, Splat
+from characters import Character, Damage, GameLine, Grounding, Splat
 
 
-def gen_char(splat: Splat, **kwargs) -> Character:
+def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character:
     """Create a basic character."""
     args = {
         "name": "Test",
+        "line": line,
         "splat": splat,
         "guild": 0,
         "user": 0,
