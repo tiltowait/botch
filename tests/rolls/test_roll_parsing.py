@@ -7,11 +7,6 @@ from characters import Character, GameLine
 from rolls.parse import RollParser
 
 
-@pytest.fixture(params=list(GameLine))
-def line(request):
-    return request.param
-
-
 @pytest.mark.parametrize(
     "syntax,expected,should_fail",
     [

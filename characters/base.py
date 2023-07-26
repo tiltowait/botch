@@ -385,12 +385,18 @@ class Character(Document):
             name (str): The exact name of the trait to add to
             subtraits (list[str]): The subtraits to add
 
+        Subtraits may not be added to innates. If this is a CofD character,
+        attributes may not accept subtraits.
+
         Returns: A copy of the trait with the subtraits added, and the set of
             the added subtraits.
         Raises: TraitNotFound if the character has no trait by that name."""
         trait_name = name.casefold()
         for trait in self.traits:
             if trait.name.casefold() == trait_name:
+                if self.line == GameLine.COFD and trait.category == Trait.Category.ATTRIBUTE:
+                    raise errors.InvalidTrait("Attributes can't have specialties in CofD.")
+
                 before = set(trait.subtraits)
                 trait.add_subtraits(subtraits)
                 after = set(trait.subtraits)

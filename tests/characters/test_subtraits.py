@@ -3,7 +3,7 @@
 import pytest
 
 import errors
-from characters.base import Character, Trait
+from characters.base import Character, GameLine, Trait
 
 
 @pytest.fixture
@@ -258,3 +258,15 @@ def test_character_remove_subtraits(
         assert delta == sorted(remove)
         assert trait.name == skill
         assert trait.subtraits == expected
+
+
+def test_wod_vs_cofd_subtraits(skilled: Character, line: GameLine):
+    skilled.line = line
+
+    skilled.add_subtraits("Brawl", ["Blocking"])
+
+    if line == GameLine.COFD:
+        with pytest.raises(errors.InvalidTrait):
+            skilled.add_subtraits("Strength", ["Vicious"])
+    else:
+        skilled.add_subtraits("Strength", ["Vicious"])

@@ -6,7 +6,7 @@ import pytest
 from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
 
-from characters import Character, GameLine, Splat
+from characters import Character, GameLine, Splat, Trait
 from characters.wod import Mortal, Vampire
 from tests.characters import gen_char
 
@@ -26,13 +26,18 @@ def character(request):
     return gen_char(GameLine.WOD, request.param)
 
 
+@pytest.fixture(params=list(GameLine))
+def line(request):
+    return request.param
+
+
 @pytest.fixture(scope="function")
 def skilled(character: Character):
-    character.add_trait("Intelligence", 4)
-    character.add_trait("Strength", 2)
-    character.add_trait("Brawl", 3)
-    character.add_trait("Fighting", 3)
-    character.add_trait("Streetwise", 1)
+    character.add_trait("Intelligence", 4, Trait.Category.ATTRIBUTE)
+    character.add_trait("Strength", 2, Trait.Category.ATTRIBUTE)
+    character.add_trait("Brawl", 3, Trait.Category.ABILITY)
+    character.add_trait("Fighting", 3, Trait.Category.CUSTOM)
+    character.add_trait("Streetwise", 1, Trait.Category.ABILITY)
     character.add_subtraits("Brawl", "Kindred")
     print(character.traits)
     return character

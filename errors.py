@@ -64,3 +64,7 @@ class TraitNotFound(TraitError):
 
 class TraitAlreadyExists(TraitError):
     """Raised when the user attempts to add an extant trait."""
+
+
+class InvalidTrait(TraitError):
+    """Raised when the wrong trait is chosen for an action."""
