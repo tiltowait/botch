@@ -198,8 +198,8 @@ def test_incomplete_duplicate_matching(skill, subtraits):
 @pytest.mark.parametrize(
     "skill,subtraits,should_raise",
     [
-        ("Brawl", ["Throws", "Grappling"], False),
-        ("Brawl", ["Throws"], False),
+        ("Fighting", ["Throws", "Grappling"], False),
+        ("Fighting", ["Throws"], False),
         ("FakeSkill", None, True),
     ],
 )
@@ -224,9 +224,15 @@ def test_character_add_subtraits(
 @pytest.mark.parametrize(
     "skill,add,remove,expected,should_raise",
     [
-        ("Brawl", ["Throws", "Grappling"], ["Throws", "Grappling"], [], False),
-        ("Brawl", ["Throws", "Grappling"], ["Throws"], ["Grappling"], False),
-        ("Brawl", ["Throws", "Grappling", "Kindred"], ["Throws"], ["Grappling", "Kindred"], False),
+        ("Fighting", ["Throws", "Grappling"], ["Throws", "Grappling"], [], False),
+        ("Fighting", ["Throws", "Grappling"], ["Throws"], ["Grappling"], False),
+        (
+            "Fighting",
+            ["Throws", "Grappling", "Kindred"],
+            ["Throws"],
+            ["Grappling", "Kindred"],
+            False,
+        ),
         ("FakeSkill", None, None, None, True),
     ],
 )

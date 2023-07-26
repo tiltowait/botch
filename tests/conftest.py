@@ -24,7 +24,13 @@ def character(request):
 
 @pytest.fixture(scope="function")
 def skilled(character: Character):
+    character.add_trait("Intelligence", 4)
+    character.add_trait("Strength", 2)
     character.add_trait("Brawl", 3)
+    character.add_trait("Fighting", 3)
+    character.add_trait("Streetwise", 1)
+    character.add_subtraits("Brawl", "Kindred")
+    print(character.traits)
     return character
 
 
