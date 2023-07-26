@@ -23,9 +23,14 @@ class Damage(StrEnum):
     AGGRAVATED = "*"
 
 
+class GameLine(StrEnum):
+    WOD = "wod"
+    COFD = "cofd"
+
+
 class Splat(StrEnum):
-    VTM = "vtm"
-    MTAS = "mtaw"
+    MORTAL = "mortal"
+    VAMPIRE = "vampire"
 
 
 class Grounding(BaseModel):
@@ -56,6 +61,7 @@ class Trait(BaseModel):
     class Category(StrEnum):
         ATTRIBUTE = "attribute"
         ABILITY = "ability"
+        VIRTUE = "virtue"
         SPECIAL = "special"
         CUSTOM = "custom"
 

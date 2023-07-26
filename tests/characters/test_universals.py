@@ -121,7 +121,7 @@ def test_remove_trait(skilled: Character):
 
 
 def test_add_specialties_not_implemented():
-    char = gen_char(Splat.VTM)
+    char = gen_char(Splat.VAMPIRE)
     char.add_trait("Brawl", 3)
 
     with pytest.raises(NotImplementedError):
@@ -136,7 +136,7 @@ def test_trait_not_found_str_value(character: Character):
 
 
 async def test_single_image_processing(sample_image):
-    char = gen_char(Splat.VTM)
+    char = gen_char(Splat.VAMPIRE)
     await char.insert()
 
     inserted = await char.add_image(sample_image)
@@ -159,7 +159,7 @@ async def test_single_image_processing(sample_image):
 
 
 async def test_image_uploading_and_char_deletion(sample_image):
-    char = gen_char(Splat.VTM)
+    char = gen_char(Splat.VAMPIRE)
     await char.insert()
 
     inserted = await char.add_image(sample_image)
@@ -188,7 +188,7 @@ async def test_image_uploading_and_char_deletion(sample_image):
 
 
 async def test_image_deletion_flag(sample_image):
-    char = gen_char(Splat.VTM)
+    char = gen_char(Splat.VAMPIRE)
     await char.insert()
 
     for _ in range(3):
