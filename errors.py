@@ -5,6 +5,18 @@ class BotchError(Exception):
     """Base error class."""
 
 
+class CharacterError(BotchError):
+    """Base class for character errors."""
+
+
+class Unfinished(CharacterError):
+    """Raised when character is created prematurely."""
+
+
+class MissingSchema(BotchError):
+    """Raised when a schema can't be found for a given character type."""
+
+
 class ApiError(BotchError):
     """An exception raised when there's an error with the API."""
 

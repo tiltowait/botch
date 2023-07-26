@@ -1,0 +1,75 @@
+{
+	"line": "wod",
+	"splats": ["vampire", "mortal", "ghoul"],
+	"attribute": [{
+			"category": "Physical",
+			"traits": [
+				"Strength",
+				"Dexterity",
+				"Stamina"
+			]
+		},
+		{
+			"category": "Social",
+			"traits": [
+				"Charisma",
+				"Manipulation",
+				"Appearance"
+			]
+		},
+		{
+			"category": "Mental",
+			"traits": [
+				"Perception",
+				"Intelligence",
+				"Wits"
+			]
+		}
+	],
+	"ability": [{
+			"category": "Talents",
+			"traits": [
+				"Alertness",
+				"Athletics",
+				"Awareness",
+				"Brawl",
+				"Empathy",
+				"Expression",
+				"Intimidation",
+				"Leadership",
+				"Streetwise",
+				"Subterfuge"
+			]
+		},
+		{
+			"category": "Skills",
+			"traits": [
+				"AnimalKen",
+				"Crafts",
+				"Drive",
+				"Etiquette",
+				"Firearms",
+				"Larceny",
+				"Melee",
+				"Performance",
+				"Stealth",
+				"Survival"
+			]
+		},
+		{
+			"category": "Knowledges",
+			"traits": [
+				"Academics",
+				"Computer",
+				"Finance",
+				"Investigation",
+				"Law",
+				"Medicine",
+				"Occult",
+				"Politics",
+				"Science",
+				"Technology"
+			]
+		}
+	]
+}
