@@ -33,9 +33,9 @@ def test_roll_prep(syntax: str, expected: list[str | int], should_fail: bool):
 
     if should_fail:
         with pytest.raises(errors.InvalidSyntax):
-            p.prep()
+            p.tokenize()
     else:
-        parsed = p.prep()
+        parsed = p.tokenize()
         assert parsed == expected
 
 

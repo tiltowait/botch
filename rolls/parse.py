@@ -37,15 +37,16 @@ class RollParser:
         """Whether the user specified a specialty."""
         return "." in self.raw_syntax
 
-    def prep(self) -> list[str | int]:
+    def tokenize(self) -> list[str | int]:
+        """Validate the syntax and return the tokenized list."""
         try:
             trait = Combine(Opt(Word(alphas)) + ZeroOrMore("." + Opt(Word(alphas))))
             operand = Word(nums) | trait
             eq = operand + ZeroOrMore(one_of("+ -") + operand)
             parsed = eq.parse_string(self.raw_syntax, parse_all=True).as_list()
 
+            # Convert to list[str | int]
             for i, elem in enumerate(parsed):
-                # Convert to list[str | int]
                 try:
                     parsed[i] = int(elem)
                 except ValueError:
@@ -61,7 +62,7 @@ class RollParser:
         if self.needs_character and self.character is None:
             raise errors.RollError(f"You need a character to roll `{self.syntax}`.")
 
-        for elem in self.prep():
+        for elem in self.tokenize():
             if elem in {"+", "-"} or isinstance(elem, int):
                 self.pool.append(elem)
                 self.equation.append(elem)
