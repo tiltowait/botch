@@ -9,8 +9,33 @@ class ApiError(BotchError):
     """An exception raised when there's an error with the API."""
 
 
+class InvalidSyntax(BotchError):
+    """Raised when invalid syntax is given."""
+
+
+class RollError(BotchError):
+    """Base roll error class."""
+
+
+class NeedsCharacter(RollError):
+    """Raised when a roll needs a character."""
+
+
 class TraitError(BotchError):
     """Base trait-related errors."""
+
+
+class AmbiguousTraitError(TraitError):
+    """Raised when multiple traits are found."""
+
+    def __init__(self, needle, matches):
+        super().__init__()
+        self.needle = needle
+        self.matches = matches
+
+    def __str__(self) -> str:
+        match_block = "```" + "\n".join(self.matches) + "```"
+        return f"`{self.needle}` is amgiguous. Did you mean: {match_block}"
 
 
 class TraitNotFound(TraitError):

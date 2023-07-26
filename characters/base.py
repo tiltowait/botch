@@ -284,6 +284,13 @@ class Character(Document):
                 traits.append(copy.deepcopy(trait))
         return traits
 
+    def match_traits(self, search: str, exact=False) -> list[Trait.Selection]:
+        """Match traits to user input. Used in rolls."""
+        matches = []
+        for trait in self.traits:
+            matches.extend(trait.matching(search, exact))
+        return matches
+
     def add_trait(self, name: str, rating: int, category=Trait.Category.CUSTOM) -> Trait:
         """Add a new trait.
         Args:
