@@ -12,7 +12,7 @@ In the meantime, check out [[Tzimisce]](https://tzimisce.app) for a basic X20 Wo
 
 ## Background
 
-I'd call this the FAQ section, only that feels disingenouus when no one's asked me anything. So, to head off those potential questions ...
+I'd call this the FAQ section, only that feels disingenuous when no one's asked me anything. So, to head off those potential questions ...
 
 ### Why not add this functionality to [Tzimisce]?
 
