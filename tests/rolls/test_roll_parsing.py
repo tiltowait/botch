@@ -52,6 +52,7 @@ def test_roll_prep(syntax: str, expected: list[str | int], should_fail: bool):
         (". + 3", True),
         ("3 + wp", False),
         ("3 + WP", False),
+        ("W+P", True),
     ],
 )
 def test_needs_character(syntax: str, needs_character: bool):
