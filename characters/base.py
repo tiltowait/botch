@@ -76,6 +76,7 @@ class Trait(BaseModel):
         rating: int  # In CofD, the rating might be higher than the base Trait's
         exact: bool  # Whether the user exactly searched for this Selection
         key: str  # The exact search key matching this Selection, ("Brawl.Kindred")
+        subtraits: list[str]  # The list of subtraits selected
         category: str  # The Trait.Category. Must be str due to placement here
 
     name: str
@@ -139,6 +140,7 @@ class Trait(BaseModel):
                         rating=self.rating,
                         exact=normalized == key.casefold(),
                         key=key,
+                        subtraits=expanded[1:],
                         category=self.category,
                     )
                 )
