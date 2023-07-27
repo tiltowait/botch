@@ -37,7 +37,7 @@ class RollParser:
     def needs_character(self) -> bool:
         """Whether the roll syntax requires a character."""
         # WP isn't a trait, so we have to filter that out
-        operands = re.split(r"[+-]", self.raw_syntax)
+        operands = re.split(r"[\s+-]", self.raw_syntax.upper())
         pool_without_wp = "".join(filter(lambda s: s != "WP", map(str, operands)))
 
         return re.search(r"[A-Za-z_.]", pool_without_wp) is not None
