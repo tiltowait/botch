@@ -70,7 +70,7 @@ class RollParser:
     def parse(self):
         """Parse the roll, populating pool, equation, and dice."""
         if self.needs_character and self.character is None:
-            raise errors.RollError(f"You need a character to roll `{self.syntax}`.")
+            raise errors.RollError(f"You need a character to roll `{self.raw_syntax}`.")
 
         specialties = []
         for elem in self.tokenize():
