@@ -146,3 +146,41 @@ def test_missing_game_line():
     p = RollParser("3", None)
     with pytest.raises(errors.MissingGameLine):
         Roll.from_parser(p, 6)
+
+
+@pytest.mark.parametrize(
+    "dice,expected",
+    [
+        ([1], "Botch!"),
+        ([2], "Failure"),
+        ([8], "Marginal Success"),
+        ([8, 8], "Moderate Success"),
+        ([8, 8, 8], "Complete Success"),
+        ([8, 8, 8, 8], "Exceptional Success"),
+        ([8, 8, 8, 8, 8], "Phenomenal Success!"),
+        ([8, 8, 8, 8, 8, 8], "Phenomenal Success!"),
+    ],
+)
+def test_wod_success_str(dice: list[int], expected: str):
+    roll = Roll(line=GameLine.WOD, dice=0, target=6)
+    roll.rolled = dice
+    assert roll.success_str == expected
+
+
+@pytest.mark.parametrize(
+    "dice,expected",
+    [
+        ([1], "Failure"),
+        ([2], "Failure"),
+        ([8], "Success"),
+        ([8, 8], "Success"),
+        ([8, 8, 8], "Success"),
+        ([8, 8, 8, 8], "Success"),
+        ([8, 8, 8, 8, 8], "Exceptional Success!"),
+        ([8, 8, 8, 8, 8, 8], "Exceptional Success!"),
+    ],
+)
+def test_cofd_success_str(dice: list[int], expected: str):
+    roll = Roll(line=GameLine.COFD, dice=0, target=10)
+    roll.rolled = dice
+    assert roll.success_str == expected

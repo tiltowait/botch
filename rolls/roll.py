@@ -50,6 +50,31 @@ class Roll(Document):
 
         return successes
 
+    @property
+    def success_str(self) -> str:
+        """The success string, such as "Exceptional Success"."""
+        successes = self.successes  # Prevent recalculation
+
+        if successes < 0:
+            return "Botch!"
+        if successes == 0:
+            return "Failure"
+
+        if self.line == GameLine.COFD:
+            if successes >= 5:
+                return "Exceptional Success!"
+            return "Success"
+
+        if successes == 1:
+            return "Marginal Success"
+        if successes == 2:
+            return "Moderate Success"
+        if successes == 3:
+            return "Complete Success"
+        if successes == 4:
+            return "Exceptional Success"
+        return "Phenomenal Success!"
+
     @classmethod
     def from_parser(cls, p: RollParser, target: int, line: GameLine | None = None):
         """Create a roll from a RollParser and a target number."""
