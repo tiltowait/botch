@@ -7,6 +7,8 @@ from characters import Character, GameLine
 from rolls.parse import RollParser
 from rolls.roll import Roll
 
+TRIALS = 1000
+
 
 @pytest.fixture
 def dice() -> list[int]:
@@ -15,12 +17,11 @@ def dice() -> list[int]:
 
 def test_cofd_explosions():
     # Ensure we get more dice, on average, than the pool
-    trials = 10000
     pool = 10
 
     def _average_rolled(target: int) -> float:
         total = 0
-        for _ in range(trials):
+        for _ in range(TRIALS):
             roll = Roll(line=GameLine.COFD, dice=pool, target=target)
             roll.roll()
             total += len(roll.rolled)
@@ -29,7 +30,7 @@ def test_cofd_explosions():
             # any explosions.
             assert len(roll.rolled) - sum(d >= target for d in roll.rolled) == pool
 
-        return total / trials
+        return total / TRIALS
 
     average_t10 = _average_rolled(10)
     average_t9 = _average_rolled(9)
@@ -184,3 +185,19 @@ def test_cofd_success_str(dice: list[int], expected: str):
     roll = Roll(line=GameLine.COFD, dice=0, target=10)
     roll.rolled = dice
     assert roll.success_str == expected
+
+
+def test_cofd_wp():
+    # Set target to 11 so there are no explosions
+    roll = Roll(line=GameLine.COFD, dice=10, target=11, wp=True).roll()
+    assert len(roll.rolled) == 13
+
+
+def test_cofd_rote():
+    def _average_successes(rote: bool):
+        total = 0
+        for _ in range(TRIALS):
+            total += Roll(line=GameLine.COFD, dice=10, target=10, rote=rote).roll().successes
+        return total / TRIALS
+
+    assert _average_successes(True) > _average_successes(False)
