@@ -30,12 +30,16 @@ class RollParser:
     @property
     def using_wp(self) -> bool:
         """Whether the roll uses Willpower."""
-        return "wp" in map(str.casefold, map(str, self.pool))
+        return "WP" in self.pool
 
     @property
     def needs_character(self) -> bool:
         """Whether the roll syntax requires a character."""
-        return re.search(r"[A-Za-z_.]", self.raw_syntax) is not None
+        # WP isn't a trait, so we have to filter that out
+        operands = re.split(r"[+-]", self.raw_syntax)
+        pool_without_wp = "".join(filter(lambda s: s != "WP", map(str, operands)))
+
+        return re.search(r"[A-Za-z_.]", pool_without_wp) is not None
 
     @property
     def specialty_used(self) -> bool:
@@ -71,6 +75,9 @@ class RollParser:
             if elem in {"+", "-"} or isinstance(elem, int):
                 self.pool.append(elem)
                 self.equation.append(elem)
+            elif elem.upper() == "WP":
+                self.pool.append("WP")
+                self.equation.append(0)
             else:
                 traits = self.character.match_traits(elem)
                 if not traits:
@@ -84,6 +91,7 @@ class RollParser:
                 self.equation.append(match.rating)
 
         self.dice = eval_expr("".join(map(str, self.equation)))
+        return self
 
 
 # Math Helpers

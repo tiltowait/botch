@@ -123,14 +123,6 @@ def test_willpower_roll_impact(
 ):
     skilled.line = line  # Safe to do only on the base class
 
-    wp = skilled.match_traits("WP", True)[0]
-    if line == GameLine.COFD:
-        assert wp.rating == 3
-        if willpower:
-            expected += 3
-    else:
-        assert wp.rating == 0
-
     p = RollParser(syntax, skilled)
     p.parse()
 

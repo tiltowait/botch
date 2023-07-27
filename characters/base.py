@@ -237,21 +237,11 @@ class Character(Document):
     def _all_traits(self) -> list[Trait]:
         """A copy of all the character's rollable traits, including innates."""
         innate = Trait.Category.INNATE
-        if self.line == GameLine.COFD:
-            # In CofD, adding WP means you get +3 dice
-            wp = Trait(name="WP", rating=3, category=innate)
-        else:
-            # In WoD, WP simply guarantees a success
-            wp = Trait(name="WP", rating=0, category=innate)
-
-        traits = copy.deepcopy(self.traits)
-
-        traits.append(wp)
-        traits.append(Trait(name="Willpower", rating=len(self.willpower), category=innate))
-        traits.append(
-            Trait(name=self.grounding.path, rating=self.grounding.rating, category=innate)
-        )
-        return traits
+        innates = [
+            Trait(name="Willpower", rating=len(self.willpower), category=innate),
+            Trait(name=self.grounding.path, rating=self.grounding.rating, category=innate),
+        ]
+        return self.traits + innates
 
     @before_event(Delete)
     async def prep_delete(self):
