@@ -8,6 +8,7 @@ from mongomock_motor import AsyncMongoMockClient
 
 from characters import Character, GameLine, Splat, Trait
 from characters.wod import Mortal, Vampire
+from rolls.roll import Roll
 from tests.characters import gen_char
 
 
@@ -17,7 +18,7 @@ async def beanie_fixture():
     client = AsyncMongoMockClient()
     await init_beanie(
         database=client.get_database(name="db"),
-        document_models=[Character, Vampire, Mortal],
+        document_models=[Character, Vampire, Mortal, Roll],
     )
 
 
@@ -39,7 +40,6 @@ def skilled(character: Character):
     character.add_trait("Fighting", 3, Trait.Category.CUSTOM)
     character.add_trait("Streetwise", 1, Trait.Category.ABILITY)
     character.add_subtraits("Brawl", "Kindred")
-    print(character.traits)
     return character
 
 

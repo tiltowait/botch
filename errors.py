@@ -29,6 +29,10 @@ class RollError(BotchError):
     """Base roll error class."""
 
 
+class MissingGameLine(RollError):
+    """The roller is unable to determine which game line it's using."""
+
+
 class NeedsCharacter(RollError):
     """Raised when a roll needs a character."""
 
