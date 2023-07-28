@@ -6,9 +6,9 @@ import pytest
 from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
 
-from characters import Character, GameLine, Splat, Trait
-from characters.wod import Mortal, Vampire
-from rolls.roll import Roll
+from botch.characters import Character, GameLine, Splat, Trait
+from botch.characters.wod import Mortal, Vampire
+from botch.rolls.roll import Roll
 from tests.characters import gen_char
 
 

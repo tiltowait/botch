@@ -1,11 +1,11 @@
 """Roll tests."""
 
+import errors
 import pytest
 
-import errors
-from characters import Character, GameLine
-from rolls.parse import RollParser
-from rolls.roll import Roll
+from botch.characters import Character, GameLine
+from botch.rolls.parse import RollParser
+from botch.rolls.roll import Roll
 
 TRIALS = 1000
 

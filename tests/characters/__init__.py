@@ -1,6 +1,6 @@
 """Shared helper functions."""
 
-from characters import Character, Damage, GameLine, Grounding, Splat
+from botch.characters import Character, Damage, GameLine, Grounding, Splat
 
 
 def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character:

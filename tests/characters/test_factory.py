@@ -6,9 +6,9 @@ from collections import OrderedDict
 import pytest
 
 import errors
-from characters import Damage, GameLine, Grounding, Splat, Trait
-from characters.factory import Factory
-from characters.wod import Vampire, gen_virtues
+from botch.characters import Damage, GameLine, Grounding, Splat, Trait
+from botch.characters.factory import Factory
+from botch.characters.wod import Vampire, gen_virtues
 
 
 @pytest.fixture

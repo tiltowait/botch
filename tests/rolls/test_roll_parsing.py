@@ -1,10 +1,10 @@
 """Various roll-parsing tests."""
 
+import errors
 import pytest
 
-import errors
-from characters import Character, GameLine
-from rolls.parse import RollParser
+from botch.characters import Character, GameLine
+from botch.rolls.parse import RollParser
 
 
 @pytest.mark.parametrize(
