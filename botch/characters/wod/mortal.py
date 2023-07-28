@@ -1,5 +1,7 @@
 """Mortal character templates."""
 
+from typing import List
+
 from botch.characters.base import Character, GameLine, Splat, Trait
 
 
@@ -14,4 +16,4 @@ class Mortal(Character):
     line: GameLine = GameLine.WOD
     splat: Splat = Splat.MORTAL
 
-    virtues: list[Trait]
+    virtues: List[Trait]

@@ -1,6 +1,6 @@
 """Dice rolls!"""
 
-from typing import Optional
+from typing import List, Optional
 
 from beanie import Document, Link
 from numpy.random import default_rng
@@ -28,10 +28,10 @@ class Roll(Document):
     target: int  # WoD: Difficulty; CofD: "again"
     wp: bool = False
     autos: int = 0
-    specialties: Optional[list[str]] = None
+    specialties: Optional[List[str]] = None
     rote: bool = False
-    rolled: list[int] = Field(default_factory=list)
-    pool: Optional[list[str | int]] = None
+    rolled: List[int] = Field(default_factory=list)
+    pool: Optional[List[str | int]] = None
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
 
