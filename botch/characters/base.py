@@ -52,6 +52,11 @@ class Profile(BaseModel):
     history: Optional[str] = Field(default=None, max_length=1024)
     images: list[HttpUrl] = Field(default_factory=list)
 
+    @property
+    def main_image(self) -> str | None:
+        """The character's main profile image."""
+        return self.images[0] if self.images else None
+
 
 class Trait(BaseModel):
     """A trait represents an Attribute, Ability, Discipline, etc."""
