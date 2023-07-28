@@ -1,8 +1,8 @@
 """Roll tests."""
 
-import errors
 import pytest
 
+import errors
 from botch.characters import Character, GameLine
 from botch.rolls.parse import RollParser
 from botch.rolls.roll import Roll
@@ -154,12 +154,12 @@ def test_missing_game_line():
     [
         ([1], "Botch!"),
         ([2], "Failure"),
-        ([8], "Marginal Success"),
-        ([8, 8], "Moderate Success"),
-        ([8, 8, 8], "Complete Success"),
-        ([8, 8, 8, 8], "Exceptional Success"),
-        ([8, 8, 8, 8, 8], "Phenomenal Success!"),
-        ([8, 8, 8, 8, 8, 8], "Phenomenal Success!"),
+        ([8], "Marginal"),
+        ([8, 8], "Moderate"),
+        ([8, 8, 8], "Success"),
+        ([8, 8, 8, 8], "Exceptional"),
+        ([8, 8, 8, 8, 8], "Phenomenal!"),
+        ([8, 8, 8, 8, 8, 8], "Phenomenal!"),
     ],
 )
 def test_wod_success_str(dice: list[int], expected: str):
@@ -177,8 +177,8 @@ def test_wod_success_str(dice: list[int], expected: str):
         ([8, 8], "Success"),
         ([8, 8, 8], "Success"),
         ([8, 8, 8, 8], "Success"),
-        ([8, 8, 8, 8, 8], "Exceptional Success!"),
-        ([8, 8, 8, 8, 8, 8], "Exceptional Success!"),
+        ([8, 8, 8, 8, 8], "Exceptional!"),
+        ([8, 8, 8, 8, 8, 8], "Exceptional!"),
     ],
 )
 def test_cofd_success_str(dice: list[int], expected: str):

@@ -3,12 +3,21 @@
 from typing import Optional
 
 from beanie import Document, Link
+from numpy.random import default_rng
 from pydantic import Field
 
 import errors
 from botch.characters import Character, GameLine
-from botch.rolls import d10
 from botch.rolls.parse import RollParser
+
+_rng = default_rng()  # numpy's default RNG is PCG64 (superior to builtin)
+
+
+def d10(count: int | None = None) -> int | list[int]:
+    """Roll one or many d10s."""
+    if count is None:
+        return int(_rng.integers(1, 11))
+    return list(map(int, _rng.integers(1, 11, count)))
 
 
 class Roll(Document):
@@ -25,6 +34,30 @@ class Roll(Document):
     pool: Optional[list[str | int]] = None
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
+
+    @property
+    def wod(self) -> bool:
+        """Whether it's a WoD roll."""
+        return self.line == GameLine.WOD
+
+    @property
+    def cofd(self) -> bool:
+        """Whether it's a CofD roll."""
+        return self.line == GameLine.COFD
+
+    @property
+    def difficulty(self) -> int:
+        """The required for a success."""
+        if self.wod:
+            return self.target
+        return 8
+
+    @property
+    def again(self) -> int:
+        """The point at which a die explodes. Always 11 (unreachable) for WoD."""
+        if self.wod:
+            return 11
+        return self.target
 
     @property
     def successes(self) -> int:
@@ -62,18 +95,18 @@ class Roll(Document):
 
         if self.line == GameLine.COFD:
             if successes >= 5:
-                return "Exceptional Success!"
+                return "Exceptional!"
             return "Success"
 
         if successes == 1:
-            return "Marginal Success"
+            return "Marginal"
         if successes == 2:
-            return "Moderate Success"
+            return "Moderate"
         if successes == 3:
-            return "Complete Success"
+            return "Success"
         if successes == 4:
-            return "Exceptional Success"
-        return "Phenomenal Success!"
+            return "Exceptional"
+        return "Phenomenal!"
 
     @classmethod
     def from_parser(cls, p: RollParser, target: int, line: GameLine | None = None):
