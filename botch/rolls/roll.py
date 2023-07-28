@@ -6,9 +6,9 @@ from beanie import Document, Link
 from pydantic import Field
 
 import errors
-from characters import Character, GameLine
-from rolls import d10
-from rolls.parse import RollParser
+from botch.characters import Character, GameLine
+from botch.rolls import d10
+from botch.rolls.parse import RollParser
 
 
 class Roll(Document):

@@ -1,8 +1,6 @@
 """Mortal character templates."""
 
-from pydantic import BaseModel
-
-from characters.base import Character, GameLine, Splat, Trait
+from botch.characters.base import Character, GameLine, Splat, Trait
 
 
 def gen_virtues(virtues: dict[str, int]):
