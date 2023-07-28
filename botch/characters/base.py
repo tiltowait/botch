@@ -6,7 +6,7 @@ import copy
 import itertools
 from collections import Counter
 from enum import StrEnum
-from typing import Optional
+from typing import List, Optional
 
 import pymongo
 from beanie import Delete, Document, before_event
@@ -50,7 +50,7 @@ class Profile(BaseModel):
 
     description: Optional[str] = Field(default=None, max_length=1024)
     history: Optional[str] = Field(default=None, max_length=1024)
-    images: list[HttpUrl] = Field(default_factory=list)
+    images: List[HttpUrl] = Field(default_factory=list)
 
     @property
     def main_image(self) -> str | None:
@@ -81,13 +81,13 @@ class Trait(BaseModel):
         rating: int  # In CofD, the rating might be higher than the base Trait's
         exact: bool  # Whether the user exactly searched for this Selection
         key: str  # The exact search key matching this Selection, ("Brawl.Kindred")
-        subtraits: list[str]  # The list of subtraits selected
+        subtraits: List[str]  # The list of subtraits selected
         category: str  # The Trait.Category. Must be str due to placement here
 
     name: str
     rating: int
     category: Category
-    subtraits: list[str] = Field(default_factory=list)
+    subtraits: List[str] = Field(default_factory=list)
 
     def add_subtraits(self, subtraits: str | list[str]):
         """Add subtraits to the trait."""
@@ -239,7 +239,7 @@ class Character(Document):
     willpower: str
     grounding: Grounding
 
-    traits: list[Trait] = Field(default_factory=list)
+    traits: List[Trait] = Field(default_factory=list)
 
     def _all_traits(self) -> list[Trait]:
         """A copy of all the character's rollable traits, including innates."""
