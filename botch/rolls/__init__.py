@@ -2,6 +2,9 @@
 
 from numpy.random import default_rng
 
+from botch.rolls import parse
+from botch.rolls.roll import Roll
+
 _rng = default_rng()  # numpy's default RNG is PCG64 (superior to builtin)
 
 
