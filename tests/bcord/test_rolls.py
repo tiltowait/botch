@@ -1,11 +1,13 @@
 """Discord roll tests."""
 
+import re
 from types import SimpleNamespace as SN
 from typing import Optional
 
 import discord
 import pytest
 
+import errors
 from botch.characters import Character, GameLine, Splat
 from botch.rolls import Roll
 from botchcord.roll import (
@@ -26,7 +28,9 @@ class EmojiMock:
     """For mocking the ctx.bot.get_emoji() calls."""
 
     def get_emoji(self, name):
-        return name  # The real deal adds \u200b, but we don't need that here
+        if re.match(r"^(ss?|f|b)\d+$", name):
+            return name  # The real deal adds \u200b, but we don't need that here
+        raise errors.EmojiNotFound
 
 
 @pytest.fixture
@@ -219,7 +223,10 @@ def test_wod_text_embed_with_character(
 def test_emoji_name(die: int, target: int, special: int, botchable: bool, expected: str):
     assert emoji_name(die, target, special, botchable) == expected
 
-    # return [1, 2, 5, 6, 6, 8, 10]
+
+def test_emoji_error(ctx):
+    with pytest.raises(errors.EmojiNotFound):
+        ctx.bot.get_emoji("this should fail")
 
 
 @pytest.mark.parametrize(
