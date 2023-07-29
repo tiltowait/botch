@@ -196,3 +196,21 @@ def test_cofd_rote():
         return total / TRIALS
 
     assert _average_successes(True) > _average_successes(False)
+
+
+@pytest.mark.parametrize(
+    "spec,expected",
+    [
+        (None, None),
+        ([], None),
+        (["spec"], ["spec"]),
+    ],
+)
+async def test_roll_spec_coalescence(spec: list[str] | None, expected: list[str] | None):
+    r = Roll(line=GameLine.WOD, num_dice=5, target=6, specialties=spec).roll()
+    assert r.specialties == spec
+    await r.insert()
+
+    r2 = await Roll.find_one()
+    assert r.id == r2.id
+    assert r2.specialties == expected

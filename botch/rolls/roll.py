@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from beanie import Document, Link
+from beanie import Document, Insert, Link, before_event
 from numpy.random import default_rng
 from pydantic import Field
 
@@ -28,13 +28,21 @@ class Roll(Document):
     target: int  # WoD: Difficulty; CofD: "again"
     wp: bool = False
     autos: int = 0
-    specialties: Optional[List[str]] = None
+    specialties: Optional[List[str]] = Field(default_factory=list)
     rote: bool = False
     dice: List[int] = Field(default_factory=list)
     pool: Optional[List[str | int]] = None
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
     use_in_stats: bool = True
+
+    @before_event(Insert)
+    def reset_specialties(self):
+        """Database operations are slightly easier if specialties is null
+        instead of an empty list, so if there aren't any specialties set, we
+        will coalesce it into null."""
+        if not self.specialties:
+            self.specialties = None
 
     @property
     def wod(self) -> bool:
@@ -151,3 +159,6 @@ class Roll(Document):
                     self.dice[-1] = d10()
 
         return self
+
+    class Settings:
+        name = "characters"
