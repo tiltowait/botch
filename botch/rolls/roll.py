@@ -34,6 +34,7 @@ class Roll(Document):
     pool: Optional[List[str | int]] = None
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
+    use_in_stats: bool = True
 
     @property
     def wod(self) -> bool:
