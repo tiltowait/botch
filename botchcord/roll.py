@@ -7,6 +7,7 @@ from typing import Optional
 import discord
 
 import botchcord
+import errors
 import utils
 from botch.characters import GameLine
 from botch.rolls import Roll
@@ -41,12 +42,19 @@ async def roll(
         else:
             roll.specialties.extend(split)
 
-    embed = build_embed(ctx, roll, comment)
+    emojis = await botchcord.settings.accessibility(ctx)
+    embed = build_embed(ctx, roll, comment, emojis)
+
     await ctx.respond(embed=embed)
     # await roll.insert()
 
 
-def build_embed(ctx: discord.ApplicationContext, roll: Roll, comment: str) -> discord.Embed:
+def build_embed(
+    ctx: discord.ApplicationContext,
+    roll: Roll,
+    comment: str,
+    emojis: bool,
+) -> discord.Embed:
     """Build the roll embed."""
     # We work our way top-down
     icon = None
@@ -58,10 +66,17 @@ def build_embed(ctx: discord.ApplicationContext, roll: Roll, comment: str) -> di
     if not icon:
         icon = botchcord.get_avatar(ctx.author)
 
-    # TODO: Emojis
+    if emojis:
+        try:
+            dice_description = emojify_dice(ctx, roll)
+        except errors.EmojiNotFound:
+            dice_description = textify_dice(roll)
+    else:
+        dice_description = textify_dice(roll)
+
     embed = discord.Embed(
         title=embed_title(roll),
-        description=textify_dice(roll),
+        description=dice_description,
         color=embed_color(roll),
     )
     embed.add_field(name="Dice", value=str(roll.num_dice))
@@ -90,6 +105,39 @@ def embed_title(roll: Roll):
     if roll.successes != 0:
         title += f" ({roll.successes})"
     return title
+
+
+def emojify_dice(ctx: discord.ApplicationContext, roll: Roll) -> str:
+    """Generate the emoji for the roll."""
+    special = roll.again  # Will be 11 if WoD
+    if roll.wod and roll.specialties:
+        special = 10
+
+    emojis = []
+    for e in map(lambda d: emoji_name(d, roll.difficulty, special, roll.wod), roll.dice):
+        emojis.append(ctx.bot.get_emoji(e))
+
+    return " ".join(emojis)
+
+
+def emoji_name(die: int, success: int, special: int, botchable: bool) -> str:
+    """Generate the emoji name for a die.
+
+    Args:
+        die (int): The die in question
+        success (int): What counts as a success
+        special (int): If this number is hit, it's a special success
+
+    Returns the emoji name."""
+    if botchable and die == 1:
+        emoji = "b1"
+    elif die >= success:
+        emoji = f"s{die}"
+        if die >= special:
+            emoji = f"s{emoji}"
+    else:
+        emoji = f"f{die}"
+    return emoji
 
 
 def textify_dice(roll: Roll):

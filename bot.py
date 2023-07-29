@@ -6,7 +6,8 @@ import os
 import discord
 
 import db
-from config import DEBUG_GUILDS
+import errors
+from config import DEBUG_GUILDS, EMOJI_GUILD
 
 logging.basicConfig(level=logging.INFO)
 
@@ -39,3 +40,16 @@ class BotchBot(discord.Bot):
             if filename[0] != "_" and filename.endswith(".py"):
                 logging.getLogger("COGS").debug("Loading %s", filename)
                 self.load_extension(f"interface.wod.{filename[:-3]}")
+
+    def get_emoji(self, emoji_name: str, count=1) -> str | list[str] | None:
+        """Get an emoji from the emoji guild."""
+        if guild := self.get_guild(EMOJI_GUILD):
+            try:
+                emoji = next(e for e in guild.emojis if e.name == emoji_name)
+                emoji = str(emoji) + "\u200b"  # Add zero-width space to fix Discord embed bug
+                if count > 1:
+                    return [emoji] * count
+                return emoji
+            except StopIteration:
+                pass
+        raise errors.EmojiNotFound

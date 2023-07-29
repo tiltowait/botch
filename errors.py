@@ -5,6 +5,10 @@ class BotchError(Exception):
     """Base error class."""
 
 
+class EmojiNotFound(Exception):
+    """Raised when an emoji isn't found."""
+
+
 class CharacterError(BotchError):
     """Base class for character errors."""
 

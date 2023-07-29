@@ -1,5 +1,6 @@
 """Discord roll tests."""
 
+from types import SimpleNamespace as SN
 from typing import Optional
 
 import discord
@@ -7,8 +8,23 @@ import pytest
 
 from botch.characters import Character, GameLine, Splat
 from botch.rolls import Roll
-from botchcord.roll import Color, build_embed, embed_color, embed_title, textify_dice
+from botchcord.roll import (
+    Color,
+    build_embed,
+    embed_color,
+    embed_title,
+    emoji_name,
+    emojify_dice,
+    textify_dice,
+)
 from tests.characters import gen_char
+
+
+class EmojiMock:
+    """For mocking the ctx.bot.get_emoji() calls."""
+
+    def get_emoji(self, name):
+        return name  # The real deal adds \u200b, but we don't need that here
 
 
 @pytest.fixture
@@ -144,7 +160,7 @@ def test_wod_text_embed_with_character(
         character=wod_vampire,
     )
 
-    embed = build_embed(None, roll, comment)
+    embed = build_embed(None, roll, comment, False)
 
     # Work our way down from the top
     assert embed.author.name == wod_vampire.name
@@ -174,3 +190,48 @@ def test_wod_text_embed_with_character(
         assert embed.footer.text == discord.Embed.Empty
 
     assert embed.description == textify_dice(roll)
+
+
+@pytest.mark.parametrize(
+    "die,target,special,botchable,expected",
+    [
+        (1, 6, 10, True, "b1"),
+        (1, 6, 10, False, "f1"),
+        (2, 2, 10, False, "s2"),
+        (2, 6, 10, True, "f2"),
+        (3, 3, 10, True, "s3"),
+        (3, 6, 10, True, "f3"),
+        (4, 4, 10, True, "s4"),
+        (4, 6, 10, True, "f4"),
+        (5, 5, 10, True, "s5"),
+        (5, 6, 10, True, "f5"),
+        (10, 6, 11, True, "s10"),
+        (10, 6, 10, True, "ss10"),
+    ],
+)
+def test_emoji_name(die: int, target: int, special: int, botchable: bool, expected: str):
+    assert emoji_name(die, target, special, botchable) == expected
+
+    # return [1, 2, 5, 6, 6, 8, 10]
+
+
+@pytest.mark.parametrize(
+    "target,expected,spec,line",
+    [
+        (6, ["b1", "f2", "f5", "s6", "s6", "s8", "s10"], None, GameLine.WOD),
+        (6, ["b1", "f2", "f5", "s6", "s6", "s8", "ss10"], ["spec"], GameLine.WOD),
+        (5, ["b1", "f2", "s5", "s6", "s6", "s8", "s10"], None, GameLine.WOD),
+        (5, ["b1", "f2", "s5", "s6", "s6", "s8", "ss10"], ["spec"], GameLine.WOD),
+        (8, ["f1", "f2", "f5", "f6", "f6", "ss8", "ss10"], ["spec"], GameLine.COFD),
+        (8, ["f1", "f2", "f5", "f6", "f6", "ss8", "ss10"], None, GameLine.COFD),
+        (10, ["f1", "f2", "f5", "f6", "f6", "s8", "ss10"], ["spec"], GameLine.COFD),
+    ],
+)
+def test_emojify_dice(
+    target: int, expected: list[str], spec: list[str], line: GameLine, dice: list[int]
+):
+    roll = Roll(line=line, num_dice=len(dice), dice=dice, target=target, specialties=spec)
+    expected = " ".join(expected)
+
+    ctx = SN(bot=EmojiMock())
+    assert emojify_dice(ctx, roll) == expected
