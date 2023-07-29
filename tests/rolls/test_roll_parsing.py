@@ -130,4 +130,4 @@ def test_willpower_roll_impact(
     p.parse()
 
     assert p.using_wp == willpower
-    assert p.dice == expected
+    assert p.num_dice == expected

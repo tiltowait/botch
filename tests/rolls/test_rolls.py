@@ -22,13 +22,13 @@ def test_cofd_explosions():
     def _average_rolled(target: int) -> float:
         total = 0
         for _ in range(TRIALS):
-            roll = Roll(line=GameLine.COFD, dice=pool, target=target)
+            roll = Roll(line=GameLine.COFD, num_dice=pool, target=target)
             roll.roll()
-            total += len(roll.rolled)
+            total += len(roll.dice)
 
             # Make sure we rolled the correct number of dice irrespective of
             # any explosions.
-            assert len(roll.rolled) - sum(d >= target for d in roll.rolled) == pool
+            assert len(roll.dice) - sum(d >= target for d in roll.dice) == pool
 
         return total / TRIALS
 
@@ -86,26 +86,23 @@ def test_wod_successes(
     roll = Roll(
         line=GameLine.WOD,
         target=difficulty,
-        dice=len(dice),
+        num_dice=len(dice),
+        dice=dice,
         wp=wp,
         specialties=specialties,
     )
-    # roll.roll()
-    roll.rolled = dice
-
     assert roll.successes == expected
 
 
 @pytest.mark.parametrize("pool", list(range(10)))
 def test_cofd_specialties(pool: int):
     # We use target = 11 so we never explode
-    roll = Roll(line=GameLine.COFD, dice=pool, target=11, specialties=["Yes"]).roll()
-    assert len(roll.rolled) == pool + 1
+    roll = Roll(line=GameLine.COFD, num_dice=pool, target=11, specialties=["Yes"]).roll()
+    assert len(roll.dice) == pool + 1
 
 
 def test_cofd_successes(dice: list[int]):
-    roll = Roll(line=GameLine.COFD, dice=len(dice), target=10)
-    roll.rolled = dice
+    roll = Roll(line=GameLine.COFD, num_dice=len(dice), target=10, dice=dice)
     assert roll.successes == 5
 
 
@@ -132,14 +129,14 @@ def test_roll_parsing(
 
 
 def test_autos():
-    roll = Roll(line=GameLine.WOD, dice=0, target=6, autos=2).roll()
+    roll = Roll(line=GameLine.WOD, num_dice=0, target=6, autos=2).roll()
     assert roll.successes == 2
 
-    roll.rolled = [1]
+    roll.dice = [1]
     assert roll.successes == 1
-    roll.rolled = [1, 1]
+    roll.dice = [1, 1]
     assert roll.successes == 0
-    roll.rolled = [1, 1, 1]
+    roll.dice = [1, 1, 1]
     assert roll.successes == -1
 
 
@@ -163,8 +160,7 @@ def test_missing_game_line():
     ],
 )
 def test_wod_success_str(dice: list[int], expected: str):
-    roll = Roll(line=GameLine.WOD, dice=0, target=6)
-    roll.rolled = dice
+    roll = Roll(line=GameLine.WOD, num_dice=0, dice=dice, target=6)
     assert roll.success_str == expected
 
 
@@ -182,22 +178,21 @@ def test_wod_success_str(dice: list[int], expected: str):
     ],
 )
 def test_cofd_success_str(dice: list[int], expected: str):
-    roll = Roll(line=GameLine.COFD, dice=0, target=10)
-    roll.rolled = dice
+    roll = Roll(line=GameLine.COFD, num_dice=0, dice=dice, target=10)
     assert roll.success_str == expected
 
 
 def test_cofd_wp():
     # Set target to 11 so there are no explosions
-    roll = Roll(line=GameLine.COFD, dice=10, target=11, wp=True).roll()
-    assert len(roll.rolled) == 13
+    roll = Roll(line=GameLine.COFD, num_dice=10, target=11, wp=True).roll()
+    assert len(roll.dice) == 13
 
 
 def test_cofd_rote():
     def _average_successes(rote: bool):
         total = 0
         for _ in range(TRIALS):
-            total += Roll(line=GameLine.COFD, dice=10, target=10, rote=rote).roll().successes
+            total += Roll(line=GameLine.COFD, num_dice=10, target=10, rote=rote).roll().successes
         return total / TRIALS
 
     assert _average_successes(True) > _average_successes(False)

@@ -25,7 +25,7 @@ class RollParser:
         self.character: Character = character
         self.pool: list[str] = []
         self.equation: list[str | int] = []
-        self.dice = 0
+        self.num_dice = 0
         self.specialties = None
 
     @property
@@ -95,7 +95,7 @@ class RollParser:
                 if match.subtraits:
                     specialties.extend(match.subtraits)
 
-        self.dice = eval_expr("".join(map(str, self.equation)))
+        self.num_dice = eval_expr("".join(map(str, self.equation)))
         if specialties:
             self.specialties = specialties
 

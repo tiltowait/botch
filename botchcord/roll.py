@@ -64,7 +64,7 @@ def build_embed(ctx: discord.ApplicationContext, roll: Roll, comment: str) -> di
         description=textify_dice(roll),
         color=embed_color(roll),
     )
-    embed.add_field(name="Dice", value=str(roll.dice))
+    embed.add_field(name="Dice", value=str(roll.num_dice))
 
     if roll.wod:
         embed.add_field(name="Difficulty", value=str(roll.target))
@@ -100,7 +100,7 @@ def textify_dice(roll: Roll):
     #   * Tens (spec): Bold
     #   * Explosions: Bold
     text = []
-    for die in roll.rolled:
+    for die in roll.dice:
         d = str(die)
         if die < roll.difficulty:
             d = f"~~{d}~~"

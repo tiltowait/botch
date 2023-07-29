@@ -38,9 +38,7 @@ def dice() -> list[int]:
 def test_textify_dice(
     target: int, expected: str, spec: Optional[list[str]], line: GameLine, dice: list[int]
 ):
-    roll = Roll(line=line, dice=len(dice), target=target, specialties=spec)
-    roll.rolled = dice
-
+    roll = Roll(line=line, num_dice=len(dice), dice=dice, target=target, specialties=spec)
     assert textify_dice(roll) == expected
 
 
@@ -80,7 +78,7 @@ def test_embed_color(successes: int, expected: Color, line: GameLine):
     else:
         dice = [9 for _ in range(successes)]
 
-    roll = Roll(line=line, dice=successes, target=6, rolled=dice)
+    roll = Roll(line=line, num_dice=successes, target=6, dice=dice)
     assert embed_color(roll) == expected
 
 
@@ -113,7 +111,7 @@ def test_embed_title(successes: int, expected: str, line: GameLine):
     else:
         dice = [9 for _ in range(successes)]
 
-    roll = Roll(line=line, dice=successes, target=6, rolled=dice)
+    roll = Roll(line=line, num_dice=successes, target=6, dice=dice)
     assert embed_title(roll) == expected
 
 
@@ -138,8 +136,8 @@ def test_wod_text_embed_with_character(
 ):
     roll = Roll(
         line=GameLine.WOD,
-        dice=len(dice),
-        rolled=dice,
+        num_dice=len(dice),
+        dice=dice,
         pool=pool,
         target=target,
         specialties=spec,
@@ -156,7 +154,7 @@ def test_wod_text_embed_with_character(
 
     # Fields
     assert embed.fields[0].name == "Dice"
-    assert embed.fields[0].value == str(roll.dice)
+    assert embed.fields[0].value == str(roll.num_dice)
     assert embed.fields[1].name == "Difficulty"
     assert embed.fields[1].value == str(target)
 
