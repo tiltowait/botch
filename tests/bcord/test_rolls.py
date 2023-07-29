@@ -9,6 +9,8 @@ import pytest
 from botch.characters import Character, GameLine, Splat
 from botch.rolls import Roll
 from botchcord.roll import (
+    DICE_CAP,
+    DICE_CAP_MESSAGE,
     Color,
     build_embed,
     embed_color,
@@ -25,6 +27,11 @@ class EmojiMock:
 
     def get_emoji(self, name):
         return name  # The real deal adds \u200b, but we don't need that here
+
+
+@pytest.fixture
+def ctx() -> SN:
+    return SN(bot=EmojiMock())
 
 
 @pytest.fixture
@@ -228,10 +235,18 @@ def test_emoji_name(die: int, target: int, special: int, botchable: bool, expect
     ],
 )
 def test_emojify_dice(
-    target: int, expected: list[str], spec: list[str], line: GameLine, dice: list[int]
+    target: int, expected: list[str], spec: list[str], line: GameLine, dice: list[int], ctx: SN
 ):
     roll = Roll(line=line, num_dice=len(dice), dice=dice, target=target, specialties=spec)
     expected = " ".join(expected)
-
-    ctx = SN(bot=EmojiMock())
     assert emojify_dice(ctx, roll) == expected
+
+
+def test_dice_caps(ctx):
+    r = Roll(line=GameLine.WOD, num_dice=DICE_CAP, target=6).roll()
+    assert textify_dice(r) != DICE_CAP_MESSAGE
+    assert emojify_dice(ctx, r) != DICE_CAP_MESSAGE
+
+    r = Roll(line=GameLine.WOD, num_dice=DICE_CAP + 1, target=6).roll()
+    assert textify_dice(r) == DICE_CAP_MESSAGE
+    assert emojify_dice(ctx, r) == DICE_CAP_MESSAGE

@@ -13,6 +13,9 @@ from botch.characters import GameLine
 from botch.rolls import Roll
 from botch.rolls.parse import RollParser
 
+DICE_CAP = 40
+DICE_CAP_MESSAGE = "***Too many to show.***"
+
 
 class Color(IntEnum):
     BOTCH = 0xFF0000
@@ -109,6 +112,8 @@ def embed_title(roll: Roll):
 
 def emojify_dice(ctx: discord.ApplicationContext, roll: Roll) -> str:
     """Generate the emoji for the roll."""
+    if len(roll.dice) > DICE_CAP:
+        return DICE_CAP_MESSAGE
     special = roll.again  # Will be 11 if WoD
     if roll.wod and roll.specialties:
         special = 10
@@ -140,8 +145,10 @@ def emoji_name(die: int, success: int, special: int, botchable: bool) -> str:
     return emoji
 
 
-def textify_dice(roll: Roll):
+def textify_dice(roll: Roll) -> str:
     """Convert the dice into text."""
+    if len(roll.dice) > DICE_CAP:
+        return DICE_CAP_MESSAGE
 
     #   * Failures: strikethrough
     #   * Ones: Bold-italic (WoD)
