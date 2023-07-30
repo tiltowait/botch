@@ -62,6 +62,12 @@ class Factory:
             return self.traits[0]
         return None
 
+    def peek_last(self) -> tuple[str, int] | None:
+        """Get the last-assigned trait and its rating, if any."""
+        if not self.assignments:
+            return None
+        return next(reversed(self.assignments.items()))
+
     def assign_next(self, rating: int) -> str | None:
         """Assign a value to the next trait and return the next trait."""
         trait = self.traits.popleft()
