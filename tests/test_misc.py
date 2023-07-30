@@ -16,3 +16,47 @@ import utils
 )
 def test_normalize_text(sample: str, expected: str):
     assert expected == utils.normalize_text(sample)
+
+
+@pytest.mark.parametrize(
+    "generation,bp",
+    [
+        (3, 60),
+        (4, 50),
+        (5, 40),
+        (6, 30),
+        (7, 20),
+        (8, 15),
+        (9, 14),
+        (10, 13),
+        (11, 12),
+        (12, 11),
+        (13, 10),
+        (14, 10),
+        (15, 10),
+    ],
+)
+def test_max_vtm_bp(generation: int, bp: int):
+    assert utils.max_vtm_bp(generation) == bp
+
+
+@pytest.mark.parametrize(
+    "generation,max_trait",
+    [
+        (3, 10),
+        (4, 9),
+        (5, 8),
+        (6, 7),
+        (7, 6),
+        (8, 5),
+        (9, 5),
+        (10, 5),
+        (11, 5),
+        (12, 5),
+        (13, 5),
+        (14, 5),
+        (15, 5),
+    ],
+)
+def test_max_vtm_trait(generation: int, max_trait: int):
+    assert utils.max_vtm_trait(generation) == max_trait
