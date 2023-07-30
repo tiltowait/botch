@@ -9,3 +9,7 @@ class Vampire(Mortal):
 
     line: GameLine = GameLine.WOD
     splat: Splat = Splat.VAMPIRE
+
+    generation: int
+    max_bp: int
+    blood_pool: int

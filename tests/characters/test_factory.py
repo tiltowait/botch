@@ -20,6 +20,9 @@ def factory():
         "health": Damage.NONE * 7,
         "willpower": Damage.NONE * 6,
         "grounding": Grounding(path="Humanity", rating=7),
+        "generation": 8,
+        "max_bp": 15,
+        "blood_pool": 15,
         "virtues": gen_virtues(
             {
                 "Conscience": 3,
