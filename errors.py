@@ -13,6 +13,10 @@ class CharacterError(BotchError):
     """Base class for character errors."""
 
 
+class CharacterNotFound(CharacterError):
+    """Raised when a character isn't found."""
+
+
 class Unfinished(CharacterError):
     """Raised when character is created prematurely."""
 
