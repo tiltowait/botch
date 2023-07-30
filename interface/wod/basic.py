@@ -17,7 +17,6 @@ class BasicCog(Cog, name="Basic WoD Commands"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
-        print("basic")
 
     @slash_command()
     @option("pool", description="The dice pool. May be a number or trait + attribute equation")
