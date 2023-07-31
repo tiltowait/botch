@@ -26,9 +26,6 @@ class Factory:
         for k, v in self.args.items():
             if isinstance(v, str):
                 self.args[k] = utils.normalize_text(v)
-        from pprint import pprint
-
-        pprint(self.args)
 
     @property
     def remaining(self) -> int:
