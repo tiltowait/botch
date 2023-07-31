@@ -32,6 +32,7 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         required=False,
         max_length=300,
     )
+    @option("character", description="[Optional] The character performing the roll", required=False)
     async def roll(
         self,
         ctx: discord.ApplicationContext,
@@ -39,9 +40,10 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         difficulty: int,
         specialty: str,
         comment: str,
+        character: str,
     ):
         """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
-        await botchcord.roll.roll(ctx, pool, difficulty, specialty, comment)
+        await botchcord.roll.roll(ctx, pool, difficulty, specialty, comment, character)
 
 
 def setup(bot: BotchBot):

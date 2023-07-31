@@ -12,6 +12,7 @@ import utils
 from botch.characters import GameLine
 from botch.rolls import Roll
 from botch.rolls.parse import RollParser
+from botchcord.haven import Haven
 
 DICE_CAP = 40
 DICE_CAP_MESSAGE = "***Too many to show.***"
@@ -33,9 +34,19 @@ async def roll(
     difficulty: int,
     specialties: Optional[str],
     comment: Optional[str],
+    character: Optional[str],
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
-    rp = RollParser(pool, None).parse()
+    rp = RollParser(pool, None)
+    if rp.needs_character or character:
+        haven = Haven(ctx, None, None, character)
+        if character := await haven.get_match():
+            rp.character = character
+        else:
+            await ctx.respond("Character matching is incomplete.", ephemeral=True)
+            return
+
+    rp.parse()
     roll = Roll.from_parser(rp, difficulty, GameLine.WOD).roll()
 
     if specialties:
