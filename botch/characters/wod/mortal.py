@@ -2,7 +2,8 @@
 
 from typing import List
 
-from botch.characters.base import Character, GameLine, Splat, Trait
+from botch.characters.base import GameLine, Splat, Trait
+from botch.characters.wod.base import WoD
 
 
 def gen_virtues(virtues: dict[str, int]):
@@ -10,7 +11,7 @@ def gen_virtues(virtues: dict[str, int]):
     return [Trait(name=k, rating=v, category=Trait.Category.VIRTUE) for k, v in virtues.items()]
 
 
-class Mortal(Character):
+class Mortal(WoD):
     """Mortals serve as the base template in WoD."""
 
     line: GameLine = GameLine.WOD
