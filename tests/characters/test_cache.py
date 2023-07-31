@@ -6,7 +6,7 @@ import pytest
 
 import errors
 from botch.cache import CharCache
-from botch.characters import Character
+from botch.characters import Character, GameLine, Splat
 
 
 @pytest.fixture
@@ -18,10 +18,14 @@ def cache() -> CharCache:
 async def fcache(skilled) -> CharCache:
     one = copy.deepcopy(skilled)
     one.name = "One"
+    one.line = GameLine.WOD
+    one.splat = Splat.VAMPIRE
     await one.insert()
 
     two = copy.deepcopy(skilled)
     two.name = "Two"
+    two.line = GameLine.COFD
+    two.splat = Splat.MORTAL
     await two.insert()
 
     return CharCache()
@@ -127,3 +131,24 @@ async def test_delete(skilled: Character, fcache: CharCache):
         expected -= 1
 
         assert expected == await fcache.count(0, 0)
+
+
+@pytest.mark.parametrize(
+    "line,splat,count,names",
+    [
+        (None, None, 2, ["One", "Two"]),
+        (GameLine.WOD, None, 1, ["One"]),
+        (GameLine.WOD, Splat.MORTAL, 0, []),
+        (GameLine.WOD, Splat.VAMPIRE, 1, ["One"]),
+        (None, Splat.VAMPIRE, 1, ["One"]),
+        (None, Splat.MORTAL, 1, ["Two"]),
+        (GameLine.COFD, None, 1, ["Two"]),
+        (GameLine.COFD, Splat.VAMPIRE, 0, []),
+        (GameLine.COFD, Splat.MORTAL, 1, ["Two"]),
+    ],
+)
+async def test_splat_line_filtering(
+    line: GameLine, splat: Splat, count: int, names: str, fcache: CharCache
+):
+    assert await fcache.count(0, 0, line=line, splat=splat) == count
+    assert await fcache.fetchnames(0, 0, line=line, splat=splat) == names

@@ -4,7 +4,7 @@
 import bisect
 
 import errors
-from botch.characters import Character
+from botch.characters import Character, GameLine, Splat
 
 
 class CharCache:
@@ -19,28 +19,50 @@ class CharCache:
         """The cache key, which is simply guild.user."""
         return f"{guild}.{user}"
 
-    async def count(self, guild: int, user: int) -> int:
+    async def count(
+        self, guild: int, user: int, line: GameLine | None = None, splat: Splat | None = None
+    ) -> int:
         """Get the number of characters the user has."""
-        chars = await self.fetchall(guild, user)
+        chars = await self.fetchall(guild, user, line=line, splat=splat)
         return len(chars)
 
-    async def fetchall(self, guild: int, user: int) -> list[Character]:
+    async def fetchall(
+        self, guild: int, user: int, line: GameLine | None = None, splat: Splat | None = None
+    ) -> list[Character]:
         """Fetch the user's characters."""
         key = self.key(guild, user)
         if key not in self._cache:
-            chars = await Character.find(Character.guild == guild, Character.user == user).to_list()
+            chars = await Character.find(
+                Character.guild == guild, Character.user == user, with_children=True
+            ).to_list()
             self._cache[key] = chars
-        return self._cache[key]
 
-    async def fetchnames(self, guild: int, user: int) -> list[str]:
+        chars = self._cache[key]
+        if line is not None:
+            chars = [char for char in chars if char.line == line]
+        if splat is not None:
+            chars = [char for char in chars if char.splat == splat]
+
+        return chars
+
+    async def fetchnames(
+        self, guild: int, user: int, line: GameLine | None = None, splat: Splat | None = None
+    ) -> list[str]:
         """Fetch just the characters' names."""
-        chars = await self.fetchall(guild, user)
+        chars = await self.fetchall(guild, user, line=line, splat=splat)
         return [char.name for char in chars]
 
-    async def fetchone(self, guild: int, user: int, name: str) -> Character:
+    async def fetchone(
+        self,
+        guild: int,
+        user: int,
+        name: str,
+        line: GameLine | None = None,
+        splat: Splat | None = None,
+    ) -> Character:
         """Fetch a single character by name."""
         name = name.casefold()
-        chars = await self.fetchall(guild, user)
+        chars = await self.fetchall(guild, user, line=line, splat=splat)
         for char in chars:
             if char.name.casefold() == name.casefold():
                 return char
@@ -65,3 +87,6 @@ class CharCache:
             raise errors.CharacterNotFound(
                 f"**{character.name}** not found. Perhaps it was already deleted?"
             )
+
+
+cache = CharCache()
