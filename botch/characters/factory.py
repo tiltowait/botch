@@ -6,6 +6,7 @@ from collections import OrderedDict, deque
 from typing import Any
 
 import errors
+import utils
 from botch.characters import Character, GameLine, Splat
 
 
@@ -21,6 +22,18 @@ class Factory:
         self.traits = deque(self.categories.keys())
         self.assignments = OrderedDict()
         self.args = args
+
+        for k, v in self.args.items():
+            if isinstance(v, str):
+                self.args[k] = utils.normalize_text(v)
+        from pprint import pprint
+
+        pprint(self.args)
+
+    @property
+    def remaining(self) -> int:
+        """The number of traits yet to be assigned."""
+        return len(self.traits)
 
     def load_schema(self) -> dict[str, Any]:
         """Loads the schema file and sets it in self.schema."""
