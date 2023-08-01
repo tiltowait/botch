@@ -161,4 +161,4 @@ class Roll(Document):
         return self
 
     class Settings:
-        name = "characters"
+        name = "rolls"
