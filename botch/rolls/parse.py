@@ -6,6 +6,7 @@ import re
 
 from pyparsing import (
     Combine,
+    DelimitedList,
     Opt,
     ParseException,
     Word,
@@ -50,7 +51,8 @@ class RollParser:
     def tokenize(self) -> list[str | int]:
         """Validate the syntax and return the tokenized list."""
         try:
-            trait = Combine(Opt(Word(alphas)) + ZeroOrMore("." + Opt(Word(alphas))))
+            alphascore = alphas + "_"
+            trait = Combine(Opt(Word(alphascore)) + ZeroOrMore("." + Opt(Word(alphascore))))
             operand = Word(nums) | trait
             eq = operand + ZeroOrMore(one_of("+ -") + operand)
             parsed = eq.parse_string(self.raw_syntax, parse_all=True).as_list()

@@ -1,37 +1,44 @@
 """Various roll-parsing tests."""
 
-import errors
 import pytest
 
+import errors
 from botch.characters import Character, GameLine
 from botch.rolls.parse import RollParser
 
 
 @pytest.mark.parametrize(
-    "syntax,expected,should_fail",
+    "syntax,expected",
     [
-        ("3", [3], False),
-        ("foo", ["foo"], False),
-        ("3 + foo", [3, "+", "foo"], False),
-        ("foo + 3", ["foo", "+", 3], False),
-        ("foo.bar", ["foo.bar"], False),
-        (". - ..", [".", "-", ".."], False),
-        ("foo + .bar - 2", ["foo", "+", ".bar", "-", 2], False),
-        ("foo3", None, True),
-        ("3foo", None, True),
-        ("foo.3", None, True),
-        ("3.bar", None, True),
-        ("3 / 2", None, True),
-        ("3 3", None, True),
-        ("foo bar", None, True),
-        ("foo 3", None, True),
-        ("3 foo", None, True),
+        ("3", [3]),
+        ("foo", ["foo"]),
+        ("3 + foo", [3, "+", "foo"]),
+        ("foo + 3", ["foo", "+", 3]),
+        ("foo.bar", ["foo.bar"]),
+        (". - ..", [".", "-", ".."]),
+        ("foo + .bar - 2", ["foo", "+", ".bar", "-", 2]),
+        ("foo3", None),
+        ("3foo", None),
+        ("foo.3", None),
+        ("3.bar", None),
+        ("3 / 2", None),
+        ("3 3", None),
+        ("foo bar", None),
+        ("foo 3", None),
+        ("3 foo", None),
+        ("animal_ken + 3", ["animal_ken", "+", 3]),
+        ("animal_ken.scrubbing", ["animal_ken.scrubbing"]),
+        ("skill.underscore_spec", ["skill.underscore_spec"]),
+        (
+            "un_skill.un_spec + 3 - skill_un + .un_spec + skill",
+            ["un_skill.un_spec", "+", 3, "-", "skill_un", "+", ".un_spec", "+", "skill"],
+        ),
     ],
 )
-def test_roll_prep(syntax: str, expected: list[str | int], should_fail: bool):
+def test_roll_prep(syntax: str, expected: list[str | int]):
     p = RollParser(syntax, None)
 
-    if should_fail:
+    if not expected:
         with pytest.raises(errors.InvalidSyntax):
             p.tokenize()
     else:
