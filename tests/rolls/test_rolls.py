@@ -106,10 +106,24 @@ def test_cofd_successes(dice: list[int]):
     assert roll.successes == 5
 
 
+async def test_roll_spec_coalescing():
+    # Without specs
+    roll = Roll(line=GameLine.WOD, num_dice=5, target=6).roll()
+    assert roll.specialties == []
+    await roll.insert()
+    assert roll.specialties is None
+
+    # Now with specs
+    roll = Roll(line=GameLine.WOD, num_dice=5, target=6, specialties=["Throws"]).roll()
+    assert roll.specialties == ["Throws"]
+    await roll.insert()
+    assert roll.specialties == ["Throws"]
+
+
 @pytest.mark.parametrize(
     "syntax,pool,wp,specialties",
     [
-        ("stren + br", ["Strength", "+", "Brawl"], False, None),
+        ("stren + br", ["Strength", "+", "Brawl"], False, []),
         ("stren + br.kin + wp", ["Strength", "+", "Brawl (Kindred)", "+", "WP"], True, ["Kindred"]),
     ],
 )

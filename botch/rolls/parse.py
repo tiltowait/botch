@@ -27,7 +27,7 @@ class RollParser:
         self.pool: list[str] = []
         self.equation: list[str | int] = []
         self.num_dice = 0
-        self.specialties = None
+        self.specialties = []
 
     @property
     def using_wp(self) -> bool:
@@ -74,7 +74,6 @@ class RollParser:
         if self.needs_character and self.character is None:
             raise errors.RollError(f"You need a character to roll `{self.raw_syntax}`.")
 
-        specialties = []
         for elem in self.tokenize():
             if elem in {"+", "-"} or isinstance(elem, int):
                 self.pool.append(elem)
@@ -95,11 +94,9 @@ class RollParser:
                 self.equation.append(match.rating)
 
                 if match.subtraits:
-                    specialties.extend(match.subtraits)
+                    self.specialties.extend(match.subtraits)
 
         self.num_dice = eval_expr("".join(map(str, self.equation)))
-        if specialties:
-            self.specialties = specialties
 
         return self
 

@@ -5,6 +5,7 @@ from enum import IntEnum
 from typing import Optional
 
 import discord
+from pyparsing import DelimitedList, ParseException, Word, alphas
 
 import botchcord
 import errors
@@ -50,14 +51,12 @@ async def roll(
     roll = Roll.from_parser(rp, difficulty, GameLine.WOD).roll()
 
     if specialties:
-        split = re.split(r"[\s*,\s*]", utils.normalize_text(specialties))
-        if roll.specialties is None:
-            roll.specialties = split
-        else:
-            roll.specialties.extend(split)
+        extra_specs = re.split(r"\s*,\s*", utils.normalize_text(specialties))
+        extra_specs = [e for e in extra_specs if e]  # Remove any empty strings
+        roll.specialties.extend(extra_specs)
 
     emojis = await botchcord.settings.accessibility(ctx)
-    embed = build_embed(ctx, roll, comment, emojis)
+    embed = build_embed(ctx, roll, extra_specs, comment, emojis)
 
     await ctx.respond(embed=embed)
     await roll.insert()
@@ -66,6 +65,7 @@ async def roll(
 def build_embed(
     ctx: discord.ApplicationContext,
     roll: Roll,
+    extra_specs: list[str] | None,
     comment: str,
     emojis: bool,
 ) -> discord.Embed:
@@ -97,9 +97,9 @@ def build_embed(
 
     if roll.wod:
         embed.add_field(name="Difficulty", value=str(roll.target))
-    if roll.specialties:
+    if extra_specs:
         embed.add_field(
-            name="Specialty" if len(roll.specialties) == 1 else "Specialties",
+            name="Bonus spec" if len(roll.specialties) == 1 else "Bonus specs",
             value=", ".join(roll.specialties),
         )
     if roll.pool and len(roll.pool) > 1:

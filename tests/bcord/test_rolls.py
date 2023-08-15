@@ -8,8 +8,9 @@ import discord
 import pytest
 
 import errors
-from botch.characters import Character, GameLine, Splat
+from botch.characters import Character, GameLine, Splat, Trait
 from botch.rolls import Roll
+from botch.rolls.parse import RollParser
 from botchcord.roll import (
     DICE_CAP,
     DICE_CAP_MESSAGE,
@@ -42,6 +43,9 @@ def ctx() -> SN:
 def wod_vampire() -> Character:
     vampire = gen_char(GameLine.WOD, Splat.VAMPIRE, name="Nadea Theron")
     vampire.profile.images.append("https://tilt-assets.s3-us-west-1.amazonaws.com/avatar.jpg")
+    vampire.add_trait("Strength", 3, Trait.Category.ATTRIBUTE)
+    vampire.add_trait("Brawl", 4, Trait.Category.ABILITY)
+    vampire.add_subtraits("Brawl", ["Throws"])
     return vampire
 
 
@@ -143,13 +147,42 @@ def test_embed_title(successes: int, expected: str, line: GameLine):
 
 
 @pytest.mark.parametrize(
+    "syntax,pool,extra_specs",
+    [
+        ("strength + brawl", "Strength + Brawl", ["Throws"]),
+        ("strength + brawl.throws", "Strength + Brawl (Throws)", []),
+    ],
+)
+def test_wod_roll_embed_with_specialties(
+    syntax: str, pool: str, extra_specs: list[str], wod_vampire: Character
+):
+    rp = RollParser(syntax, wod_vampire).parse()
+    roll = Roll.from_parser(rp, 6)
+    roll.specialties.extend(extra_specs)
+
+    embed = build_embed(None, roll, extra_specs, None, False)
+
+    f = 2
+    if extra_specs:
+        assert (
+            embed.fields[f].name == "Bonus spec"
+            if len(extra_specs) == 1
+            else "Bonus specs"
+        )
+        assert embed.fields[f].value == ", ".join(extra_specs)
+        f += 1
+    assert embed.fields[f].name == "Pool"
+    assert embed.fields[f].value == pool
+
+
+@pytest.mark.parametrize(
     "title,pool,target,spec,comment",
     [
         ("Success (3)", None, 6, None, None),
         ("Exceptional (4)", ["7"], 5, None, None),
         ("Exceptional (4)", ["4", "+", "3"], 5, None, None),
         ("Phenomenal! (5)", None, 5, ["Bipping"], None),
-        ("Phenomenal! (5)", ["4", "+", "3"], 5, ["Bipping"], None),
+        ("Phenomenal! (5)", ["4", "+", "3"], 5, ["Bipping", "Tripping"], "Comment"),
     ],
 )
 def test_wod_text_embed_with_character(
@@ -161,17 +194,20 @@ def test_wod_text_embed_with_character(
     dice: list[int],
     wod_vampire: Character,
 ):
+    # Normally, Roll.specialties and build_embed.extra_spec will be different;
+    # however, because we aren't using trait pools in these rolls, there's no
+    # issue in this section
     roll = Roll(
         line=GameLine.WOD,
         num_dice=len(dice),
         dice=dice,
         pool=pool,
-        target=target,
         specialties=spec,
+        target=target,
         character=wod_vampire,
     )
 
-    embed = build_embed(None, roll, comment, False)
+    embed = build_embed(None, roll, spec, comment, False)
 
     # Work our way down from the top
     assert embed.author.name == wod_vampire.name
@@ -188,7 +224,7 @@ def test_wod_text_embed_with_character(
     # The next fields are optional but follow a predictable pattern
     i = 2
     if spec:
-        assert embed.fields[i].name == "Specialty"
+        assert embed.fields[i].name == "Bonus spec" if len(spec) == 1 else "Bonus specs"
         assert embed.fields[i].value == ", ".join(spec)
         i += 1
     if pool and len(pool) > 1:
