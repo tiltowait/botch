@@ -50,6 +50,7 @@ async def roll(
     rp.parse()
     roll = Roll.from_parser(rp, difficulty, GameLine.WOD).roll()
 
+    extra_specs = []
     if specialties:
         extra_specs = re.split(r"\s*,\s*", utils.normalize_text(specialties))
         extra_specs = [e for e in extra_specs if e]  # Remove any empty strings
@@ -102,7 +103,7 @@ def build_embed(
             name="Bonus spec" if len(roll.specialties) == 1 else "Bonus specs",
             value=", ".join(roll.specialties),
         )
-    if roll.pool and len(roll.pool) > 1:
+    if roll.uses_traits:
         embed.add_field(name="Pool", value=" ".join(roll.pool), inline=False)
 
     embed.set_author(name=author_name, icon_url=icon or discord.Embed.Empty)

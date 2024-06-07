@@ -1,5 +1,6 @@
 """Dice rolls!"""
 
+import re
 from typing import List, Optional
 
 from beanie import Document, Insert, Link, before_event
@@ -43,6 +44,12 @@ class Roll(Document):
         will coalesce it into null."""
         if not self.specialties:
             self.specialties = None
+
+    @property
+    def uses_traits(self) -> bool:
+        """Whether the roll uses traits."""
+        pool = " ".join(map(str, self.pool))
+        return re.match(r"[A-Za-z]", pool) is not None
 
     @property
     def wod(self) -> bool:
