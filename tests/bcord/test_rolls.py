@@ -4,7 +4,6 @@ import re
 from types import SimpleNamespace as SN
 from typing import Optional
 
-import discord
 import pytest
 
 import errors
@@ -179,6 +178,7 @@ def test_wod_roll_embed_with_specialties(
         ("Exceptional (4)", ["4", "+", "3"], 5, None, None),
         ("Phenomenal! (5)", None, 5, ["Bipping"], None),
         ("Phenomenal! (5)", ["4", "+", "3"], 5, ["Bipping", "Tripping"], "Comment"),
+        ("Phenomenal! (5)", ["Strength", "+", "Brawl"], 5, ["Bipping", "Tripping"], "Comment"),
     ],
 )
 def test_wod_text_embed_with_character(
