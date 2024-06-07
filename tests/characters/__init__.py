@@ -3,7 +3,7 @@
 from botch.characters import Character, Damage, GameLine, Grounding, Splat
 
 
-def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character:
+def gen_char(line: GameLine, splat: Splat, cls=Character, **kwargs) -> Character:
     """Create a basic character."""
     args = {
         "name": "Test",
@@ -17,4 +17,4 @@ def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character:
     }
     args.update(kwargs)
 
-    return Character(**args)
+    return cls(**args)
