@@ -13,6 +13,10 @@ class CharacterError(BotchError):
     """Base class for character errors."""
 
 
+class CharacterTemplateNotFound(CharacterError):
+    """A supplied game line or splat is not found."""
+
+
 class CharacterNotFound(CharacterError):
     """Raised when a character isn't found."""
 
