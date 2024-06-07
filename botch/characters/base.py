@@ -33,6 +33,13 @@ class Splat(StrEnum):
     VAMPIRE = "vampire"
 
 
+class Experience(BaseModel):
+    """Character experience totals."""
+
+    unspent: int = 0
+    lifetime: int = 0
+
+
 class Grounding(BaseModel):
     """Humanity, Paths of Enlightenment, Integrity, etc."""
 
@@ -231,6 +238,7 @@ class Character(Document):
     profile: Profile = Field(default_factory=Profile, repr=False)
     line: GameLine
     splat: Splat
+    experience: Experience = Field(default_factory=Experience, repr=False)
 
     guild: int
     user: int
