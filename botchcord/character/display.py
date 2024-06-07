@@ -49,10 +49,10 @@ def build_embed(
     fields: list[DisplayField] | None = None,
     title="",
     description="",
-    thumbnail: str = discord.Embed.Empty,
-    author_tag: str = discord.Embed.Empty,
-    icon_url: str = discord.Embed.Empty,
-    image: str = discord.Embed.Empty,
+    thumbnail: str = None,
+    author_tag: str = None,
+    icon_url: str = None,
+    image: str = None,
 ):
     """Build the character embed."""
     embed = discord.Embed(title=title or character.name, description=description)

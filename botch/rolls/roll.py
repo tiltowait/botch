@@ -48,6 +48,8 @@ class Roll(Document):
     @property
     def uses_traits(self) -> bool:
         """Whether the roll uses traits."""
+        if self.pool is None:
+            return False
         pool = " ".join(map(str, self.pool))
         return re.match(r"[A-Za-z]", pool) is not None
 

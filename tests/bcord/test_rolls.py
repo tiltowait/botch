@@ -164,11 +164,7 @@ def test_wod_roll_embed_with_specialties(
 
     f = 2
     if extra_specs:
-        assert (
-            embed.fields[f].name == "Bonus spec"
-            if len(extra_specs) == 1
-            else "Bonus specs"
-        )
+        assert embed.fields[f].name == "Bonus spec" if len(extra_specs) == 1 else "Bonus specs"
         assert embed.fields[f].value == ", ".join(extra_specs)
         f += 1
     assert embed.fields[f].name == "Pool"
@@ -227,14 +223,14 @@ def test_wod_text_embed_with_character(
         assert embed.fields[i].name == "Bonus spec" if len(spec) == 1 else "Bonus specs"
         assert embed.fields[i].value == ", ".join(spec)
         i += 1
-    if pool and len(pool) > 1:
+    if roll.uses_traits:
         assert embed.fields[i].name == "Pool"
         assert embed.fields[i].value == " ".join(roll.pool)
 
     if comment:
         assert embed.footer.text == comment
     else:
-        assert embed.footer.text == discord.Embed.Empty
+        assert embed.footer is None
 
     assert embed.description == textify_dice(roll)
 

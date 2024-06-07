@@ -10,7 +10,7 @@ from typing import List, Optional
 
 import pymongo
 from beanie import Delete, Document, before_event
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, PrivateAttr
 
 import api
 import errors
@@ -134,9 +134,9 @@ class Trait(BaseModel):
         if groups := self.expanding(identifier, exact, False):
             # The expanded values are sorted alphabetically, and we need
             # that to match our input for testing exactness
-            tokens = identifier.split(Trait._DELIMITER)
+            tokens = identifier.split(self._DELIMITER)
             tokens = [tokens[0]] + sorted(tokens[1:])
-            normalized = Trait._DELIMITER.join(tokens).casefold()
+            normalized = self._DELIMITER.join(tokens).casefold()
 
             for expanded in groups:
                 full_name = self.name
@@ -144,7 +144,7 @@ class Trait(BaseModel):
                     # Add the subtraits
                     full_name += f" ({', '.join(expanded[1:])})"
 
-                key = Trait._DELIMITER.join(expanded)
+                key = self._DELIMITER.join(expanded)
 
                 matches.append(
                     Trait.Selection(
@@ -160,7 +160,7 @@ class Trait(BaseModel):
 
     def expanding(self, identifier: str, exact: bool, join=True) -> list[str | list[str]]:
         """Expand the user's input to full skill:spec names. If join is False, return a list."""
-        tokens = [token.casefold() for token in identifier.split(Trait._DELIMITER)]
+        tokens = [token.casefold() for token in identifier.split(self._DELIMITER)]
 
         # The "comp" lambda takes a token and an instance var
         if exact:
@@ -220,7 +220,7 @@ class Trait(BaseModel):
                 matches = [[self.name]]
 
             if join:
-                return [Trait._DELIMITER.join(match) for match in matches]
+                return [self._DELIMITER.join(match) for match in matches]
             return matches
 
         # No matches
@@ -430,7 +430,7 @@ class Character(Document):
     async def add_image(self, discord_url: str) -> str:
         """Upload a character image via URL. Premium feature."""
         image_url = await api.upload_faceclaim(self, discord_url)
-        self.profile.images.append(image_url)
+        self.profile.images.append(HttpUrl(image_url))
         await self.save_changes()
 
         return image_url
@@ -438,7 +438,7 @@ class Character(Document):
     async def delete_image(self, url: str):
         """Remove a profile image. Premium feature."""
         if await api.delete_single_faceclaim(url):
-            self.profile.images.remove(url)
+            self.profile.images.remove(HttpUrl(url))
             await self.save_changes()
 
     async def delete_all_images(self, save_changes=True):

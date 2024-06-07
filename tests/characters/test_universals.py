@@ -24,7 +24,7 @@ def sample_image() -> str:
 @pytest.mark.parametrize("splat", list(Splat) + ["invalid"])
 async def test_splat_constraints(splat: str):
     if splat not in list(Splat):
-        with pytest.raises(pydantic.error_wrappers.ValidationError):
+        with pytest.raises(pydantic.ValidationError):
             gen_char(GameLine.WOD, splat)
     else:
         gen_char(GameLine.WOD, splat)

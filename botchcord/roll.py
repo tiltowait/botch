@@ -106,7 +106,7 @@ def build_embed(
     if roll.uses_traits:
         embed.add_field(name="Pool", value=" ".join(roll.pool), inline=False)
 
-    embed.set_author(name=author_name, icon_url=icon or discord.Embed.Empty)
+    embed.set_author(name=author_name, icon_url=icon or None)
 
     if comment:
         embed.set_footer(text=comment)

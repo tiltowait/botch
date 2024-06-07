@@ -17,7 +17,7 @@ class Wizard(discord.ui.View):
         self.char_name = char_args["name"]
         self.factory = Factory(line, splat, constructor, char_args)
         self.last_trait = None
-        self.bot_avatar = discord.Embed.Empty
+        self.bot_avatar = None
 
         if max_rating > 5:
             self._add_select(max_rating)
