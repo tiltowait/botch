@@ -4,7 +4,9 @@ from enum import StrEnum
 
 import discord
 
+import botchcord
 import errors
+from botchcord.haven import haven
 from core.characters import Character, Damage, GameLine, Splat
 
 
@@ -23,14 +25,14 @@ class DisplayField(StrEnum):
 DEFAULT_FIELDS = {
     GameLine.WOD: {
         Splat.MORTAL: (
-            DisplayField.NAME,
+            # DisplayField.NAME,
             DisplayField.HEALTH,
             DisplayField.WILLPOWER,
             DisplayField.GROUNDING,
             DisplayField.EXPERIENCE,
         ),
         Splat.VAMPIRE: (
-            DisplayField.NAME,
+            # DisplayField.NAME,
             DisplayField.HEALTH,
             DisplayField.WILLPOWER,
             DisplayField.GROUNDING,
@@ -42,6 +44,18 @@ DEFAULT_FIELDS = {
 }
 
 
+@haven()
+async def display(ctx: discord.ApplicationContext, character: Character):
+    user = ctx.bot.get_user(character.user)
+    embed = build_embed(
+        character,
+        False,
+        author_tag=user.display_name,
+        icon_url=botchcord.get_avatar(user),
+    )
+    await ctx.respond(embed=embed)
+
+
 def build_embed(
     character: Character,
     emojis: bool,
@@ -49,10 +63,11 @@ def build_embed(
     fields: list[DisplayField] | None = None,
     title="",
     description="",
-    thumbnail: str = None,
-    author_tag: str = None,
-    icon_url: str = None,
-    image: str = None,
+    thumbnail: str | None = None,
+    author_tag: str | None = None,
+    icon_url: str | None = None,
+    image: str | None = None,
+    footer: str | None = None,
 ):
     """Build the character embed."""
     embed = discord.Embed(title=title or character.name, description=description)
@@ -67,6 +82,8 @@ def build_embed(
             value=get_field_value(character, field, emojis),
             inline=False,
         )
+    if footer:
+        embed.set_footer(text=footer)
 
     return embed
 

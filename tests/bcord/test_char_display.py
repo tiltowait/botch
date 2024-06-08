@@ -3,8 +3,6 @@
 import pytest
 
 import errors
-from core.characters import Experience, GameLine, Splat
-from core.characters.wod import Vampire
 from botchcord.character.display import (
     DisplayField,
     build_embed,
@@ -13,6 +11,8 @@ from botchcord.character.display import (
     get_field_value,
     get_track_string,
 )
+from core.characters import Experience, GameLine, Splat
+from core.characters.wod import Vampire
 from tests.characters import gen_char
 
 
@@ -93,10 +93,11 @@ def test_get_field_value(field: DisplayField, expected: str | None, wod_vamp):
 
 
 def test_build_emoji(wod_vamp):
-    embed = build_embed(wod_vamp, False, author_tag="Jimmy Maxwell")
+    embed = build_embed(wod_vamp, False, author_tag="Jimmy Maxwell", footer="Vampire")
 
     assert embed.title == wod_vamp.name
     assert embed.author.name == "Jimmy Maxwell"
+    assert embed.footer.text == "Vampire"
 
     for i, field in enumerate(get_default_fields(wod_vamp)):
         expected_name = get_field_name(wod_vamp, field)

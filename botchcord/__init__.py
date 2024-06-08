@@ -2,7 +2,7 @@
 
 import discord
 
-from botchcord import roll, settings
+from botchcord import character, roll, settings
 
 
 def get_avatar(user: discord.User | discord.Member):
