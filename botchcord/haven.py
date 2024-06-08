@@ -13,14 +13,13 @@ def haven(line: GameLine | None = None, splat: Splat | None = None):
         """A decorator that automatically selects a character."""
         functools.wraps(func)
 
-        async def wrapper(*args, **kwargs):
-            haven = Haven(args[0], line, splat, kwargs.get("character"))
-            if char := await haven.get_match() is None:
+        async def wrapper(ctx, character, *args, **kwargs):
+            haven = Haven(ctx, line, splat, character)
+            if (char := await haven.get_match()) is None:
                 # TODO: Present the selector
                 pass
 
-            kwargs["character"] = char
-            return await func(*args, **kwargs)
+            return await func(ctx, char, *args, **kwargs)
 
         return wrapper
 
