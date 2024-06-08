@@ -5,11 +5,13 @@ import os
 
 import discord
 
+import config
 import db
 import errors
 from config import DEBUG_GUILDS, EMOJI_GUILD
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("BOT")
 
 
 class BotchBot(discord.Bot):
@@ -23,15 +25,16 @@ class BotchBot(discord.Bot):
             **kwargs,
         )
         if DEBUG_GUILDS:
-            logging.getLogger("BOT").info("Debugging on %s", DEBUG_GUILDS)
+            logger.info("Debugging on %s", DEBUG_GUILDS)
 
     async def on_connect(self):
-        print("Connected")
+        logger.info("Connected")
         await db.init()
         await self.sync_commands()
 
     async def on_ready(self):
-        print("Ready!")
+        config.set_bot_id(self.user.id)
+        logger.info("Ready!")
 
     def load_cogs(self):
         """Load cogs based on configuration parameters."""
