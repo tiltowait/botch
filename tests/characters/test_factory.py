@@ -36,7 +36,7 @@ def factory():
 
 def test_invalid_schema():
     with pytest.raises(errors.MissingSchema):
-        f = Factory("fake", "fake", None, None)
+        _ = Factory("fake", "fake", None, None)
 
 
 def test_valid_schema():
@@ -65,7 +65,7 @@ def test_premature_create(factory):
         factory.create()
 
 
-async def test_create(factory):
+def test_create(factory):
     assigned = OrderedDict()
 
     while trait := factory.next_trait():
