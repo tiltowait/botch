@@ -7,8 +7,8 @@ from beanie import init_beanie
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from botch.characters import Character, wod
-from botch.rolls import Roll
+from core.characters import Character, wod
+from core.rolls import Roll
 
 load_dotenv()
 

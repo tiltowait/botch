@@ -1,7 +1,7 @@
 """The characters package defines various PC/NPC objects and functions."""
 
-from botch.characters import wod
-from botch.characters.base import (
+from core.characters import wod
+from core.characters.base import (
     Character,
     Damage,
     Experience,

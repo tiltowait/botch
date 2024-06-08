@@ -7,7 +7,7 @@ from typing import Any
 
 import errors
 import utils
-from botch.characters import Character, GameLine, Splat
+from core.characters import Character, GameLine, Splat
 
 
 class Factory:
@@ -34,7 +34,7 @@ class Factory:
 
     def load_schema(self) -> dict[str, Any]:
         """Loads the schema file and sets it in self.schema."""
-        path = f"./botch/characters/schemas/{self.line}/*"
+        path = f"./core/characters/schemas/{self.line}/*"
         for schema_file in glob.glob(path):
             with open(schema_file, "r", encoding="utf-8") as f:
                 schema = json.load(f)

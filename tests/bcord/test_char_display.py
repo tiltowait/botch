@@ -3,8 +3,8 @@
 import pytest
 
 import errors
-from botch.characters import Experience, GameLine, Splat
-from botch.characters.wod import Vampire
+from core.characters import Experience, GameLine, Splat
+from core.characters.wod import Vampire
 from botchcord.character.display import (
     DisplayField,
     build_embed,

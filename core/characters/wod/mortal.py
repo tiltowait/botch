@@ -2,8 +2,8 @@
 
 from typing import List
 
-from botch.characters.base import GameLine, Splat, Trait
-from botch.characters.wod.base import WoD
+from core.characters.base import GameLine, Splat, Trait
+from core.characters.wod.base import WoD
 
 
 def gen_virtues(virtues: dict[str, int]):

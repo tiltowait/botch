@@ -3,8 +3,8 @@
 import pytest
 
 import errors
-from botch.characters import Character, GameLine
-from botch.rolls.parse import RollParser
+from core.characters import Character, GameLine
+from core.rolls.parse import RollParser
 
 
 @pytest.mark.parametrize(

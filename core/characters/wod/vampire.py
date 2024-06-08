@@ -1,7 +1,7 @@
 """WoD vampire characters."""
 
-from botch.characters.base import GameLine, Splat
-from botch.characters.wod.mortal import Mortal
+from core.characters.base import GameLine, Splat
+from core.characters.wod.mortal import Mortal
 
 
 class Vampire(Mortal):

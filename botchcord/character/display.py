@@ -5,7 +5,7 @@ from enum import StrEnum
 import discord
 
 import errors
-from botch.characters import Character, Damage, GameLine, Splat
+from core.characters import Character, Damage, GameLine, Splat
 
 
 class DisplayField(StrEnum):

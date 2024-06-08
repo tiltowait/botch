@@ -9,7 +9,7 @@ import requests
 
 import api
 import errors
-from botch.characters import Character, Damage, GameLine, Splat, Trait
+from core.characters import Character, Damage, GameLine, Splat, Trait
 from config import FC_BUCKET
 from tests.characters import gen_char
 

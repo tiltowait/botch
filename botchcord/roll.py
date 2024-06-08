@@ -10,9 +10,9 @@ from pyparsing import DelimitedList, ParseException, Word, alphas
 import botchcord
 import errors
 import utils
-from botch.characters import GameLine
-from botch.rolls import Roll
-from botch.rolls.parse import RollParser
+from core.characters import GameLine
+from core.rolls import Roll
+from core.rolls.parse import RollParser
 from botchcord.haven import Haven
 
 DICE_CAP = 40

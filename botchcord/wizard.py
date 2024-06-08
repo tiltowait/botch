@@ -2,9 +2,9 @@
 
 import discord
 
-from botch.cache import cache
-from botch.characters import GameLine, Splat
-from botch.characters.factory import Factory
+from core.cache import cache
+from core.characters import GameLine, Splat
+from core.characters.factory import Factory
 
 
 class Wizard(discord.ui.View):

@@ -8,8 +8,8 @@ from numpy.random import default_rng
 from pydantic import Field
 
 import errors
-from botch.characters import Character, GameLine
-from botch.rolls.parse import RollParser
+from core.characters import Character, GameLine
+from core.rolls.parse import RollParser
 
 _rng = default_rng()  # numpy's default RNG is PCG64 (superior to builtin)
 

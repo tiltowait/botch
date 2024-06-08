@@ -1,6 +1,6 @@
 """Base WoD character attributes."""
 
-from botch.characters.base import Character
+from core.characters.base import Character
 
 
 class WoD(Character):

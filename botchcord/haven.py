@@ -4,8 +4,8 @@ import functools
 
 import discord
 
-from botch.cache import cache
-from botch.characters import Character, GameLine, Splat
+from core.cache import cache
+from core.characters import Character, GameLine, Splat
 
 
 def haven(line: GameLine | None = None, splat: Splat | None = None):

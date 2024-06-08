@@ -1,3 +1,3 @@
 """Botch's backend module."""
 
-from botch import rolls
+from core import rolls

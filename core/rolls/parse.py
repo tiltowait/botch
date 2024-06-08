@@ -17,7 +17,7 @@ from pyparsing import (
 )
 
 import errors
-from botch.characters import Character
+from core.characters import Character
 
 
 class RollParser:

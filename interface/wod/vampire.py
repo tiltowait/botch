@@ -7,8 +7,8 @@ from discord.ext.commands import Cog
 
 import utils
 from bot import BotchBot
-from botch.characters import Damage, GameLine, Grounding, Splat, Trait
-from botch.characters.wod import Vampire
+from core.characters import Damage, GameLine, Grounding, Splat, Trait
+from core.characters.wod import Vampire
 from botchcord.options import promoted_choice
 from botchcord.wizard import Wizard
 

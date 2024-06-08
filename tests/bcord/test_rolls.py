@@ -7,9 +7,9 @@ from typing import Optional
 import pytest
 
 import errors
-from botch.characters import Character, GameLine, Splat, Trait
-from botch.rolls import Roll
-from botch.rolls.parse import RollParser
+from core.characters import Character, GameLine, Splat, Trait
+from core.rolls import Roll
+from core.rolls.parse import RollParser
 from botchcord.roll import (
     DICE_CAP,
     DICE_CAP_MESSAGE,

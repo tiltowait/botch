@@ -3,7 +3,7 @@
 import pytest
 
 import errors
-from botch.characters.base import Character, GameLine, Trait
+from core.characters.base import Character, GameLine, Trait
 
 
 @pytest.fixture

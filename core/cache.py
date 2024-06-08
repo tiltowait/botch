@@ -4,7 +4,7 @@
 import bisect
 
 import errors
-from botch.characters import Character, GameLine, Splat
+from core.characters import Character, GameLine, Splat
 
 
 class CharCache:
