@@ -10,7 +10,7 @@ from typing import List, Optional
 
 import pymongo
 from beanie import Delete, Document, before_event
-from pydantic import BaseModel, Field, HttpUrl, PrivateAttr
+from pydantic import BaseModel, Field, HttpUrl
 
 import api
 import errors
