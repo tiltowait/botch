@@ -14,6 +14,10 @@ def haven(line: GameLine | None = None, splat: Splat | None = None):
         functools.wraps(func)
 
         async def wrapper(ctx, character, *args, **kwargs):
+            if isinstance(character, Character):
+                # No need to look up!
+                return character
+
             haven = Haven(ctx, line, splat, character)
             if (char := await haven.get_match()) is None:
                 # TODO: Present the selector
