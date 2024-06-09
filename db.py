@@ -15,11 +15,13 @@ load_dotenv()
 logger = logging.getLogger("db")
 logger.info("Initializing database connection")
 
+DOCUMENT_MODELS = [Character, wod.Vampire, wod.Mortal, Roll]
+
 
 async def init():
     """Initialize the database."""
-    logger.info("Initializing beanie")
+    logger.info("Initializing database")
 
     client = AsyncIOMotorClient(os.environ["MONGO_URL"])
     db = client[os.environ["MONGO_DB"]]
-    await init_beanie(database=db, document_models=[Character, wod.Vampire, wod.Mortal, Roll])
+    await init_beanie(database=db, document_models=DOCUMENT_MODELS)

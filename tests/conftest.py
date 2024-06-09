@@ -7,8 +7,7 @@ from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
 
 from core.characters import Character, GameLine, Splat, Trait
-from core.characters.wod import Mortal, Vampire
-from core.rolls.roll import Roll
+from db import DOCUMENT_MODELS
 from tests.characters import gen_char
 
 
@@ -18,7 +17,7 @@ async def beanie_fixture():
     client = AsyncMongoMockClient()
     await init_beanie(
         database=client.get_database(name="db"),
-        document_models=[Character, Vampire, Mortal, Roll],
+        document_models=DOCUMENT_MODELS,
     )
 
 
