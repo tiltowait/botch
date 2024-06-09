@@ -1,9 +1,11 @@
 """Basic character tests."""
 
+import asyncio
 from urllib.parse import urlparse
 
 import pydantic
 import pytest
+import requests
 
 import api
 import errors
@@ -134,11 +136,8 @@ def test_trait_not_found_str_value(character: Character):
 
 
 # Botch uses Cloudflare SSL to enable HTTPS for the GCS buckets. Unfortunately,
-# I'm having trouble disabling Cloudflare's caching system. Therefore, we don't
-# verify here if the image is actually removed from the bucket. Given the Cloud
-# Functions are independently tested and verified to work, this isn't a real
-# issue in this instance. Not checking for deletion has the positive side
-# effect of speeding the tests up.
+# Cloudflare's caching apparently can't be completely disabled, so we have to
+# take a more strategic approach to checking deletion.
 
 
 async def test_single_image_processing(sample_image):
@@ -147,49 +146,41 @@ async def test_single_image_processing(sample_image):
 
     inserted = await char.add_image(sample_image)
     assert urlparse(inserted).netloc == FC_BUCKET, f"{inserted} isn't in dev bucket"
-    # assert requests.get(inserted).status_code == 200, "Image not found"
+    assert requests.head(inserted).status_code == 200, "Image not found"
 
-    await char.delete_image(inserted)
+    await char.delete_image(inserted)  # Deletion is tested in a later test
     assert not char.profile.images
-
-    # wait_time = 10
-    # deleted = False
-    # for _ in range(wait_time):
-    #     await asyncio.sleep(1)
-    #     if requests.get(inserted).status_code == 404:
-    #         deleted = True
-    #         break
-    # assert deleted, f"{inserted} was never deleted within {wait_time} seconds"
 
     await char.delete()
 
 
-async def test_multiple_image_uploading(sample_image):
+async def test_multiple_image_deletion(sample_image):
     char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     await char.insert()
 
-    inserted = await char.add_image(sample_image)
-    assert urlparse(inserted).netloc == FC_BUCKET, f"{inserted} isn't in dev bucket"
-    # assert requests.get(inserted).status_code == 200, "Image not found"
-
-    # Try character deletion
-    images = [inserted]
-    for _ in range(2):
+    # Insert some images
+    urls = []
+    for _ in range(3):
         url = await char.add_image(sample_image)
-        images.append(url)
+        assert urlparse(url).netloc == FC_BUCKET, f"{url} isn't in dev bucket"
+        urls.append(url)
 
-    assert [str(i) for i in char.profile.images] == images
-    await char.delete()  # This triggers an API call, which errors if unsuccessful
+    assert [str(i) for i in char.profile.images] == urls, "The image URLs don't match"
 
-    # wait_time = 15
-    # for _ in range(wait_time):
-    #     await asyncio.sleep(1)
-    #     for url in images:
-    #         if requests.get(url).status_code == 404:
-    #             images.remove(url)
-    #     if not images:
-    #         break
-    # assert not images, "The images weren't deleted with the character"
+    # Check that deleting the character deletes all three images
+    await char.delete()
+
+    await asyncio.sleep(5)
+    wait_time = 15
+    for _ in range(wait_time):
+        for url in urls:
+            if requests.head(url).status_code == 404:
+                urls.remove(url)
+        if not urls:
+            break
+        await asyncio.sleep(1)
+
+    assert not urls, "The images weren't deleted with the character"
 
 
 async def test_image_deletion_flag(sample_image):
