@@ -4,6 +4,7 @@ from enum import StrEnum
 
 import discord
 
+import bot
 import botchcord
 import errors
 from botchcord.haven import haven
@@ -47,9 +48,11 @@ DEFAULT_FIELDS = {
 @haven()
 async def display(ctx: discord.ApplicationContext, character: Character):
     user = ctx.bot.get_user(character.user)
+    use_emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(
+        ctx.bot,
         character,
-        False,
+        use_emojis,
         author_tag=user.display_name,
         icon_url=botchcord.get_avatar(user),
     )
@@ -57,6 +60,7 @@ async def display(ctx: discord.ApplicationContext, character: Character):
 
 
 def build_embed(
+    bot: bot.BotchBot,
     character: Character,
     emojis: bool,
     *,
@@ -79,7 +83,7 @@ def build_embed(
     for field in fields:
         embed.add_field(
             name=get_field_name(character, field),
-            value=get_field_value(character, field, emojis),
+            value=get_field_value(bot, character, field, emojis),
             inline=False,
         )
     if footer:
@@ -99,18 +103,18 @@ def get_field_name(character: Character, field: DisplayField):
             return field.value
 
 
-def get_field_value(character: Character, field: DisplayField, use_emoji: bool):
+def get_field_value(bot: bot.BotchBot, character: Character, field: DisplayField, use_emoji: bool):
     """Get the value for a particular field."""
     match field:
         case DisplayField.NAME:
             return character.name
         case DisplayField.HEALTH:
             if use_emoji:
-                raise NotImplementedError("Track emoji are not yet implemented")
+                return emojify_track(bot, character.health)
             return get_track_string(character.health)
         case DisplayField.WILLPOWER:
             if use_emoji:
-                raise NotImplementedError("Track emoji are not yet implemented")
+                return emojify_track(bot, character.willpower)
             return get_track_string(character.willpower)
         case DisplayField.GROUNDING:
             return str(character.grounding.rating)
@@ -120,6 +124,11 @@ def get_field_value(character: Character, field: DisplayField, use_emoji: bool):
             return f"```{character.blood_pool} / {character.max_bp}```"
         case DisplayField.EXPERIENCE:
             return f"```{character.experience.unspent} / {character.experience.lifetime}```"
+
+
+def emojify_track(bot: bot.BotchBot, track: str) -> str:
+    """Convert a track to emoji."""
+    return " ".join(map(lambda e: bot.get_emoji(Damage.emoji_name(e)), track))
 
 
 def get_track_string(track: str) -> str:

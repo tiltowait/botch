@@ -22,6 +22,17 @@ class Damage(StrEnum):
     LETHAL = "X"
     AGGRAVATED = "*"
 
+    @classmethod
+    def emoji_name(cls, e: str) -> str:
+        """The box's emoji name."""
+        emoji = {
+            Damage.NONE: "no_dmg",
+            Damage.BASHING: "bash",
+            Damage.LETHAL: "leth",
+            Damage.AGGRAVATED: "agg",
+        }
+        return emoji[e]
+
 
 class GameLine(StrEnum):
     WOD = "wod"
