@@ -1,8 +1,35 @@
 """Miscellaneous tests."""
 
+import os
+from unittest import mock
+
+import mongomock_motor
 import pytest
 
+import db
 import utils
+
+
+# Mock the necessary components
+@pytest.mark.asyncio
+async def test_db_init():
+    with mock.patch.dict(os.environ, {"MONGO_URL": "mock_url", "MONGO_DB": "mock_db"}), mock.patch(
+        "db.init_beanie"
+    ) as mock_init_beanie:
+
+        # Use AsyncMongoMockClient as the mock client
+        client = mongomock_motor.AsyncMongoMockClient()
+        database = client["mock_db"]
+
+        # Mock the AsyncIOMotorClient to return the AsyncMongoMockClient
+        with mock.patch("db.AsyncIOMotorClient", return_value=client):
+            await db.init()
+
+            # Ensure the mocks were called as expected
+            mock_init_beanie.assert_called_once_with(
+                database=database,
+                document_models=db.DOCUMENT_MODELS,
+            )
 
 
 @pytest.mark.parametrize(
