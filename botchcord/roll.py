@@ -10,10 +10,10 @@ from pyparsing import DelimitedList, ParseException, Word, alphas
 import botchcord
 import errors
 import utils
+from botchcord.haven import Haven
 from core.characters import GameLine
 from core.rolls import Roll
 from core.rolls.parse import RollParser
-from botchcord.haven import Haven
 
 DICE_CAP = 40
 DICE_CAP_MESSAGE = "***Too many to show.***"
@@ -56,7 +56,7 @@ async def roll(
         extra_specs = [e for e in extra_specs if e]  # Remove any empty strings
         roll.specialties.extend(extra_specs)
 
-    emojis = await botchcord.settings.accessibility(ctx)
+    emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(ctx, roll, extra_specs, comment, emojis)
 
     await ctx.respond(embed=embed)
