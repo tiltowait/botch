@@ -1,9 +1,13 @@
 """Specialty test suite."""
 
+import random
+
 import pytest
 
 import errors
-from core.characters.base import Character, GameLine, Trait
+from core.characters.base import Character, GameLine, Splat, Trait
+from core.characters.wod.base import WoD
+from tests.characters import gen_char
 
 
 @pytest.fixture
@@ -20,6 +24,26 @@ def skill() -> Trait:
         category=Trait.Category.ABILITY,
         subcategory=Trait.Subcategory.PHYSICAL,
     )
+
+
+def test_trait_sort_order():
+    Cat = Trait.Category
+    Sub = Trait.Subcategory
+    traits = [
+        ("Strength", Cat.ATTRIBUTE, Sub.PHYSICAL),
+        ("Dexterity", Cat.ATTRIBUTE, Sub.PHYSICAL),
+        ("Stamina", Cat.ATTRIBUTE, Sub.PHYSICAL),
+        ("Alertness", Cat.ABILITY, Sub.TALENTS),
+        ("Brawl", Cat.ABILITY, Sub.TALENTS),
+        ("Subterfuge", Cat.ABILITY, Sub.TALENTS),
+        ("Larceny", Cat.ABILITY, Sub.SKILLS),
+    ]
+
+    char = gen_char(GameLine.WOD, Splat.VAMPIRE, WoD)
+    for t, c, s in random.sample(traits, len(traits)):
+        char.add_trait(t, 1, c, s)
+
+    assert [t[0] for t in traits] == [t.name for t in char.traits]
 
 
 @pytest.mark.parametrize(

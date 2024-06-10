@@ -355,6 +355,12 @@ class Character(Document):
             matches.extend(trait.matching(search, exact))
         return matches
 
+    @staticmethod
+    def _trait_sort_key(t: Trait) -> str:
+        """The key used for insorting traits. A default is provided so tests
+        pass, but this method should be overridden by child classes."""
+        return t.name.casefold()
+
     def add_trait(
         self,
         name: str,
@@ -376,7 +382,7 @@ class Character(Document):
             raise errors.TraitAlreadyExists(f"**{self.name}** already has a trait called `{name}`.")
 
         new_trait = Trait(name=name, rating=rating, category=category, subcategory=subcategory)
-        bisect.insort(self.traits, new_trait, key=lambda t: t.name.casefold())
+        bisect.insort(self.traits, new_trait, key=self._trait_sort_key)
 
         return copy.deepcopy(new_trait)
 
