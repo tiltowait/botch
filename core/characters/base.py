@@ -82,12 +82,21 @@ class Trait(BaseModel):
     _DELIMITER = "."
 
     class Category(StrEnum):
-        ATTRIBUTE = "attribute"
-        ABILITY = "ability"
-        VIRTUE = "virtue"
+        ATTRIBUTE = "attributes"
+        ABILITY = "abilities"
+        VIRTUE = "virtues"
         SPECIAL = "special"
         INNATE = "innate"
         CUSTOM = "custom"
+
+    class Subcategory(StrEnum):
+        PHYSICAL = "physical"
+        SOCIAL = "social"
+        MENTAL = "mental"
+        TALENTS = "talents"
+        SKILLS = "skills"
+        KNOWLEDGES = "knowledges"
+        BLANK = "\u200b"  # Discord doesn't allow empty field names
 
     class Selection(BaseModel):
         """When the user invokes a Trait, they receive a Trait.Selection. This
@@ -105,6 +114,7 @@ class Trait(BaseModel):
     name: str
     rating: int
     category: Category
+    subcategory: Subcategory
     subtraits: List[str] = Field(default_factory=list)
 
     def add_subtraits(self, subtraits: str | list[str]):
@@ -263,9 +273,20 @@ class Character(Document):
     def _all_traits(self) -> list[Trait]:
         """A copy of all the character's rollable traits, including innates."""
         innate = Trait.Category.INNATE
+        blank = Trait.Subcategory.BLANK
         innates = [
-            Trait(name="Willpower", rating=len(self.willpower), category=innate),
-            Trait(name=self.grounding.path, rating=self.grounding.rating, category=innate),
+            Trait(
+                name="Willpower",
+                rating=len(self.willpower),
+                category=innate,
+                subcategory=blank,
+            ),
+            Trait(
+                name=self.grounding.path,
+                rating=self.grounding.rating,
+                category=innate,
+                subcategory=blank,
+            ),
         ]
         return self.traits + innates
 
@@ -334,7 +355,13 @@ class Character(Document):
             matches.extend(trait.matching(search, exact))
         return matches
 
-    def add_trait(self, name: str, rating: int, category=Trait.Category.CUSTOM) -> Trait:
+    def add_trait(
+        self,
+        name: str,
+        rating: int,
+        category=Trait.Category.CUSTOM,
+        subcategory=Trait.Subcategory.BLANK,
+    ) -> Trait:
         """Add a new trait.
         Args:
             name (str): The new trait's name
@@ -348,7 +375,7 @@ class Character(Document):
         if self.has_trait(name):
             raise errors.TraitAlreadyExists(f"**{self.name}** already has a trait called `{name}`.")
 
-        new_trait = Trait(name=name, rating=rating, category=category)
+        new_trait = Trait(name=name, rating=rating, category=category, subcategory=subcategory)
         bisect.insort(self.traits, new_trait, key=lambda t: t.name.casefold())
 
         return copy.deepcopy(new_trait)

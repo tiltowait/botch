@@ -56,8 +56,8 @@ class Factory:
             return o
 
         traits = OrderedDict()
-        traits.update(_prep("attribute"))
-        traits.update(_prep("ability"))
+        traits.update(_prep("attributes"))
+        traits.update(_prep("abilities"))
 
         if special := self.schema.get("special"):
             for k, v in special.items():

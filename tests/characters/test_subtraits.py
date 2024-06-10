@@ -14,7 +14,12 @@ def subtraits() -> list[str]:
 @pytest.fixture
 def skill() -> Trait:
     """A basic trait."""
-    return Trait(name="Brawl", rating=4, category=Trait.Category.ABILITY.value)
+    return Trait(
+        name="Brawl",
+        rating=4,
+        category=Trait.Category.ABILITY,
+        subcategory=Trait.Subcategory.PHYSICAL,
+    )
 
 
 @pytest.mark.parametrize(
