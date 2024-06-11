@@ -5,13 +5,13 @@ from collections import defaultdict
 import discord
 
 import bot
+from botchcord.utils import CEmbed
 from botchcord.utils.text import b
 from core.characters import Character, Trait
 
 
 def build_embed(bot: bot.BotchBot, char: Character) -> discord.Embed:
-    embed = discord.Embed(title="Character Traits")
-    embed.set_author(name=char.name)
+    embed = CEmbed(bot, char, title="Character Traits")
 
     for category in Trait.Category:
         add_trait_category(embed, char, category)

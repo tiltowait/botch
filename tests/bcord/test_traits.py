@@ -26,6 +26,18 @@ def sample_traits() -> list[Trait]:
 
 
 @pytest.fixture
+def bot_mock() -> Mock:
+    user = Mock()
+    user.display_name = "tiltowait"
+    user.guild_avatar = "https://example.com/img.png"
+
+    bot = Mock()
+    bot.get_user.return_value = user
+
+    return bot
+
+
+@pytest.fixture
 def mixed_traits() -> list[Trait]:
     """A longer list of traits."""
     tf = partial(Trait, category=Trait.Category.ATTRIBUTE, rating=1)
@@ -110,7 +122,7 @@ def test_add_trait_category(char: Character):
         i += 1
 
 
-def test_build_embed(char: Character, mixed_traits: list[Trait]):
+def test_build_embed(bot_mock, char: Character, mixed_traits: list[Trait]):
     extra = [
         Trait(
             name="Z",
@@ -122,10 +134,11 @@ def test_build_embed(char: Character, mixed_traits: list[Trait]):
     mixed_traits.append(extra)
     char.traits.append(extra[0])
 
-    embed = display.build_embed(Mock(), char)
+    embed = display.build_embed(bot_mock, char)
 
     assert embed.title == "Character Traits"
     assert embed.author.name == char.name
+    assert embed.author.icon_url == bot_mock.get_user().guild_avatar
     assert len(embed.fields) == 6, "Empty categories should not be added"
 
     assert embed.fields[0].name == "ATTRIBUTES"
