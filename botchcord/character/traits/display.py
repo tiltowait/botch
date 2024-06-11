@@ -5,9 +5,17 @@ from collections import defaultdict
 import discord
 
 import bot
+from botchcord.haven import haven
 from botchcord.utils import CEmbed
 from botchcord.utils.text import b
 from core.characters import Character, Trait
+
+
+@haven()
+async def display(ctx: discord.ApplicationContext, character: str):
+    """Display the character's traits."""
+    embed = build_embed(ctx.bot, character)
+    await ctx.respond(embed=embed, ephemeral=True)
 
 
 def build_embed(bot: bot.BotchBot, char: Character) -> discord.Embed:
@@ -26,7 +34,7 @@ def add_trait_category(
 ):
     traits = categorize_traits(category, char.traits)
     if traits:
-        embed.add_field(name=category.upper(), value=" ", inline=False)
+        embed.add_field(name=" ", value=b(category.upper()), inline=False)
         for sub, traits in traits.items():
             add_trait_subcategory(embed, sub.title(), traits)
 

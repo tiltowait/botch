@@ -1,12 +1,20 @@
 """Test the traits display, creation, updating, and deletion interfaces."""
 
 from functools import partial
-from unittest.mock import Mock
+from unittest.mock import ANY, AsyncMock, Mock
 
 import discord
 import pytest
 
-from botchcord.character.traits import display
+from botchcord.character.traits.display import (
+    add_trait_category,
+    add_trait_subcategory,
+    build_embed,
+    categorize_traits,
+    display,
+    printout,
+)
+from botchcord.utils.text import b
 from core.characters import Character, GameLine, Splat, Trait
 from tests.characters import gen_char
 
@@ -68,17 +76,17 @@ def char(mixed_traits) -> Character:
 
 
 def test_printout(sample_traits: list[Trait]):
-    printout = display.printout(sample_traits)
-    assert printout == "**dexterity:** 2\n**strength:** 4\n**stamina:** 3"
+    pout = printout(sample_traits)
+    assert pout == "**dexterity:** 2\n**strength:** 4\n**stamina:** 3"
 
 
 def test_add_trait_subcategory(sample_traits: list[Trait]):
     embed = discord.Embed()
-    display.add_trait_subcategory(embed, "physical", sample_traits)
+    add_trait_subcategory(embed, "physical", sample_traits)
 
     field = embed.fields[0]
     assert field.name == "physical"
-    assert field.value == display.printout(sample_traits)
+    assert field.value == printout(sample_traits)
     assert field.inline is True
 
 
@@ -92,7 +100,7 @@ def test_categorize_traits(mixed_traits: list[Trait]):
         )
     ]
     mixed_traits += extra
-    traits = display.categorize_traits(Trait.Category.ATTRIBUTE, mixed_traits)
+    traits = categorize_traits(Trait.Category.ATTRIBUTE, mixed_traits)
 
     def f(sub: Trait.Subcategory) -> list[Trait]:
         return [t for t in mixed_traits if t.subcategory == sub]
@@ -105,20 +113,21 @@ def test_categorize_traits(mixed_traits: list[Trait]):
 
 def test_add_trait_category(char: Character):
     cat = Trait.Category.ATTRIBUTE
-    categorized = display.categorize_traits(cat, char.traits)
+    categorized = categorize_traits(cat, char.traits)
 
     embed = discord.Embed()
-    display.add_trait_category(embed, char, cat)
+    add_trait_category(embed, char, cat)
 
     fields = embed.fields
-    assert fields[0].name == cat.upper()
+    assert fields[0].name == " "
+    assert fields[0].value == b(cat.upper())
     assert fields[0].inline is False
 
     i = 1
     for k, v in categorized.items():
         field = fields[i]
         assert field.name == k.title()
-        assert field.value == display.printout(v)
+        assert field.value == printout(v)
         i += 1
 
 
@@ -134,33 +143,45 @@ def test_build_embed(bot_mock, char: Character, mixed_traits: list[Trait]):
     mixed_traits.append(extra)
     char.traits.append(extra[0])
 
-    embed = display.build_embed(bot_mock, char)
+    embed = build_embed(bot_mock, char)
 
     assert embed.title == "Character Traits"
     assert embed.author.name == char.name
     assert embed.author.icon_url == bot_mock.get_user().guild_avatar
     assert len(embed.fields) == 6, "Empty categories should not be added"
 
-    assert embed.fields[0].name == "ATTRIBUTES"
-    assert embed.fields[0].value == " "
+    assert embed.fields[0].name == " "
+    assert embed.fields[0].value == b("ATTRIBUTES")
     assert embed.fields[0].inline is False
 
-    categorized = display.categorize_traits(Trait.Category.ATTRIBUTE, char.traits)
+    categorized = categorize_traits(Trait.Category.ATTRIBUTE, char.traits)
     i = 1
     for c, t in categorized.items():
         field = embed.fields[i]
         assert field.name == c.title()
-        assert field.value == display.printout(t)
+        assert field.value == printout(t)
         i += 1
 
-    assert embed.fields[i].name == "ABILITIES"
-    assert embed.fields[i].value == " "
+    assert embed.fields[i].name == " "
+    assert embed.fields[i].value == b("ABILITIES")
     assert embed.fields[i].inline is False
 
-    categorized = display.categorize_traits(Trait.Category.ABILITY, char.traits)
+    categorized = categorize_traits(Trait.Category.ABILITY, char.traits)
     i += 1
     for c, t in categorized.items():
         field = embed.fields[i]
         assert field.name == c.title(), c
-        assert field.value == display.printout(t)
+        assert field.value == printout(t)
         i += 1
+
+
+async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
+    ctx = AsyncMock()
+    ctx.bot = bot_mock
+    ctx.respond.return_value = 3
+
+    for trait in mixed_traits:
+        char.traits.append(trait)
+
+    await display(ctx, char)
+    ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
