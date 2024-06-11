@@ -2,12 +2,12 @@
 
 import glob
 import json
-from collections import OrderedDict, deque
+from collections import OrderedDict, defaultdict, deque
 from typing import Any
 
 import errors
 import utils
-from core.characters import Character, GameLine, Splat
+from core.characters import Character, GameLine, Splat, Trait
 
 
 class Factory:
@@ -19,6 +19,7 @@ class Factory:
         self.char_class = char_class
         self.schema = self.load_schema()
         self.categories = self.gather_traits()
+        self.subcategories = self.gather_subcategories()
         self.traits = deque(self.categories.keys())
         self.assignments = OrderedDict()
         self.args = args
@@ -66,6 +67,22 @@ class Factory:
 
         return traits
 
+    def gather_subcategories(self) -> dict[str, str]:
+        """Assign traits to their subcategories."""
+
+        def _prep(key: str) -> dict[str, str]:
+            s = {}
+            for section in self.schema[key]:
+                for trait in section["traits"]:
+                    s[trait] = section["category"].casefold()
+            return s
+
+        subcategories = defaultdict(lambda: Trait.Subcategory.BLANK)
+        subcategories.update(_prep("attributes"))
+        subcategories.update(_prep("abilities"))
+
+        return subcategories
+
     def next_trait(self) -> str | None:
         """Get the next trait, if it exists."""
         if self.traits:
@@ -92,6 +109,8 @@ class Factory:
 
         character = self.char_class(**self.args)
         for trait, rating in self.assignments.items():
-            character.add_trait(trait, rating, self.categories[trait])
+            cat = self.categories[trait]
+            sub = self.subcategories[trait]
+            character.add_trait(trait, rating, cat, sub)
 
         return character
