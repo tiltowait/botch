@@ -1,75 +1,87 @@
 {
-	"line": "wod",
-	"splats": ["vampire", "mortal", "ghoul"],
-	"attributes": [{
-			"category": "Physical",
-			"traits": [
-				"Strength",
-				"Dexterity",
-				"Stamina"
-			]
-		},
-		{
-			"category": "Social",
-			"traits": [
-				"Charisma",
-				"Manipulation",
-				"Appearance"
-			]
-		},
-		{
-			"category": "Mental",
-			"traits": [
-				"Perception",
-				"Intelligence",
-				"Wits"
-			]
-		}
-	],
-	"abilities": [{
-			"category": "Talents",
-			"traits": [
-				"Alertness",
-				"Athletics",
-				"Awareness",
-				"Brawl",
-				"Empathy",
-				"Expression",
-				"Intimidation",
-				"Leadership",
-				"Streetwise",
-				"Subterfuge"
-			]
-		},
-		{
-			"category": "Skills",
-			"traits": [
-				"AnimalKen",
-				"Crafts",
-				"Drive",
-				"Etiquette",
-				"Firearms",
-				"Larceny",
-				"Melee",
-				"Performance",
-				"Stealth",
-				"Survival"
-			]
-		},
-		{
-			"category": "Knowledges",
-			"traits": [
-				"Academics",
-				"Computer",
-				"Finance",
-				"Investigation",
-				"Law",
-				"Medicine",
-				"Occult",
-				"Politics",
-				"Science",
-				"Technology"
-			]
-		}
-	]
+  "line": "wod",
+  "splats": [
+    "vampire",
+    "mortal",
+    "ghoul"
+  ],
+  "inherent": {
+    "category": "attributes",
+    "subcategories": [
+      {
+        "name": "physical",
+        "traits": [
+          "Strength",
+          "Dexterity",
+          "Stamina"
+        ]
+      },
+      {
+        "name": "social",
+        "traits": [
+          "Charisma",
+          "Manipulation",
+          "Appearance"
+        ]
+      },
+      {
+        "name": "mental",
+        "traits": [
+          "Perception",
+          "Intelligence",
+          "Wits"
+        ]
+      }
+    ]
+  },
+  "learned": {
+    "category": "abilities",
+    "subcategories": [
+      {
+        "name": "talents",
+        "traits": [
+          "Alertness",
+          "Athletics",
+          "Awareness",
+          "Brawl",
+          "Empathy",
+          "Expression",
+          "Intimidation",
+          "Leadership",
+          "Streetwise",
+          "Subterfuge"
+        ]
+      },
+      {
+        "name": "skills",
+        "traits": [
+          "AnimalKen",
+          "Crafts",
+          "Drive",
+          "Etiquette",
+          "Firearms",
+          "Larceny",
+          "Melee",
+          "Performance",
+          "Stealth",
+          "Survival"
+        ]
+      },
+      {
+        "name": "knowledges",
+        "traits": [
+          "Academics",
+          "Computer",
+          "Finance",
+          "Investigation",
+          "Law",
+          "Medicine",
+          "Occult",
+          "Politics",
+          "Science",
+          "Technology"
+        ]
+      }
+    ]
+  }
 }

@@ -8,6 +8,7 @@ from typing import Any
 import errors
 import utils
 from core.characters import Character, GameLine, Splat, Trait
+from core.characters.factory.schema import Schema
 
 
 class Factory:
@@ -18,9 +19,7 @@ class Factory:
         self.splat = splat
         self.char_class = char_class
         self.schema = self.load_schema()
-        self.categories = self.gather_traits()
-        self.subcategories = self.gather_subcategories()
-        self.traits = deque(self.categories.keys())
+        self.traits = deque(self.schema.all_traits)
         self.assignments = OrderedDict()
         self.args = args
 
@@ -40,48 +39,11 @@ class Factory:
             with open(schema_file, "r", encoding="utf-8") as f:
                 schema = json.load(f)
                 if self.splat in schema["splats"]:
-                    return schema
+                    return Schema(**schema)
 
         raise errors.MissingSchema(
             f"Unable to locate character schema for {self.line} -> {self.splat}."
         )
-
-    def gather_traits(self) -> OrderedDict[str, str]:
-        """Gathers all the traits into a dictionary of trait: type."""
-
-        def _prep(key: str) -> OrderedDict:
-            o = OrderedDict()
-            for section in self.schema[key]:
-                for trait in section["traits"]:
-                    o[trait] = key
-            return o
-
-        traits = OrderedDict()
-        traits.update(_prep("attributes"))
-        traits.update(_prep("abilities"))
-
-        if special := self.schema.get("special"):
-            for k, v in special.items():
-                for trait in v["traits"]:
-                    traits[trait] = k
-
-        return traits
-
-    def gather_subcategories(self) -> dict[str, str]:
-        """Assign traits to their subcategories."""
-
-        def _prep(key: str) -> dict[str, str]:
-            s = {}
-            for section in self.schema[key]:
-                for trait in section["traits"]:
-                    s[trait] = section["category"].casefold()
-            return s
-
-        subcategories = defaultdict(lambda: Trait.Subcategory.BLANK)
-        subcategories.update(_prep("attributes"))
-        subcategories.update(_prep("abilities"))
-
-        return subcategories
 
     def next_trait(self) -> str | None:
         """Get the next trait, if it exists."""
@@ -109,8 +71,8 @@ class Factory:
 
         character = self.char_class(**self.args)
         for trait, rating in self.assignments.items():
-            cat = self.categories[trait]
-            sub = self.subcategories[trait]
+            cat = self.schema.category(trait)
+            sub = self.schema.subcategory(trait)
             character.add_trait(trait, rating, cat, sub)
 
         return character
