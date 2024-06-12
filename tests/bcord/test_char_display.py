@@ -14,9 +14,22 @@ from botchcord.character.display import (
     get_field_value,
     get_track_string,
 )
-from core.characters import Experience, GameLine, Splat
+from core.characters import Damage, Experience, GameLine, Splat
 from core.characters.wod import Vampire
 from tests.characters import gen_char
+
+
+@pytest.fixture
+def bot_mock() -> Mock:
+    user = Mock()
+    user.display_name = "tiltowait"
+    user.guild_avatar = "https://example.com/img.png"
+
+    bot = Mock()
+    bot.get_user.return_value = user
+    bot.get_emoji = lambda e: e
+
+    return bot
 
 
 @pytest.fixture
@@ -95,21 +108,34 @@ def test_get_field_value(field: DisplayField, expected: str | None, wod_vamp):
     assert get_field_value(None, wod_vamp, field, False) == expected
 
 
-def test_build_emoji(wod_vamp):
-    bot = Mock()
-    bot.get_emoji = lambda e: e
-    embed = build_embed(bot, wod_vamp, False, author_tag="Jimmy Maxwell", footer="Vampire")
+@pytest.mark.parametrize("use_emojis", [True, False])
+def test_build_emoji(use_emojis, bot_mock, wod_vamp):
+    embed = build_embed(bot_mock, wod_vamp, False, footer="Vampire")
 
     assert embed.title == wod_vamp.name
-    assert embed.author.name == "Jimmy Maxwell"
+    assert embed.author.name == "tiltowait"
+    assert embed.author.icon_url == "https://example.com/img.png"
     assert embed.footer.text == "Vampire"
 
     for i, field in enumerate(get_default_fields(wod_vamp)):
         expected_name = get_field_name(wod_vamp, field)
-        expected_value = get_field_value(bot, wod_vamp, field, False)
+        expected_value = get_field_value(bot_mock, wod_vamp, field, False)
 
         assert embed.fields[i].name == expected_name
         assert embed.fields[i].value == expected_value
+
+        # Emoji fields should not include any of the Damage symbols. They also
+        # do not have backticks (`), so we skip over those, otherwise the test
+        # will fail due to the the experience field having a slash (/).
+        if use_emojis and "`" not in embed.fields[i].value:
+            for sym in Damage:
+                assert sym not in embed.fields[i].value
+
+
+def test_alt_title(bot_mock, wod_vamp):
+    embed = build_embed(bot_mock, wod_vamp, False, title="Custom title")
+    assert embed.author.name == wod_vamp.name
+    assert embed.title == "Custom title"
 
 
 @pytest.mark.parametrize(

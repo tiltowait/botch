@@ -8,6 +8,7 @@ import bot
 import botchcord
 import errors
 from botchcord.haven import haven
+from botchcord.utils import CEmbed
 from core.characters import Character, Damage, GameLine, Splat
 
 
@@ -54,14 +55,11 @@ DEFAULT_FIELDS = {
 
 @haven()
 async def display(ctx: discord.ApplicationContext, character: Character):
-    user = ctx.bot.get_user(character.user)
     use_emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(
         ctx.bot,
         character,
         use_emojis,
-        author_tag=user.display_name,
-        icon_url=botchcord.get_avatar(user),
     )
     await ctx.respond(embed=embed)
 
@@ -81,9 +79,7 @@ def build_embed(
     footer: str | None = None,
 ):
     """Build the character embed."""
-    embed = discord.Embed(title=title or character.name, description=description)
-    embed.set_author(name=author_tag, icon_url=icon_url)
-    embed.set_thumbnail(url=thumbnail)
+    embed = CEmbed(bot, character, title=title or character.name, description=description)
 
     if not fields:
         fields = get_default_fields(character)
