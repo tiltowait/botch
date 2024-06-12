@@ -42,6 +42,7 @@ class GameLine(StrEnum):
 class Splat(StrEnum):
     MORTAL = "mortal"
     VAMPIRE = "vampire"
+    GHOUL = "ghoul"
 
 
 class Experience(BaseModel):
