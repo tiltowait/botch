@@ -32,6 +32,13 @@ DEFAULT_FIELDS = {
             DisplayField.GROUNDING,
             DisplayField.EXPERIENCE,
         ),
+        Splat.GHOUL: (
+            # DisplayField.NAME,
+            DisplayField.HEALTH,
+            DisplayField.WILLPOWER,
+            DisplayField.GROUNDING,
+            DisplayField.EXPERIENCE,
+        ),
         Splat.VAMPIRE: (
             # DisplayField.NAME,
             DisplayField.HEALTH,
