@@ -6,6 +6,7 @@ from unittest.mock import ANY, AsyncMock, Mock
 import discord
 import pytest
 
+from botchcord.character.traits import add_update
 from botchcord.character.traits.display import (
     add_trait_category,
     add_trait_subcategory,
@@ -73,6 +74,9 @@ def char(mixed_traits) -> Character:
     for trait in mixed_traits:
         char.traits.append(trait)  # Direct add instead of using add_trait()
     return char
+
+
+# TRAITS DISPLAY
 
 
 def test_printout(sample_traits: list[Trait]):
@@ -185,3 +189,31 @@ async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
 
     await display(ctx, char)
     ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+
+
+# TRAITS ADDING
+
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("t1=2", {"t1": 2}),
+        (" t1=2", {"t1": 2}),
+        ("t1 =2", {"t1": 2}),
+        ("t1= 2", {"t1": 2}),
+        ("t1=2", {"t1": 2}),
+        ("t1 = 2", {"t1": 2}),
+        ("t1 =   2 ", {"t1": 2}),
+        ("t1=2 t2=3", {"t1": 2, "t2": 3}),
+        ("Brawl=4 Academics=3", {"Brawl": 4, "Academics": 3}),
+    ],
+)
+def test_parse_input(text: str, expected: dict[str, int]):
+    parsed = add_update.parse_input(text)
+    assert parsed == expected
+
+
+@pytest.mark.parametrize("text", ["t", "t=", "t==1", "1=1", "1t=1", "=1", "1=t", "t=t"])
+def test_parse_errors(text: str):
+    with pytest.raises(SyntaxError):
+        _ = add_update.parse_input(text)
