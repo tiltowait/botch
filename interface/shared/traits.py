@@ -2,6 +2,7 @@
 
 
 import discord
+from discord import option
 from discord.commands import SlashCommandGroup
 from discord.ext.commands import Cog
 
@@ -21,6 +22,18 @@ class TraitsCog(Cog, name="Character trait commands"):
     async def display(self, ctx: discord.ApplicationContext, character: str):
         """Display a character's traits."""
         await botchcord.character.traits.display(ctx, character)
+
+    @traits.command()
+    @option("traits", required=True)
+    @options.character("The character to assign traits to")
+    async def assign(
+        self,
+        ctx: discord.ApplicationContext,
+        traits: str,
+        character: str,
+    ):
+        """Assign new traits or update existing ones."""
+        await botchcord.character.traits.assign(ctx, character, traits)
 
 
 def setup(bot: BotchBot):

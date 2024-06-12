@@ -1,12 +1,12 @@
 """Test the traits display, creation, updating, and deletion interfaces."""
 
+import importlib
 from functools import partial
-from unittest.mock import ANY, AsyncMock, Mock
+from unittest.mock import ANY, AsyncMock, patch
 
 import discord
 import pytest
 
-from botchcord.character.traits import add_update
 from botchcord.character.traits.display import (
     add_trait_category,
     add_trait_subcategory,
@@ -15,9 +15,14 @@ from botchcord.character.traits.display import (
     display,
     printout,
 )
+from botchcord.utils import CEmbed
 from botchcord.utils.text import b
 from core.characters import Character, GameLine, Splat, Trait
 from tests.characters import gen_char
+
+# __init__.py only exposes the assign function, so we have to import
+# the module using importlib.
+assign = importlib.import_module("botchcord.character.traits.assign")
 
 
 @pytest.fixture
@@ -35,15 +40,12 @@ def sample_traits() -> list[Trait]:
 
 
 @pytest.fixture
-def bot_mock() -> Mock:
-    user = Mock()
-    user.display_name = "tiltowait"
-    user.guild_avatar = "https://example.com/img.png"
+def ctx(bot_mock) -> AsyncMock:
+    ctx = AsyncMock()
+    ctx.bot = bot_mock
+    ctx.respond.return_value = None
 
-    bot = Mock()
-    bot.get_user.return_value = user
-
-    return bot
+    return ctx
 
 
 @pytest.fixture
@@ -209,11 +211,61 @@ async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
     ],
 )
 def test_parse_input(text: str, expected: dict[str, int]):
-    parsed = add_update.parse_input(text)
+    parsed = assign.parse_input(text)
     assert parsed == expected
 
 
 @pytest.mark.parametrize("text", ["t", "t=", "t==1", "1=1", "1t=1", "=1", "1=t", "t=t"])
 def test_parse_errors(text: str):
     with pytest.raises(SyntaxError):
-        _ = add_update.parse_input(text)
+        _ = assign.parse_input(text)
+
+
+@pytest.mark.parametrize(
+    "assignments,custom",
+    [
+        ("strength=1 brawl=5", False),
+        ("Apples=3 Barp=2", True),
+    ],
+)
+def test_assign_traits(assignments: str, custom: bool, skilled: Character):
+    parsed = assign.parse_input(assignments)
+    assign.assign_traits(skilled, parsed)
+
+    for trait, rating in parsed.items():
+        for t in skilled.traits:
+            if t.name.casefold() == trait.casefold():
+                assert t.rating == rating
+                if custom:
+                    assert t.category == Trait.Category.CUSTOM
+                else:
+                    assert t.category != Trait.Category.CUSTOM
+
+
+def test_describe_assignments():
+    tf = partial(Trait, category=Trait.Category.ATTRIBUTE, subcategory=Trait.Subcategory.PHYSICAL)
+    traits = [
+        tf(name="Strength", rating=3),
+        tf(name="Dexterity", rating=2),
+    ]
+    desc = assign.describe_assignments(traits)
+    assert desc == "Strength: `3`\nDexterity: `2`"
+
+
+def test_build_assignment_embed(bot_mock, skilled: Character):
+    parsed = assign.parse_input("strength=2 brawl=3")
+    traits = assign.assign_traits(skilled, parsed)
+    embed = assign.build_embed(bot_mock, skilled, traits)
+
+    assert isinstance(embed, CEmbed)
+    assert embed.title == "Traits assigned"
+    assert embed.description == "Strength: `2`\nBrawl: `3`"
+    assert embed.author.name == skilled.name
+
+
+async def test_assign(ctx, skilled: Character):
+    with patch("core.characters.Character.save", return_value=None):
+        await assign.assign(ctx, skilled, "brawl=2")
+
+        ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+        skilled.save.assert_called_once()
