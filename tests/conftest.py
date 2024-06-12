@@ -1,6 +1,7 @@
 """Pytest configuration."""
 
 import asyncio
+from unittest.mock import Mock
 
 import pytest
 from beanie import init_beanie
@@ -33,13 +34,29 @@ def line(request):
 
 @pytest.fixture(scope="function")
 def skilled(character: Character):
-    character.add_trait("Intelligence", 4, Trait.Category.ATTRIBUTE)
-    character.add_trait("Strength", 2, Trait.Category.ATTRIBUTE)
-    character.add_trait("Brawl", 3, Trait.Category.ABILITY)
-    character.add_trait("Fighting", 3, Trait.Category.CUSTOM)
-    character.add_trait("Streetwise", 1, Trait.Category.ABILITY)
+    Cat = Trait.Category
+    Sub = Trait.Subcategory
+
+    character.add_trait("Intelligence", 4, Cat.ATTRIBUTE, Sub.MENTAL)
+    character.add_trait("Strength", 2, Cat.ATTRIBUTE, Sub.PHYSICAL)
+    character.add_trait("Brawl", 3, Cat.ABILITY, Sub.TALENTS)
+    character.add_trait("Fighting", 3, Cat.CUSTOM)
+    character.add_trait("Streetwise", 1, Cat.ABILITY, Sub.TALENTS)
     character.add_subtraits("Brawl", "Kindred")
     return character
+
+
+@pytest.fixture(scope="function")
+def bot_mock() -> Mock:
+    user = Mock()
+    user.display_name = "tiltowait"
+    user.guild_avatar = "https://example.com/img.png"
+
+    bot = Mock()
+    bot.get_user.return_value = user
+    bot.get_emoji = lambda e: e
+
+    return bot
 
 
 @pytest.fixture(scope="session")
