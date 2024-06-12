@@ -14,7 +14,7 @@ from botchcord.character.display import (
     get_field_value,
     get_track_string,
 )
-from core.characters import Damage, Experience, GameLine, Splat
+from core.characters import Experience, GameLine, Splat
 from core.characters.wod import Vampire
 from tests.characters import gen_char
 
