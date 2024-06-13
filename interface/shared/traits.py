@@ -24,8 +24,8 @@ class TraitsCog(Cog, name="Character trait commands"):
         await botchcord.character.traits.display(ctx, character)
 
     @traits.command()
-    @option("traits", required=True)
-    @options.character("The character to assign traits to")
+    @option("traits", description="The traits to assign. Ex: Foo=1 Bar=2", required=True)
+    @options.character("The character to modify")
     async def assign(
         self,
         ctx: discord.ApplicationContext,
@@ -34,6 +34,13 @@ class TraitsCog(Cog, name="Character trait commands"):
     ):
         """Assign new traits or update existing ones."""
         await botchcord.character.traits.assign(ctx, character, traits)
+
+    @traits.command()
+    @option("traits", description="The traits to remove (separate with spaces)", required=True)
+    @options.character("The character to modify")
+    async def remove(self, ctx: discord.ApplicationContext, traits: str, character: str):
+        """Remove traits from a character."""
+        await botchcord.character.traits.remove(ctx, character, traits)
 
 
 def setup(bot: BotchBot):

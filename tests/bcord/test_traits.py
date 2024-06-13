@@ -23,6 +23,7 @@ from tests.characters import gen_char
 # __init__.py only exposes the assign function, so we have to import
 # the module using importlib.
 assign = importlib.import_module("botchcord.character.traits.assign")
+remove = importlib.import_module("botchcord.character.traits.remove")
 
 
 @pytest.fixture
@@ -243,7 +244,11 @@ def test_assign_traits(assignments: str, custom: bool, skilled: Character):
 
 
 def test_describe_assignments():
-    tf = partial(Trait, category=Trait.Category.ATTRIBUTE, subcategory=Trait.Subcategory.PHYSICAL)
+    tf = partial(
+        Trait,
+        category=Trait.Category.ATTRIBUTE,
+        subcategory=Trait.Subcategory.PHYSICAL,
+    )
     traits = [
         tf(name="Strength", rating=3),
         tf(name="Dexterity", rating=2),
@@ -269,3 +274,97 @@ async def test_assign(ctx, skilled: Character):
 
         ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
         skilled.save.assert_called_once()
+
+
+# TRAIT DELETION
+
+
+@pytest.mark.parametrize(
+    "user_input,expected",
+    [
+        ("foo", ["foo"]),
+        ("  foo   ", ["foo"]),
+        ("foo bar", ["foo", "bar"]),
+        ("foo1 bar1 ba2z", ["foo1", "bar1", "ba2z"]),
+    ],
+)
+def test_parse_deletion_input(user_input: str, expected: list[str]):
+    parsed = remove.parse_input(user_input)
+    assert parsed == expected
+
+
+@pytest.mark.parametrize("user_input", ["1", "foo.bar", "1foo", "foo 3", ""])
+def test_parse_deletion_error(user_input: str):
+    with pytest.raises(SyntaxError):
+        _ = remove.parse_input(user_input)
+
+
+@pytest.mark.parametrize(
+    "found,not_found",
+    [
+        (["foo", "bar"], []),
+        (["foo", "bar"], ["baz", "zoq"]),
+    ],
+)
+def test_remove_traits(
+    found: list[str],
+    not_found: list[str],
+    character: Character,
+):
+    for trait in found:
+        character.add_trait(trait, 1)
+        assert character.has_trait(trait)
+
+    f, m = remove.remove_traits(character, found + not_found)
+    assert f == found
+    assert m == not_found
+
+
+def test_remove_core_traits(skilled: Character):
+    t = skilled.find_traits("Strength")
+    assert t[0].rating != 0
+
+    f, m = remove.remove_traits(skilled, ["Strength"])
+
+    assert f == ["Strength"]
+    assert not m
+
+    t = skilled.find_traits("Strength")
+    assert t[0].rating == 0
+
+
+@pytest.mark.parametrize(
+    "found,missing",
+    [
+        (["Strength", "Brawl"], []),
+        (["Strength"], ["Foo"]),
+        ([], ["Foo", "Bar"]),
+    ],
+)
+def test_build_removal_embed(found: list[str], missing: list[str], bot_mock, skilled: Character):
+    embed = remove.build_embed(bot_mock, skilled, found, missing)
+
+    user = bot_mock.get_user()
+    assert embed.title == "Traits removed"
+    assert embed.author.name == skilled.name
+    assert embed.author.icon_url == user.guild_avatar
+
+    if found:
+        assert embed.fields[0].name == "Removed"
+        assert embed.fields[0].value == "\n".join(found)
+        assert embed.fields[0].inline
+
+    if missing:
+        # Last field, since there may be none found
+        assert embed.fields[-1].name == "Not found!"
+        assert embed.fields[-1].value == "\n".join(missing)
+        assert embed.fields[-1].inline
+
+    if missing and not found:
+        assert embed.color == discord.Color.red()
+
+
+async def test_remove(ctx, skilled: Character, mock_char_save):
+    await remove.remove(ctx, skilled, "foo bar")
+    ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+    mock_char_save.assert_called_once()
