@@ -39,10 +39,14 @@ class BotchBot(discord.Bot):
     def load_cogs(self):
         """Load cogs based on configuration parameters."""
         # Add the cogs
-        for filename in os.listdir("./interface/wod"):
-            if filename[0] != "_" and filename.endswith(".py"):
-                logging.getLogger("COGS").debug("Loading %s", filename)
-                self.load_extension(f"interface.wod.{filename[:-3]}")
+        def load(dir: str):
+            for filename in os.listdir(f"./interface/{dir}"):
+                if filename[0] != "_" and filename.endswith(".py"):
+                    logging.getLogger("COGS").debug("Loading %s", filename)
+                    self.load_extension(f"interface.{dir}.{filename[:-3]}")
+
+        load("wod")
+        load("shared")
 
     def get_emoji(self, emoji_name: str, count=1) -> str | list[str] | None:
         """Get an emoji from the emoji guild."""

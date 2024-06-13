@@ -6,7 +6,6 @@ import re
 
 from pyparsing import (
     Combine,
-    DelimitedList,
     Opt,
     ParseException,
     Word,

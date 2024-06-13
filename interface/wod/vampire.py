@@ -1,5 +1,7 @@
 """Vampire commands."""
 
+from functools import partial
+
 import discord
 from discord import option
 from discord.commands import SlashCommandGroup
@@ -7,10 +9,10 @@ from discord.ext.commands import Cog
 
 import utils
 from bot import BotchBot
-from core.characters import Damage, GameLine, Grounding, Splat, Trait
-from core.characters.wod import Vampire
 from botchcord.options import promoted_choice
 from botchcord.wizard import Wizard
+from core.characters import Damage, GameLine, Grounding, Splat, Trait
+from core.characters.wod import Vampire
 
 
 class VampireCog(Cog, name="VtM Commands"):
@@ -77,10 +79,11 @@ class VampireCog(Cog, name="VtM Commands"):
             max_bp = utils.max_vtm_bp(generation)
 
         # Because they have unique names, virtues are separate from regular traits
+        tv = partial(Trait, category=Trait.Category.VIRTUE, subcategory=Trait.Subcategory.BLANK)
         virtues = [
-            Trait(name=integrity, rating=integrity_rating, category=Trait.Category.VIRTUE),
-            Trait(name=control, rating=control_rating, category=Trait.Category.VIRTUE),
-            Trait(name="Courage", rating=courage, category=Trait.Category.VIRTUE),
+            tv(name=integrity, rating=integrity_rating),
+            tv(name=control, rating=control_rating),
+            tv(name="Courage", rating=courage),
         ]
 
         wizard = Wizard(

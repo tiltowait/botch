@@ -8,7 +8,15 @@ from core.characters.wod.base import WoD
 
 def gen_virtues(virtues: dict[str, int]):
     """Generate a list of virtue Traits."""
-    return [Trait(name=k, rating=v, category=Trait.Category.VIRTUE) for k, v in virtues.items()]
+    return [
+        Trait(
+            name=k,
+            rating=v,
+            category=Trait.Category.VIRTUE,
+            subcategory=Trait.Subcategory.BLANK,
+        )
+        for k, v in virtues.items()
+    ]
 
 
 class Mortal(WoD):

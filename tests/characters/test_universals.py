@@ -1,11 +1,10 @@
 """Basic character tests."""
 
-import asyncio
-from urllib.parse import urlparse
+import random
+from unittest.mock import patch
 
 import pydantic
 import pytest
-import requests
 
 import api
 import errors
@@ -109,15 +108,32 @@ def test_update_trait(skilled: Character):
         skilled.update_trait("Fake", 2)
 
 
-def test_remove_trait(skilled: Character):
-    assert skilled.has_trait("Brawl")
-    removed = skilled.remove_trait("brawl")
+def test_remove_trait(character: Character):
+    trait = "Foo"
+    character.add_trait("Foo", 1)
+    assert character.has_trait(trait)
+    assert character.has_trait(trait.lower())
+    removed = character.remove_trait(trait.lower())
 
-    assert removed == "Brawl"
-    assert not skilled.has_trait("Brawl")
+    assert removed == trait
+    assert not character.has_trait(trait)
 
     with pytest.raises(errors.TraitNotFound):
-        skilled.remove_trait("Fake")
+        character.remove_trait("Fake")
+
+
+def test_remove_core_trait(skilled: Character):
+    b = "Brawl"
+    t = skilled.find_traits("Brawl")
+    assert t
+    assert t[0].name == b
+    assert t[0].rating != 0
+
+    skilled.remove_trait(b)
+    t = skilled.find_traits(b)
+    assert t, "Core trait should not have been removed!"
+    assert t[0].name == b
+    assert t[0].rating == 0
 
 
 def test_add_specialties_not_implemented():
@@ -135,21 +151,29 @@ def test_trait_not_found_str_value(character: Character):
         assert str(err) == f"**{character.name}** has no trait named `Foo`."
 
 
-# Botch uses Cloudflare SSL to enable HTTPS for the GCS buckets. Unfortunately,
-# Cloudflare's caching apparently can't be completely disabled, so we have to
-# take a more strategic approach to checking deletion.
-
-
 async def test_single_image_processing(sample_image):
+    """Test the image processing logic but not the API itself."""
     char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     await char.insert()
 
-    inserted = await char.add_image(sample_image)
-    assert urlparse(inserted).netloc == FC_BUCKET, f"{inserted} isn't in dev bucket"
-    assert requests.head(inserted).status_code == 200, "Image not found"
+    with patch(
+        "core.characters.base.api.upload_faceclaim",
+        return_value=f"https://{FC_BUCKET}/123a/456b.webp",
+    ) as mock_add:
+        inserted = await char.add_image(sample_image)
 
-    await char.delete_image(inserted)  # Deletion is tested in a later test
-    assert not char.profile.images
+        mock_add.assert_called_once_with(char, sample_image)
+        assert len(char.profile.images) == 1
+        assert inserted in map(str, char.profile.images)  # Images are type Url
+
+    with patch(
+        "core.characters.base.api.delete_single_faceclaim",
+        return_value=True,
+    ) as mock_delete:
+        await char.delete_image(inserted)
+
+        mock_delete.assert_called_once_with(inserted)
+        assert not char.profile.images
 
     await char.delete()
 
@@ -158,44 +182,31 @@ async def test_multiple_image_deletion(sample_image):
     char = gen_char(GameLine.WOD, Splat.VAMPIRE)
     await char.insert()
 
-    # Insert some images
-    urls = []
-    for _ in range(3):
-        url = await char.add_image(sample_image)
-        assert urlparse(url).netloc == FC_BUCKET, f"{url} isn't in dev bucket"
-        urls.append(url)
+    def randurl(*args, **kwargs):
+        return f"https://{FC_BUCKET}/{random.randint(1, 1000)}/{random.randint(1, 1000)}.webp"
 
-    assert [str(i) for i in char.profile.images] == urls, "The image URLs don't match"
+    with patch("core.characters.base.api.upload_faceclaim", side_effect=randurl) as mock_add:
+        # Insert some images
+        urls = []
+        for _ in range(3):
+            url = await char.add_image(sample_image)
+            urls.append(url)
 
-    # Check that deleting the character deletes all three images
-    await char.delete()
+        mock_add.assert_called_with(char, sample_image)
+        assert mock_add.call_count == len(urls)
+        assert len(set(urls)) == len(urls)
+        assert [str(i) for i in char.profile.images] == urls, "The image URLs don't match"
 
-    await asyncio.sleep(5)
-    wait_time = 15
-    for _ in range(wait_time):
-        for url in urls:
-            if requests.head(url).status_code == 404:
-                urls.remove(url)
-        if not urls:
-            break
-        await asyncio.sleep(1)
+    with patch("core.characters.base.api.delete_character_faceclaims") as mock_delete:
+        # Make sure delete_all_images() clears profile.images
+        await char.delete_all_images()
+        assert not char.is_changed
+        assert not char.profile.images, "The image URLs were not removed from the character!"
 
-    assert not urls, "The images weren't deleted with the character"
+        await char.delete()
 
-
-async def test_image_deletion_flag(sample_image):
-    char = gen_char(GameLine.WOD, Splat.VAMPIRE)
-    await char.insert()
-
-    for _ in range(3):
-        await char.add_image(sample_image)
-
-    assert len(char.profile.images) == 3
-    await char.delete_all_images()
-    assert not char.profile.images
-    assert not char.is_changed
-
-    await char.delete()
+        mock_delete.assert_called_with(char)
+        assert mock_delete.call_count == 2
 
 
 @pytest.mark.parametrize(

@@ -1,5 +1,6 @@
 """Tests of the character creation factory."""
 
+import json
 import random
 from collections import OrderedDict
 
@@ -7,7 +8,7 @@ import pytest
 
 import errors
 from core.characters import Damage, GameLine, Grounding, Splat, Trait
-from core.characters.factory import Factory
+from core.characters.factory import Factory, Schema
 from core.characters.wod import Vampire, gen_virtues
 
 
@@ -41,12 +42,34 @@ def test_invalid_schema():
 
 def test_valid_schema():
     f = Factory(GameLine.WOD, Splat.VAMPIRE, Vampire, {"name": "Billy"})
-    assert isinstance(f.schema, dict)
+    assert isinstance(f.schema, Schema)
 
 
-def test_get_traits(factory: Factory):
-    for trait_category in factory.categories.values():
-        assert trait_category in list(Trait.Category)
+def test_wod_trait_categories_and_subcategories(factory: Factory):
+    with open("./core/characters/schemas/wod/vtm.json") as f:
+        data = json.load(f)
+
+    sections = ["inherent", "learned"]
+    for section in sections:
+        cat = data[section]
+        cat_name = cat["category"]
+        assert cat_name in list(Trait.Category), "Unrecognized category"
+
+        # Check each subcategory and make sure Schema reports them correctly
+        for sub in cat["subcategories"]:
+            sub_name = sub["name"]
+            assert sub_name in list(Trait.Subcategory)
+
+            for trait in sub["traits"]:
+                assert factory.schema.category(trait) == cat_name
+                assert factory.schema.subcategory(trait) == sub_name
+
+    # We've automated the check, but let's do some manual ones just for peace
+    # of mind.
+    schema = factory.schema
+    assert schema.category("Brawl") == Trait.Category.ABILITY
+    assert schema.subcategory("Brawl") == Trait.Subcategory.TALENTS
+    assert schema.subcategory("Academics") == Trait.Subcategory.KNOWLEDGES
 
 
 def test_assignment(factory: Factory):
