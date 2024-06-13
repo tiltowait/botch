@@ -61,7 +61,7 @@ Yes, we're saving the most important info for the end, after most people have al
 - [ ] Macro display
 - [ ] User error messages
 
-Once the above are finished, Botch will enter private beta for Patreon supporters. This will be a true beta period, and not a Big Tech "release finished product but all it beta forever" beta. The bot will not be available to add to other servers during this time, and the database may be wiped at any moment to facilitate backend changes (in reality, I don't expect this to happen, but I can't make any promises). In addition to testing the bot, beta users will be able to make suggestions and help influence the direction of the bot's development.
+Once the above are finished, Botch will enter private beta for Patreon supporters. This will be a true beta period, and not a Big Tech "release finished product but call it beta forever" beta. The bot will not be available to add to other servers during this time, and the database may be wiped at any moment to facilitate backend changes (in reality, I don't expect this to happen, but I can't make any promises). In addition to testing the bot, beta users will be able to make suggestions and help influence the direction of the bot's development.
 
 ### Milestones to v1.0
 
