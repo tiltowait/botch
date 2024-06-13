@@ -74,7 +74,7 @@ def assign_traits(
     return assigned
 
 
-def parse_input(user_input: str):
+def parse_input(user_input: str) -> dict[str, int]:
     """Parse the user's input and find all the traits and ratings."""
     alphascore = alphas + "_"
     equals = Suppress("=")
