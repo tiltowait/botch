@@ -414,7 +414,11 @@ class Character(Document):
         trait_name = name.casefold()
         for i, trait in enumerate(self.traits):
             if trait.name.casefold() == trait_name:
-                del self.traits[i]
+                if trait.category == Trait.Category.CUSTOM:
+                    del self.traits[i]
+                else:
+                    # Set core traits to 0 rather than remove them
+                    trait.rating = 0
                 return trait.name
         raise errors.TraitNotFound(self, name)
 
