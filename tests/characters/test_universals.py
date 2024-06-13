@@ -108,15 +108,32 @@ def test_update_trait(skilled: Character):
         skilled.update_trait("Fake", 2)
 
 
-def test_remove_trait(skilled: Character):
-    assert skilled.has_trait("Brawl")
-    removed = skilled.remove_trait("brawl")
+def test_remove_trait(character: Character):
+    trait = "Foo"
+    character.add_trait("Foo", 1)
+    assert character.has_trait(trait)
+    assert character.has_trait(trait.lower())
+    removed = character.remove_trait(trait.lower())
 
-    assert removed == "Brawl"
-    assert not skilled.has_trait("Brawl")
+    assert removed == trait
+    assert not character.has_trait(trait)
 
     with pytest.raises(errors.TraitNotFound):
-        skilled.remove_trait("Fake")
+        character.remove_trait("Fake")
+
+
+def test_remove_core_trait(skilled: Character):
+    b = "Brawl"
+    t = skilled.find_traits("Brawl")
+    assert t
+    assert t[0].name == b
+    assert t[0].rating != 0
+
+    skilled.remove_trait(b)
+    t = skilled.find_traits(b)
+    assert t, "Core trait should not have been removed!"
+    assert t[0].name == b
+    assert t[0].rating == 0
 
 
 def test_add_specialties_not_implemented():
