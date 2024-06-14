@@ -3,6 +3,7 @@
 import glob
 import json
 from collections import OrderedDict, deque
+from typing import Type
 
 import errors
 import utils
@@ -13,7 +14,7 @@ from core.characters.factory.schema import Schema
 class Factory:
     """Factory for creating characters based on JSON schema."""
 
-    def __init__(self, line: GameLine, splat: Splat, char_class: Character, args: dict):
+    def __init__(self, line: GameLine, splat: Splat, char_class: Type[Character], args: dict):
         self.line = line
         self.splat = splat
         self.char_class = char_class
