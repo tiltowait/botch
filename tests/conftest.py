@@ -1,7 +1,7 @@
 """Pytest configuration."""
 
 import asyncio
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from beanie import init_beanie
@@ -57,6 +57,15 @@ def bot_mock() -> Mock:
     bot.get_emoji = lambda e: e
 
     return bot
+
+
+@pytest.fixture
+def ctx(bot_mock) -> AsyncMock:
+    ctx = AsyncMock()
+    ctx.bot = bot_mock
+    ctx.respond.return_value = None
+
+    return ctx
 
 
 @pytest.fixture

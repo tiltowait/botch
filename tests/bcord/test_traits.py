@@ -41,15 +41,6 @@ def sample_traits() -> list[Trait]:
 
 
 @pytest.fixture
-def ctx(bot_mock) -> AsyncMock:
-    ctx = AsyncMock()
-    ctx.bot = bot_mock
-    ctx.respond.return_value = None
-
-    return ctx
-
-
-@pytest.fixture
 def mixed_traits() -> list[Trait]:
     """A longer list of traits."""
     tf = partial(Trait, category=Trait.Category.ATTRIBUTE, rating=1)
