@@ -2,12 +2,11 @@
 
 import glob
 import json
-from collections import OrderedDict, defaultdict, deque
-from typing import Any
+from collections import OrderedDict, deque
 
 import errors
 import utils
-from core.characters import Character, GameLine, Splat, Trait
+from core.characters import Character, GameLine, Splat
 from core.characters.factory.schema import Schema
 
 
@@ -32,7 +31,7 @@ class Factory:
         """The number of traits yet to be assigned."""
         return len(self.traits)
 
-    def load_schema(self) -> dict[str, Any]:
+    def load_schema(self) -> Schema:
         """Loads the schema file and sets it in self.schema."""
         path = f"./core/characters/schemas/{self.line}/*"
         for schema_file in glob.glob(path):
@@ -69,7 +68,10 @@ class Factory:
         if self.traits:
             raise errors.Unfinished(f"{self.args['name']} is not yet finished.")
 
-        character = self.char_class(**self.args)
+        # Remove NoneType values, since no class has them
+        char_args = {k: v for k, v in self.args.items() if v is not None}
+        character = self.char_class(**char_args)
+
         for trait, rating in self.assignments.items():
             cat = self.schema.category(trait)
             sub = self.schema.subcategory(trait)
