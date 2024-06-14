@@ -1,18 +1,14 @@
 """Vampire commands."""
 
-from functools import partial
-
 import discord
 from discord import option
 from discord.commands import SlashCommandGroup
 from discord.ext.commands import Cog
 
-import utils
 from bot import BotchBot
+from botchcord.character.creation import wod
 from botchcord.options import promoted_choice
-from botchcord.wizard import Wizard
-from core.characters import Damage, GameLine, Grounding, Splat, Trait
-from core.characters.wod import Vampire
+from core.characters import Splat
 
 
 class VampireCog(Cog, name="VtM Commands"):
@@ -73,36 +69,23 @@ class VampireCog(Cog, name="VtM Commands"):
         max_bp: int,
     ):
         """Create a new V20 vampire."""
-        if max_trait is None:
-            max_trait = utils.max_vtm_trait(generation)
-        if max_bp is None:
-            max_bp = utils.max_vtm_bp(generation)
-
-        # Because they have unique names, virtues are separate from regular traits
-        tv = partial(Trait, category=Trait.Category.VIRTUE, subcategory=Trait.Subcategory.BLANK)
-        virtues = [
-            tv(name=integrity, rating=integrity_rating),
-            tv(name=control, rating=control_rating),
-            tv(name="Courage", rating=courage),
-        ]
-
-        wizard = Wizard(
-            GameLine.WOD,
+        await wod.create(
+            ctx,
             Splat.VAMPIRE,
-            Vampire,
+            name,
+            health,
+            willpower,
+            path,
+            path_rating,
+            integrity,
+            integrity_rating,
+            control,
+            control_rating,
+            courage,
+            max_trait,
             generation=generation,
-            max_rating=max_trait,
-            name=name,
-            guild=ctx.guild.id,
-            user=ctx.user.id,
-            health=Damage.NONE * health,
-            willpower=Damage.NONE * willpower,
-            grounding=Grounding(path=utils.normalize_text(path), rating=path_rating),
             max_bp=max_bp,
-            blood_pool=max_bp,
-            virtues=virtues,
         )
-        await wizard.start(ctx.interaction)
 
 
 def setup(bot: BotchBot):
