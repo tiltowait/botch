@@ -1,4 +1,4 @@
-"""Vampire commands."""
+"""Mortal commands."""
 
 import discord
 from discord import option
@@ -11,17 +11,16 @@ from botchcord.options import promoted_choice
 from core.characters import Splat
 
 
-class VampireCog(Cog, name="WoD Vampire Commands"):
-    """The vampire cog contains commands specific to VtM vampires."""
+class MortalCog(Cog, name="WoD Mortal Commands"):
+    """The mortal cog contains commands specific to VtM mortals."""
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
 
-    vampire = SlashCommandGroup("vampire", "Vampire-specific commands")
+    mortal = SlashCommandGroup("mortal", "Mortal-specific commands")
 
-    @vampire.command(name="create")
-    @option("name", description="The new vampire's name")
-    @promoted_choice("generation", "The vampire's generation", start=4, end=15, first=13)
+    @mortal.command(name="create")
+    @option("name", description="The new mortal's name")
     @promoted_choice("health", "The number of health levels", start=1, end=10, first=7)
     @promoted_choice("willpower", "The willpower rating", start=1, end=10)
     @option("path", description="The character's path (e.g. Humanity)")
@@ -45,17 +44,10 @@ class VampireCog(Cog, name="WoD Vampire Commands"):
         min_value=1,
         required=False,
     )
-    @option(
-        "max_bp",
-        description="Override the generational maximum blood pool",
-        min_value=1,
-        required=False,
-    )
-    async def create_vampire(
+    async def create_mortal(
         self,
         ctx: discord.ApplicationContext,
         name: str,
-        generation: int,
         health: int,
         willpower: int,
         path: str,
@@ -66,12 +58,11 @@ class VampireCog(Cog, name="WoD Vampire Commands"):
         control_rating: str,
         courage: int,
         max_trait: int,
-        max_bp: int,
     ):
-        """Create a new V20 vampire."""
+        """Create a new WoD vanilla mortal."""
         await wod.create(
             ctx,
-            Splat.VAMPIRE,
+            Splat.MORTAL,
             name,
             health,
             willpower,
@@ -83,10 +74,8 @@ class VampireCog(Cog, name="WoD Vampire Commands"):
             control_rating,
             courage,
             max_trait,
-            generation=generation,
-            max_bp=max_bp,
         )
 
 
 def setup(bot: BotchBot):
-    bot.add_cog(VampireCog(bot))
+    bot.add_cog(MortalCog(bot))

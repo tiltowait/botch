@@ -26,3 +26,9 @@ class Mortal(WoD):
     splat: Splat = Splat.MORTAL
 
     virtues: List[Trait]
+
+
+class Ghoul(Mortal):
+    """A ghoul is just a fancy mortal."""
+
+    bond_strength: int

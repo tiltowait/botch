@@ -41,14 +41,14 @@ Yes, we're saving the most important info for the end, after most people have al
 - [x] ~~Basic (numeric) rolls~~
 - [x] ~~Character trait pool rolls ("Strength + Brawl")~~
 - [x] ~~Vampire character creation~~
-- [ ] Ghoul character creation
-- [ ] Mortal character creation
+- [x] ~~Ghoul character creation~~
+- [x] ~~Mortal character creation~~
 - [x] ~~Character stats display~~
 - [ ] Character deletion
 - [ ] Vampire character stats adjustment
 - [ ] Ghoul character stats adjustment
 - [ ] Mortal character stats adjustment
-- [ ] Character selection *(partially implemented)*
+- [ ] Character selection
 - [x] ~~Traits assignment~~
 - [x] ~~Traits display~~
 - [x] ~~Traits removal~~

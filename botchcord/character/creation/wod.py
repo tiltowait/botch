@@ -7,7 +7,7 @@ import discord
 import utils
 from botchcord.wizard import Wizard
 from core.characters import Damage, GameLine, Grounding, Splat, Trait
-from core.characters.wod import Vampire
+from core.characters.wod import Ghoul, Mortal, Vampire
 
 
 async def create(
@@ -25,8 +25,9 @@ async def create(
     courage: int,
     max_trait: int,
     *,
-    generation: int,
-    max_bp: int,
+    generation: int | None = None,
+    max_bp: int | None = None,
+    bond_strength: int | None = None
 ):
     """Start a WoD character creation wizard."""
     # Because they have unique names, virtues are separate from regular traits
@@ -37,7 +38,7 @@ async def create(
         tv(name="Courage", rating=courage),
     ]
 
-    if splat == Splat.VAMPIRE:
+    if splat == Splat.VAMPIRE and generation is not None:
         if max_trait is None:
             max_trait = utils.max_vtm_trait(generation)
         if max_bp is None:
@@ -60,11 +61,16 @@ async def create(
         max_bp=max_bp,
         blood_pool=max_bp,
         virtues=virtues,
+        bond_strength=bond_strength,
     )
     await wizard.start(ctx.interaction)
 
 
 def creation_class(splat: Splat):
     """Gets the character creation class for the given line and splat."""
-    splats = {Splat.VAMPIRE: Vampire}
+    splats = {
+        Splat.MORTAL: Mortal,
+        Splat.GHOUL: Ghoul,
+        Splat.VAMPIRE: Vampire,
+    }
     return splats[splat]
