@@ -180,15 +180,27 @@ class Trait(BaseModel):
                 )
         return matches
 
+    @staticmethod
+    def _exact_comp(t: str, i: str) -> bool:
+        """Return true if t is i."""
+        return t == i.casefold()
+
+    @staticmethod
+    def _starting_comp(t: str, i: str) -> bool:
+        """Return true if i starts with t."""
+        return i.casefold().startswith(t)
+
     def expanding(self, identifier: str, exact: bool, join=True) -> list[str | list[str]]:
         """Expand the user's input to full skill:spec names. If join is False, return a list."""
         tokens = [token.casefold() for token in identifier.split(self._DELIMITER)]
 
         # The "comp" lambda takes a token and an instance var
         if exact:
-            comp = lambda t, i: t == i.casefold()
+            # comp = lambda t, i: t == i.casefold()
+            comp = self._exact_comp
         else:
-            comp = lambda t, i: i.casefold().startswith(t)
+            # comp = lambda t, i: i.casefold().startswith(t)
+            comp = self._starting_comp
 
         if comp(tokens[0], self.name):
             # A token might match multiple specs in the same skill. Therefore,

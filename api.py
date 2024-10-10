@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 import aiohttp
 import async_timeout
 
+import core.characters
 import errors
 from config import FC_BUCKET
 
@@ -43,7 +44,7 @@ def measure(func):
     return wrapper
 
 
-async def upload_faceclaim(character: "Character", image_url: str) -> str:
+async def upload_faceclaim(character: "core.characters.Character", image_url: str) -> str:
     """Uploads a faceclaim to cloud storage."""
     payload = {
         "guild": character.guild,
@@ -73,7 +74,7 @@ async def delete_single_faceclaim(image: str) -> bool:
     return True
 
 
-async def delete_character_faceclaims(character: "Character"):
+async def delete_character_faceclaims(character: "core.characters.Character"):
     """Delete all of a character's faceclaims."""
     res = await _delete(path=f"/faceclaim/delete/{FC_BUCKET}/{character.id}/all")
     logger.info("%s", res)

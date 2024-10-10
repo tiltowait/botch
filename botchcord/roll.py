@@ -5,7 +5,6 @@ from enum import IntEnum
 from typing import Optional
 
 import discord
-from pyparsing import DelimitedList, ParseException, Word, alphas
 
 import botchcord
 import errors
