@@ -1,7 +1,7 @@
 """Dice rolls!"""
 
 import re
-from typing import List, Optional
+from typing import Optional
 
 from beanie import Document, Insert, Link, before_event
 from numpy.random import default_rng
@@ -29,10 +29,10 @@ class Roll(Document):
     target: int  # WoD: Difficulty; CofD: "again"
     wp: bool = False
     autos: int = 0
-    specialties: Optional[List[str]] = Field(default_factory=list)
+    specialties: Optional[list[str]] = Field(default_factory=list)
     rote: bool = False
-    dice: List[int] = Field(default_factory=list)
-    pool: Optional[List[str | int]] = None
+    dice: list[int] = Field(default_factory=list)
+    pool: Optional[list[str | int]] = None
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
     use_in_stats: bool = True
@@ -168,6 +168,12 @@ class Roll(Document):
                     self.dice[-1] = d10()
 
         return self
+
+    def add_specs(self, specs: list[str]):
+        """Add a specialty."""
+        if self.specialties is None:
+            self.specialties = []
+        self.specialties.extend(specs)
 
     class Settings:
         name = "rolls"

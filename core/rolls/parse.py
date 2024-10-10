@@ -21,11 +21,11 @@ from core.characters import Character
 
 class RollParser:
     def __init__(self, syntax: str, character: Character | None):
-        self.raw_syntax: str = syntax
-        self.character: Character = character
-        self.pool: list[str] = []
+        self.raw_syntax = syntax
+        self.character = character
+        self.pool: list[str | int] = []
         self.equation: list[str | int] = []
-        self.num_dice = 0
+        self.num_dice: int = 0
         self.specialties = []
 
     @property

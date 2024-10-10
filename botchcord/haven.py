@@ -32,13 +32,17 @@ class Haven(discord.ui.View):
     ambiguous."""
 
     def __init__(
-        self, ctx: discord.ApplicationContext, line: GameLine, splat: Splat, character: str | None
+        self,
+        ctx: discord.ApplicationContext,
+        line: GameLine | None,
+        splat: Splat | None,
+        character: str | Character | None,
     ):
         self.ctx = ctx
         self.line = line
         self.splat = splat
         self.character = character
-        self.chars: list[Character] = None
+        self.chars: list[Character] | None = None
 
     async def _populate(self):
         """Get the available characters."""
@@ -54,6 +58,6 @@ class Haven(discord.ui.View):
         """Get the match, assuming there's only one. If there are multiple,
         returns None."""
         await self._populate()
-        if len(self.chars) == 1:
+        if self.chars and len(self.chars) == 1:
             return self.chars[0]
         return None

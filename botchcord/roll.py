@@ -10,7 +10,7 @@ import botchcord
 import errors
 import utils
 from botchcord.haven import Haven
-from core.characters import GameLine
+from core.characters import Character, GameLine
 from core.rolls import Roll
 from core.rolls.parse import RollParser
 
@@ -34,7 +34,7 @@ async def roll(
     difficulty: int,
     specialties: Optional[str],
     comment: Optional[str],
-    character: Optional[str],
+    character: Optional[str | Character],
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
     rp = RollParser(pool, None)
@@ -53,7 +53,7 @@ async def roll(
     if specialties:
         extra_specs = re.split(r"\s*,\s*", utils.normalize_text(specialties))
         extra_specs = [e for e in extra_specs if e]  # Remove any empty strings
-        roll.specialties.extend(extra_specs)
+        roll.add_specs(extra_specs)
 
     emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(ctx, roll, extra_specs, comment, emojis)
@@ -66,7 +66,7 @@ def build_embed(
     ctx: discord.ApplicationContext,
     roll: Roll,
     extra_specs: list[str] | None,
-    comment: str,
+    comment: str | None,
     emojis: bool,
 ) -> discord.Embed:
     """Build the roll embed."""
@@ -97,7 +97,7 @@ def build_embed(
 
     if roll.wod:
         embed.add_field(name="Difficulty", value=str(roll.target))
-    if extra_specs:
+    if roll.specialties and extra_specs:
         embed.add_field(
             name="Bonus spec" if len(roll.specialties) == 1 else "Bonus specs",
             value=", ".join(roll.specialties),
