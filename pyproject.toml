@@ -29,6 +29,7 @@ mongomock-motor = "^0.0.20"
 pytest-cov = "^4.1.0"
 requests = "^2.31.0"
 debugpy = "^1.6.7"
+setuptools = "^72.2.0"
 
 [build-system]
 requires = ["poetry-core"]
