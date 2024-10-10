@@ -74,9 +74,9 @@ def test_cofd_explosions():
         (9, 1, True, None),
         (9, 1, False, ["Spec"]),
         (9, 2, True, ["Spec"]),
-        (10, -2, False, None),
+        (11, -3, False, None),  # Unrealistic case
         (10, 1, True, None),
-        (10, -1, False, ["Spec"]),
+        (10, 0, False, ["Spec"]),
         (10, 1, True, ["Spec"]),
     ],
 )
@@ -151,7 +151,7 @@ def test_autos():
     roll.dice = [1, 1]
     assert roll.successes == 0
     roll.dice = [1, 1, 1]
-    assert roll.successes == -1
+    assert roll.successes == 0  # autos override botch possibility
 
 
 def test_missing_game_line():
@@ -226,5 +226,6 @@ async def test_roll_spec_coalescence(spec: list[str] | None, expected: list[str]
     await r.insert()
 
     r2 = await Roll.find_one()
+    assert r2 is not None
     assert r.id == r2.id
     assert r2.specialties == expected

@@ -7,9 +7,6 @@ from typing import Optional
 import pytest
 
 import errors
-from core.characters import Character, GameLine, Splat, Trait
-from core.rolls import Roll
-from core.rolls.parse import RollParser
 from botchcord.roll import (
     DICE_CAP,
     DICE_CAP_MESSAGE,
@@ -21,6 +18,9 @@ from botchcord.roll import (
     emojify_dice,
     textify_dice,
 )
+from core.characters import Character, GameLine, Splat, Trait
+from core.rolls import Roll
+from core.rolls.parse import RollParser
 from tests.characters import gen_char
 
 
@@ -143,6 +143,21 @@ def test_embed_title(successes: int, expected: str, line: GameLine):
 
     roll = Roll(line=line, num_dice=successes, target=6, dice=dice)
     assert embed_title(roll) == expected
+
+
+@pytest.mark.parametrize(
+    "dice,should_botch",
+    [
+        ([1, 1, 10], False),
+        ([1, 5], True),
+    ],
+)
+def test_botch_logic(dice: list[int], should_botch: bool):
+    roll = Roll(line=GameLine.WOD, num_dice=len(dice), target=6, dice=dice)
+    if should_botch:
+        assert "Botch!" in embed_title(roll)
+    else:
+        assert "Botch!" not in embed_title(roll)
 
 
 @pytest.mark.parametrize(

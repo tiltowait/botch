@@ -93,7 +93,10 @@ class Roll(Document):
             successes += tens
 
         ones = sum(d == 1 for d in self.dice)
-        successes -= ones
+        if successes > 0 and ones > successes:
+            successes = 0
+        else:
+            successes -= ones
 
         if self.wp:
             # WP creates an uncancelable success
