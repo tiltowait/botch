@@ -13,7 +13,7 @@ def test_single_d10():
 
 
 @pytest.mark.parametrize("count", [n for n in range(1, 101)])
-def test_multiple_d10s(count):
+def test_multiple_d10s(count: int):
     dice = d10(count)
     assert len(dice) == count
     assert all(1 <= d <= 10 for d in dice)
