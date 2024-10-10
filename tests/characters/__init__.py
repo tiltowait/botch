@@ -1,9 +1,13 @@
 """Shared helper functions."""
 
+from typing import Type, TypeVar
+
 from core.characters import Character, Damage, GameLine, Grounding, Splat
 
+T = TypeVar("T", bound=Character)
 
-def gen_char(line: GameLine, splat: Splat, cls=Character, **kwargs) -> Character:
+
+def gen_char(line: GameLine, splat: Splat, cls: Type[T] = Character, **kwargs) -> T:
     """Create a basic character."""
     args = {
         "name": "Test",
