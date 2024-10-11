@@ -33,9 +33,12 @@ class CharCache:
         key = self.key(guild, user)
         if key not in self._cache:
             chars = await Character.find(
-                Character.guild == guild, Character.user == user, with_children=True
+                Character.guild == guild,
+                Character.user == user,
+                with_children=True,
             ).to_list()
-            self._cache[key] = chars
+
+            self._cache[key] = sorted(chars, key=lambda c: c.name.casefold())
 
         chars = self._cache[key]
         if line is not None:
