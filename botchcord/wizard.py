@@ -52,7 +52,7 @@ class Wizard(discord.ui.View):
             title="Timed out",
             description="Due to inactivity, the character entry wizard has been canceled.",
         )
-        await self.message.edit(embed=embed, view=None)
+        await self.message.edit(embed=embed, view=None)  # type:ignore
 
     def embed(self) -> discord.Embed:
         """Generate the embed for the current trait being looked at."""
@@ -78,12 +78,12 @@ class Wizard(discord.ui.View):
 
     async def rating_selected(self, interaction: discord.Interaction):
         """Apply the rating to the current trait, then prompt for the next one."""
-        if values := interaction.data.get("values"):
+        if values := interaction.data.get("values"):  # type: ignore
             rating = int(values[0])
         else:
             for child in self.children:
-                if child.custom_id == interaction.custom_id:
-                    rating = int(child.label)
+                if child.custom_id == interaction.custom_id:  # type: ignore
+                    rating = int(child.label)  # type: ignore
                     break
 
         # Got the rating
@@ -107,5 +107,5 @@ class Wizard(discord.ui.View):
 
     async def start(self, interaction: discord.Interaction):
         """Start the wizard."""
-        self.bot_avatar = interaction.client.user.display_avatar
+        self.bot_avatar = interaction.client.user.display_avatar  # type: ignore
         await interaction.response.send_message(embed=self.embed(), view=self, ephemeral=True)
