@@ -84,3 +84,15 @@ class TraitAlreadyExists(TraitError):
 
 class InvalidTrait(TraitError):
     """Raised when the wrong trait is chosen for an action."""
+
+
+class HavenError(BotchError):
+    """Base error class for Haven errors."""
+
+
+class NoMatchingCharacter(HavenError):
+    """Raised when a character can't be matched."""
+
+
+class NoCharacterSelected(HavenError):
+    """Raised when a character isn't selected."""
