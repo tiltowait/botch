@@ -99,6 +99,19 @@ class RollParser:
 
         return self
 
+    @classmethod
+    def can_roll(cls, char: Character, syntax: str) -> bool:
+        """Returns true if the character can make the roll."""
+        try:
+            rp = cls(syntax, char)
+            rp.parse()
+        except errors.TraitNotFound:
+            return False
+        except errors.AmbiguousTraitError:
+            return True
+        else:
+            return True
+
 
 # Math Helpers
 

@@ -3,8 +3,9 @@
 import pytest
 
 import errors
-from core.characters import Character, GameLine
+from core.characters import Character, GameLine, Splat
 from core.rolls.parse import RollParser
+from tests.characters import gen_char
 
 
 @pytest.mark.parametrize(
@@ -138,3 +139,12 @@ def test_willpower_roll_impact(
 
     assert p.using_wp == willpower
     assert p.num_dice == expected
+
+
+def test_can_parse():
+    a = gen_char(GameLine.WOD, Splat.VAMPIRE)
+    a.add_trait("Strength", 2)
+    a.add_trait("Brawl", 5)
+
+    assert RollParser.can_roll(a, "stren+br")
+    assert not RollParser.can_roll(a, "stren+fake")

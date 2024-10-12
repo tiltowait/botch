@@ -6,6 +6,7 @@ from typing import Optional
 
 import discord
 
+import bot
 import botchcord
 import errors
 import utils
@@ -16,6 +17,7 @@ from core.rolls.parse import RollParser
 
 DICE_CAP = 40
 DICE_CAP_MESSAGE = "***Too many to show.***"
+GAME_LINE = GameLine.WOD  # TODO: Use a global config
 
 
 class Color(IntEnum):
@@ -29,7 +31,7 @@ class Color(IntEnum):
 
 
 async def roll(
-    ctx: discord.ApplicationContext,
+    ctx: bot.AppCtx,
     pool: str,
     difficulty: int,
     specialties: Optional[str],
@@ -39,12 +41,12 @@ async def roll(
     """Perform and display the specified roll. The roll is saved to the database."""
     rp = RollParser(pool, None)
     if rp.needs_character or character:
-        haven = Haven(ctx, None, None, character)
+        haven = Haven(ctx, None, None, character, lambda c: RollParser.can_roll(c, pool))
         if character := await haven.get_match():
             rp.character = character
 
     rp.parse()
-    roll = Roll.from_parser(rp, difficulty, GameLine.WOD).roll()
+    roll = Roll.from_parser(rp, difficulty, GAME_LINE).roll()
 
     extra_specs = []
     if specialties:
