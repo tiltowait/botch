@@ -77,5 +77,3 @@ The following features will be added during the private beta period:
 And maybe ...
 
 - [ ] Metamacros
-
-It's a long list! While there's no ETA, many of the features listed already have their backends finished—most that remains is the command interface. Others can largely be lifted from Inconnu's code base. **I expect to enter beta in or before August, 2024.**
