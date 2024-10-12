@@ -8,6 +8,7 @@ from discord.ext.commands import Cog
 from bot import BotchBot
 from botchcord.character.creation import wod
 from botchcord.options import promoted_choice
+from config import MAX_NAME_LEN
 from core.characters import Splat
 
 
@@ -20,7 +21,7 @@ class VampireCog(Cog, name="WoD Vampire Commands"):
     vampire = SlashCommandGroup("vampire", "Vampire-specific commands")
 
     @vampire.command(name="create")
-    @option("name", description="The new vampire's name")
+    @option("name", description="The new vampire's name", max_length=MAX_NAME_LEN)
     @promoted_choice("generation", "The vampire's generation", start=4, end=15, first=13)
     @promoted_choice("health", "The number of health levels", start=1, end=10, first=7)
     @promoted_choice("willpower", "The willpower rating", start=1, end=10)

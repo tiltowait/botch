@@ -17,6 +17,8 @@ BOT_ID: int | None = None
 # Bucket for storing character images
 FC_BUCKET = "pcs-dev.botch.lol" if "TESTING" in os.environ else "pcs.botch.lol"
 
+MAX_NAME_LEN = 37  # Because of modal length restrictions
+
 
 def set_bot_id(bot_id: int):
     """Set the bot's user ID."""

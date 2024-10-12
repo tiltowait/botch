@@ -8,7 +8,7 @@ import pytest
 
 import api
 import errors
-from config import FC_BUCKET
+from config import FC_BUCKET, MAX_NAME_LEN
 from core.characters import Character, Damage, GameLine, Splat, Trait
 from tests.characters import gen_char
 
@@ -34,6 +34,11 @@ async def test_char_saving(character):
     found = await Character.find_one(Character.id == char.id)
 
     assert found == char
+
+
+def test_char_name_max_length():
+    with pytest.raises(pydantic.ValidationError):
+        _ = gen_char(GameLine.WOD, Splat.VAMPIRE, name="A" * (MAX_NAME_LEN + 1))
 
 
 async def test_state_management(character):

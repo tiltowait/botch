@@ -14,6 +14,7 @@ from pydantic import AnyUrl, BaseModel, Field, HttpUrl
 
 import api
 import errors
+from config import MAX_NAME_LEN
 
 
 class Damage(StrEnum):
@@ -276,7 +277,7 @@ class Character(Document):
     unexpected behavior. Do not directly work on these objects; use
     Character.get_traits() instead."""
 
-    name: str
+    name: str = Field(max_length=MAX_NAME_LEN)
     profile: Profile = Field(default_factory=Profile, repr=False)
     line: GameLine
     splat: Splat

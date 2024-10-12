@@ -8,6 +8,7 @@ from discord.ext.commands import Cog
 from bot import BotchBot
 from botchcord.character.creation import wod
 from botchcord.options import promoted_choice
+from config import MAX_NAME_LEN
 from core.characters import Splat
 
 
@@ -20,7 +21,7 @@ class GhoulCog(Cog, name="WoD Ghoul Commands"):
     ghoul = SlashCommandGroup("ghoul", "Ghoul-specific commands")
 
     @ghoul.command(name="create")
-    @option("name", description="The new ghoul's name")
+    @option("name", description="The new ghoul's name", max_length=MAX_NAME_LEN)
     @promoted_choice("health", "The number of health levels", start=1, end=10, first=7)
     @promoted_choice("willpower", "The willpower rating", start=1, end=10)
     @option("path", description="The character's path (e.g. Humanity)")
