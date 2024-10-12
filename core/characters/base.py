@@ -10,7 +10,7 @@ from typing import List, Optional
 
 import pymongo
 from beanie import Delete, Document, before_event
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import AnyUrl, BaseModel, Field, HttpUrl
 
 import api
 import errors
@@ -75,6 +75,14 @@ class Profile(BaseModel):
     def main_image(self) -> str | None:
         """The character's main profile image."""
         return str(self.images[0]) if self.images else None
+
+    def add_image(self, url: str):
+        """Add an image."""
+        self.images.append(AnyUrl(url))
+
+    def remove_image(self, url: str):
+        """Remove an image."""
+        self.images.remove(AnyUrl(url))
 
 
 class Trait(BaseModel):
@@ -491,7 +499,7 @@ class Character(Document):
     async def add_image(self, discord_url: str) -> str:
         """Upload a character image via URL. Premium feature."""
         image_url = await api.upload_faceclaim(self, discord_url)
-        self.profile.images.append(HttpUrl(image_url))
+        self.profile.add_image(image_url)
         await self.save_changes()
 
         return image_url
@@ -499,7 +507,7 @@ class Character(Document):
     async def delete_image(self, url: str):
         """Remove a profile image. Premium feature."""
         if await api.delete_single_faceclaim(url):
-            self.profile.images.remove(HttpUrl(url))
+            self.profile.remove_image(url)
             await self.save_changes()
 
     async def delete_all_images(self, save_changes=True):
