@@ -1,12 +1,11 @@
 """Command interface for basic WoD commands."""
 
-import discord
 from discord import option
 from discord.commands import slash_command
 from discord.ext.commands import Cog
 
 import botchcord
-from bot import BotchBot
+from bot import AppCtx, BotchBot
 from botchcord import options
 
 
@@ -32,10 +31,10 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         required=False,
         max_length=300,
     )
-    @option("character", description="[Optional] The character performing the roll", required=False)
+    @options.character("[Optional] The character performing the roll")
     async def roll(
         self,
-        ctx: discord.ApplicationContext,
+        ctx: AppCtx,
         pool: str,
         difficulty: int,
         specialty: str,
