@@ -38,6 +38,7 @@ class BotchBot(discord.Bot):
         await self.sync_commands()
 
     async def on_ready(self):
+        assert self.user is not None
         config.set_bot_id(self.user.id)
         logger.info("Ready!")
 
