@@ -38,28 +38,24 @@ Yes, we're saving the most important info for the end, after most people have al
 
 ### Milestones to private beta
 
-- [x] ~~Basic (numeric) rolls~~
-- [x] ~~Character trait pool rolls ("Strength + Brawl")~~
-- [x] ~~Vampire character creation~~
-- [x] ~~Ghoul character creation~~
-- [x] ~~Mortal character creation~~
-- [x] ~~Character stats display~~
 - [ ] Character deletion
 - [ ] Vampire character stats adjustment
 - [ ] Ghoul character stats adjustment
 - [ ] Mortal character stats adjustment
-- [ ] Character selection
-- [x] ~~Traits assignment~~
-- [x] ~~Traits display~~
-- [x] ~~Traits removal~~
 - [ ] Specialties assignment
 - [ ] Specialties display
 - [ ] Specialties removal
-- [ ] Macro creation
-- [ ] Macro deletion
-- [ ] Macro updates
-- [ ] Macro display
 - [ ] User error messages
+- [x] ~~*Basic (numeric) rolls*~~
+- [x] ~~*Character trait pool rolls ("Strength + Brawl")*~~
+- [x] ~~*Vampire character creation*~~
+- [x] ~~*Ghoul character creation*~~
+- [x] ~~*Mortal character creation*~~
+- [x] ~~*Character stats display*~~
+- [x] ~~*Character selection*~~
+- [x] ~~*Traits assignment*~~
+- [x] ~~*Traits display*~~
+- [x] ~~*Traits removal*~~
 
 Once the above are finished, Botch will enter private beta for Patreon supporters. This will be a true beta period, and not a Big Tech "release finished product but call it beta forever" beta. The bot will not be available to add to other servers during this time, and the database may be wiped at any moment to facilitate backend changes (in reality, I don't expect this to happen, but I can't make any promises). In addition to testing the bot, beta users will be able to make suggestions and help influence the direction of the bot's development.
 
@@ -67,12 +63,19 @@ Once the above are finished, Botch will enter private beta for Patreon supporter
 
 The following features will be added during the private beta period:
 
+- [ ] Macro creation
+- [ ] Macro deletion
+- [ ] Macro updates
+- [ ] Macro display
 - [ ] QoL commands, particularly for vampire characters (e.g. a `/vampire blood` command that allows the player to quickly add/remove blood points from their pool without using the more complex `/vampire adjust` command)
 - [ ] An `/embrace` command
 - [ ] A command to turn a mortal character into a ghoul ("enghoul")
 - [ ] Lookup commands for STs
 - [ ] Logging facilities for STs
 - [ ] Character image uploads (premium feature)
+
+And maybe ...
+
 - [ ] Metamacros
 
 It's a long list! While there's no ETA, many of the features listed already have their backends finished—most that remains is the command interface. Others can largely be lifted from Inconnu's code base. **I expect to enter beta in or before August, 2024.**
