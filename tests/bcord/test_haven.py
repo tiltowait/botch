@@ -17,6 +17,7 @@ from tests.characters import gen_char
 @pytest.fixture(autouse=True)
 def clear_cache():
     """Clear the cache after every test."""
+    cache._cache = {}
     yield
     cache._cache = {}
 
