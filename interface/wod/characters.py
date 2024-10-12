@@ -23,6 +23,6 @@ class CharactersCog(Cog, name="General character commands"):
         await botchcord.character.display(ctx, character)
 
 
-def setup(bot: discord.Bot):
+def setup(bot: BotchBot):
     """Add the cog to the bot."""
     bot.add_cog(CharactersCog(bot))

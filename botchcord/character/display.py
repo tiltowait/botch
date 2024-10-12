@@ -69,7 +69,7 @@ def build_embed(
     character: Character,
     emojis: bool,
     *,
-    fields: list[DisplayField] | None = None,
+    fields: tuple[DisplayField, ...] | None = None,
     title="",
     description="",
     thumbnail: str | None = None,

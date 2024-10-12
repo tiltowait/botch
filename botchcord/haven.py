@@ -1,28 +1,46 @@
 """Character selection utilities."""
 
 import functools
-from typing import Callable
+from typing import Any, Callable, Concatenate, Coroutine, ParamSpec, TypeVar
 
 import discord
-from discord import ButtonStyle
+from discord import ApplicationContext, ButtonStyle
 from discord.ui import Button, Select
 
 from core.cache import cache
 from core.characters import Character, GameLine, Splat
 from errors import NoCharacterSelected, NoMatchingCharacter
 
+T = TypeVar("T")
 
-def haven(line: GameLine | None = None, splat: Splat | None = None, filter=lambda _: True):
-    def inner(func):
+
+T = TypeVar("T")
+P = ParamSpec("P")
+
+
+def haven(
+    line: GameLine | None = None,
+    splat: Splat | None = None,
+    filter: Callable[[Character], bool] = lambda _: True,
+) -> Callable[
+    [Callable[Concatenate[ApplicationContext, Character, P], Coroutine[Any, Any, T]]],
+    Callable[Concatenate[ApplicationContext, str | Character, P], Coroutine[Any, Any, T]],
+]:
+    def inner(
+        func: Callable[Concatenate[ApplicationContext, Character, P], Coroutine[Any, Any, T]]
+    ) -> Callable[Concatenate[ApplicationContext, str | Character, P], Coroutine[Any, Any, T]]:
         """A decorator that automatically selects a character."""
-        functools.wraps(func)
 
-        async def wrapper(ctx, char, *args, **kwargs):
+        @functools.wraps(func)
+        async def wrapper(
+            ctx: ApplicationContext,
+            char: str | Character,
+            *args: P.args,
+            **kwargs: P.kwargs,
+        ) -> T:
             if not isinstance(char, Character):
                 haven = Haven(ctx, line, splat, char, filter)
-                if (char := await haven.get_match()) is None:
-                    # TODO: Present the selector
-                    pass
+                char = await haven.get_match()
 
             return await func(ctx, char, *args, **kwargs)
 
@@ -37,7 +55,7 @@ class Haven(discord.ui.View):
 
     def __init__(
         self,
-        ctx: discord.ApplicationContext,
+        ctx: ApplicationContext,
         line: GameLine | None,
         splat: Splat | None,
         character: str | Character | None,
