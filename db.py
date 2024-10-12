@@ -13,8 +13,6 @@ from core.rolls import Roll
 load_dotenv()
 
 logger = logging.getLogger("db")
-logger.info("Initializing database connection")
-
 DOCUMENT_MODELS = [Character, wod.Vampire, wod.Mortal, Roll]
 
 
