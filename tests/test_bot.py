@@ -65,6 +65,12 @@ def test_get_emoji(emoji_name, count, expected, bot):
             assert result == expected
 
 
+async def test_get_ctx(bot: BotchBot):
+    inter = AsyncMock()
+    ctx = await bot.get_application_context(inter)
+    assert isinstance(ctx, AppCtx)
+
+
 async def test_send_error_message(bot: BotchBot, ctx: AppCtx):
     msg = "This is a test"
     err = ApplicationCommandInvokeError(errors.BotchError(msg))
