@@ -10,6 +10,7 @@ import config
 import db
 import errors
 from config import DEBUG_GUILDS, EMOJI_GUILD
+from errors import BotchError
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -87,3 +88,19 @@ class BotchBot(discord.Bot):
         """Make all contexts AppCtx instances."""
         ctx = await super().get_application_context(interaction, cls=cls)
         return cast(AppCtx, ctx)
+
+    async def on_application_command_error(
+        self,
+        ctx: AppCtx,
+        exception: discord.ApplicationCommandInvokeError,
+    ):
+        err = exception.original
+        match err:
+            case discord.NotFound():
+                # This might be dangerous during development
+                pass
+            case BotchError():
+                await ctx.send_error("Error", str(err), ephemeral=True)
+            case _:
+                # TODO: Error reporter
+                raise err

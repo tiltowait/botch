@@ -44,7 +44,7 @@ Yes, we're saving the most important info for the end, after most people have al
 - [ ] Specialties assignment
 - [ ] Specialties display
 - [ ] Specialties removal
-- [ ] User error messages
+- [x] ~~*User error messages*~~
 - [x] ~~*Character deletion*~~
 - [x] ~~*Basic (numeric) rolls*~~
 - [x] ~~*Character trait pool rolls ("Strength + Brawl")*~~

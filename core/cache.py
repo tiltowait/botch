@@ -69,7 +69,7 @@ class CharCache:
         for char in chars:
             if char.name.casefold() == name.casefold():
                 return char
-        raise errors.CharacterNotFound
+        raise errors.CharacterNotFound(f"**{name}** not found.")
 
     async def register(self, character: Character):
         """Insert the character and register it in the cache."""

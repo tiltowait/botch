@@ -1,18 +1,26 @@
 """Bot instance tests."""
 
 from unittest import mock
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 import pytest
+from discord import ApplicationCommandInvokeError, NotFound
 
 import config
 import errors
-from bot import BotchBot
+from bot import AppCtx, BotchBot
 
 
 @pytest.fixture
 def bot():
     return BotchBot()
+
+
+@pytest.fixture
+def ctx(bot: BotchBot) -> AppCtx:
+    ctx = AppCtx(bot, AsyncMock())
+    ctx.send_error = AsyncMock()
+    return ctx
 
 
 async def test_on_connect(bot):
@@ -55,3 +63,24 @@ def test_get_emoji(emoji_name, count, expected, bot):
         else:
             result = bot.get_emoji(emoji_name, count)
             assert result == expected
+
+
+async def test_send_error_message(bot: BotchBot, ctx: AppCtx):
+    msg = "This is a test"
+    err = ApplicationCommandInvokeError(errors.BotchError(msg))
+
+    await bot.on_application_command_error(ctx, err)
+    ctx.send_error.assert_awaited_once_with("Error", msg, ephemeral=True)
+
+
+async def test_re_raise_error_message(bot: BotchBot, ctx: AppCtx):
+    err = ApplicationCommandInvokeError(ValueError("test"))
+
+    with pytest.raises(ValueError):
+        await bot.on_application_command_error(ctx, err)
+
+
+async def test_not_found_ignored(bot: BotchBot, ctx: AppCtx):
+    err = ApplicationCommandInvokeError(NotFound(MagicMock(), None))
+    await bot.on_application_command_error(ctx, err)
+    ctx.send_error.assert_not_called()

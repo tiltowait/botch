@@ -42,8 +42,13 @@ async def roll(
     rp = RollParser(pool, None)
     if rp.needs_character or character:
         haven = Haven(ctx, None, None, character, lambda c: RollParser.can_roll(c, pool))
-        if character := await haven.get_match():
-            rp.character = character
+        try:
+            if character := await haven.get_match():
+                rp.character = character
+        except errors.NoMatchingCharacter:
+            if character:
+                raise errors.RollError(f"**{character}** is unable to roll `{pool}`.")
+            raise errors.RollError(f"No characters able to roll `{pool}`.")
 
     rp.parse()
     roll = Roll.from_parser(rp, difficulty, GAME_LINE).roll()

@@ -96,13 +96,13 @@ class Haven(discord.ui.View):
                 char = next(c for c in self.chars if c.name.lower() == self.character.lower())
                 return char
             except StopIteration as err:
-                raise NoMatchingCharacter from err
+                raise NoMatchingCharacter(f"**{self.character}** not found.") from err
 
         if len(self.chars) == 1:
             return self.chars[0]
 
         if not self.chars:
-            raise NoMatchingCharacter
+            raise NoMatchingCharacter("No matching character found.")
 
         # User must select from among multiple matches
         self._add_buttons()
