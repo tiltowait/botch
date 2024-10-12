@@ -45,9 +45,9 @@ async def roll(
         try:
             if character := await haven.get_match():
                 rp.character = character
+        except errors.CharacterIneligible:
+            raise errors.RollError(f"**{character}** is unable to roll `{pool}`.")
         except errors.NoMatchingCharacter:
-            if character:
-                raise errors.RollError(f"**{character}** is unable to roll `{pool}`.")
             raise errors.RollError(f"No characters able to roll `{pool}`.")
 
     rp.parse()
