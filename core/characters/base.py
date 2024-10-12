@@ -26,10 +26,10 @@ class Damage(StrEnum):
     def emoji_name(cls, e: str) -> str:
         """The box's emoji name."""
         emoji = {
-            Damage.NONE: "no_dmg",
-            Damage.BASHING: "bash",
-            Damage.LETHAL: "leth",
-            Damage.AGGRAVATED: "agg",
+            Damage.NONE.value: "no_dmg",
+            Damage.BASHING.value: "bash",
+            Damage.LETHAL.value: "leth",
+            Damage.AGGRAVATED.value: "agg",
         }
         return emoji[e]
 
@@ -74,7 +74,7 @@ class Profile(BaseModel):
     @property
     def main_image(self) -> str | None:
         """The character's main profile image."""
-        return self.images[0] if self.images else None
+        return str(self.images[0]) if self.images else None
 
 
 class Trait(BaseModel):
@@ -190,7 +190,7 @@ class Trait(BaseModel):
         """Return true if i starts with t."""
         return i.casefold().startswith(t)
 
-    def expanding(self, identifier: str, exact: bool, join=True) -> list[str | list[str]]:
+    def expanding(self, identifier: str, exact: bool, join=True) -> list[str] | list[list[str]]:
         """Expand the user's input to full skill:spec names. If join is False, return a list."""
         tokens = [token.casefold() for token in identifier.split(self._DELIMITER)]
 
