@@ -13,9 +13,6 @@ from core.characters import Character, GameLine, Splat
 from errors import NoCharacterSelected, NoMatchingCharacter
 
 T = TypeVar("T")
-
-
-T = TypeVar("T")
 P = ParamSpec("P")
 
 
