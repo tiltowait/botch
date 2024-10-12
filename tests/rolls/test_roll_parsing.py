@@ -145,6 +145,9 @@ def test_can_parse():
     a = gen_char(GameLine.WOD, Splat.VAMPIRE)
     a.add_trait("Strength", 2)
     a.add_trait("Brawl", 5)
+    a.add_trait("aaa", 1)
+    a.add_trait("aaaa", 1)
 
     assert RollParser.can_roll(a, "stren+br")
+    assert RollParser.can_roll(a, "a")  # ambiguous traits are allowed
     assert not RollParser.can_roll(a, "stren+fake")
