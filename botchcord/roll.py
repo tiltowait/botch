@@ -42,9 +42,6 @@ async def roll(
         haven = Haven(ctx, None, None, character)
         if character := await haven.get_match():
             rp.character = character
-        else:
-            await ctx.respond("Character matching is incomplete.", ephemeral=True)
-            return
 
     rp.parse()
     roll = Roll.from_parser(rp, difficulty, GameLine.WOD).roll()
