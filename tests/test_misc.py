@@ -1,11 +1,13 @@
 """Miscellaneous tests."""
 
+import importlib
 import os
 from unittest import mock
 
 import mongomock_motor
 import pytest
 
+import config
 import db
 import utils
 
@@ -87,3 +89,9 @@ def test_max_vtm_bp(generation: int, bp: int):
 )
 def test_max_vtm_trait(generation: int, max_trait: int):
     assert utils.max_vtm_trait(generation) == max_trait
+
+
+def test_debug_guilds():
+    os.environ["DEBUG"] = "1,2,3"
+    importlib.reload(config)
+    assert config.DEBUG_GUILDS == [1, 2, 3]
