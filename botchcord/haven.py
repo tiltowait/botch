@@ -10,7 +10,12 @@ from discord.ui import Button, Select
 from bot import AppCtx
 from core.cache import cache
 from core.characters import Character, GameLine, Splat
-from errors import NoCharacterSelected, NoMatchingCharacter
+from errors import (
+    CharacterIneligible,
+    CharacterNotFound,
+    NoCharacterSelected,
+    NoMatchingCharacter,
+)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -80,6 +85,7 @@ class Haven(discord.ui.View):
                 line=self.line,
                 splat=self.splat,
             )
+            self.unfiltered = characters
             self.chars = [char for char in characters if self.filter(char)]
             self._populated = True
 
@@ -93,10 +99,12 @@ class Haven(discord.ui.View):
         await self._populate()
         if self.character:
             try:
-                char = next(c for c in self.chars if c.name.lower() == self.character.lower())
-                return char
+                char = next(c for c in self.unfiltered if c.name.lower() == self.character.lower())
+                if self.filter(char):
+                    return char
+                raise CharacterIneligible(f"**{char.name}** does not match." "")
             except StopIteration as err:
-                raise NoMatchingCharacter(f"**{self.character}** not found.") from err
+                raise CharacterNotFound(f"**{self.character}** not found.") from err
 
         if len(self.chars) == 1:
             return self.chars[0]

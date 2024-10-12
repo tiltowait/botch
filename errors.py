@@ -94,5 +94,9 @@ class NoMatchingCharacter(HavenError):
     """Raised when a character can't be matched."""
 
 
+class CharacterIneligible(HavenError):
+    """Raised when the specified character doesn't match the filtering criteria."""
+
+
 class NoCharacterSelected(HavenError):
     """Raised when a character isn't selected."""

@@ -95,8 +95,16 @@ async def test_match_name(search_name: str, should_find: bool, ctx: AsyncMock, v
         found = await haven.get_match()
         assert found == vamp
     else:
-        with pytest.raises(errors.NoMatchingCharacter):
+        with pytest.raises(errors.CharacterNotFound):
             await haven.get_match()
+
+
+async def test_character_ineligible(ctx: AsyncMock, vamp: Character):
+    await vamp.save()
+
+    haven = Haven(ctx, None, None, vamp.name, lambda _: False)
+    with pytest.raises(errors.CharacterIneligible):
+        await haven.get_match()
 
 
 async def test_buttons(ctx: AsyncMock, vamp: Character, mortal: Character):
