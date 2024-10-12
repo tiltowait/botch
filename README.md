@@ -38,7 +38,6 @@ Yes, we're saving the most important info for the end, after most people have al
 
 ### Milestones to private beta
 
-- [ ] Character deletion
 - [ ] Vampire character stats adjustment
 - [ ] Ghoul character stats adjustment
 - [ ] Mortal character stats adjustment
@@ -46,6 +45,7 @@ Yes, we're saving the most important info for the end, after most people have al
 - [ ] Specialties display
 - [ ] Specialties removal
 - [ ] User error messages
+- [x] ~~*Character deletion*~~
 - [x] ~~*Basic (numeric) rolls*~~
 - [x] ~~*Character trait pool rolls ("Strength + Brawl")*~~
 - [x] ~~*Vampire character creation*~~

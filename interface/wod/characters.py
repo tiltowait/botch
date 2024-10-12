@@ -1,12 +1,11 @@
 """General character command interface."""
 
 
-import discord
 from discord.commands import SlashCommandGroup
 from discord.ext.commands import Cog
 
 import botchcord
-from bot import BotchBot
+from bot import AppCtx, BotchBot
 from botchcord import options
 
 
@@ -17,10 +16,16 @@ class CharactersCog(Cog, name="General character commands"):
         self.bot = bot
 
     @character.command()
-    @options.character("The character to display", required=False)
-    async def display(self, ctx: discord.ApplicationContext, character: str):
+    @options.character("The character to display")
+    async def display(self, ctx: AppCtx, character: str):
         """Display a character."""
         await botchcord.character.display(ctx, character)
+
+    @character.command()
+    @options.character("The character to delete", required=True)
+    async def delete(self, ctx: AppCtx, character: str):
+        """Delete a character."""
+        await botchcord.character.delete(ctx, character)
 
 
 def setup(bot: BotchBot):
