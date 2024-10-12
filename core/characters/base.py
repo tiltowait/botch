@@ -315,7 +315,7 @@ class Character(Document):
         """Set the tracker's new damage rating. Returns the new track."""
 
         def _track(track: str, severity: Damage, count: int):
-            """Inner fuction handles the actual work."""
+            """Inner function handles the actual work."""
             length = len(track)
             counter = Counter()
 
