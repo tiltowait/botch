@@ -6,7 +6,7 @@
 
 # Botch
 
-Botch is a WIP Discord bot for playing Vampire: The Masquerade (V20) gams. It features a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
+Botch is a WIP Discord bot for playing Vampire: The Masquerade (V20) games. It features a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
 
 Botch is being designed from the ground up to be modular and extensible, meaning it can eventually expand to other World of Darkness—and Chronicles of Darkness!—game lines, depending on community interest.
 
