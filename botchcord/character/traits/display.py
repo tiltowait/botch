@@ -12,7 +12,7 @@ from core.characters import Character, Trait
 
 
 @haven()
-async def display(ctx: discord.ApplicationContext, character: str):
+async def display(ctx: bot.AppCtx, character: Character):
     """Display the character's traits."""
     embed = build_embed(ctx.bot, character)
     await ctx.respond(embed=embed, ephemeral=True)

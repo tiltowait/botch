@@ -1,7 +1,6 @@
 """Functions for adding/updating character traits. Not inclusive of subtraits."""
 
 
-import discord
 from pyparsing import (
     Dict,
     Group,
@@ -21,11 +20,7 @@ from core.characters import Character, Trait
 
 
 @haven()
-async def assign(
-    ctx: discord.ApplicationContext,
-    character: Character,
-    user_input: str,
-):
+async def assign(ctx: bot.AppCtx, character: Character, user_input: str):
     """Assign the traits and inform the user."""
     parsed = parse_input(user_input)
     traits = assign_traits(character, parsed)

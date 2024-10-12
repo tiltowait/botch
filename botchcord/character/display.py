@@ -2,8 +2,6 @@
 
 from enum import StrEnum
 
-import discord
-
 import bot
 import botchcord
 import errors
@@ -54,7 +52,7 @@ DEFAULT_FIELDS = {
 
 
 @haven()
-async def display(ctx: discord.ApplicationContext, character: Character):
+async def display(ctx: bot.AppCtx, character: Character):
     use_emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(
         ctx.bot,

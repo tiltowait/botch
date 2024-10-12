@@ -3,6 +3,7 @@
 import discord
 from pyparsing import OneOrMore, ParseException, Word, alphas, nums
 
+import bot
 import errors
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
@@ -10,7 +11,7 @@ from core.characters import Character
 
 
 @haven()
-async def remove(ctx: discord.ApplicationContext, character: Character, user_input: str):
+async def remove(ctx: bot.AppCtx, character: Character, user_input: str):
     """Remove the traits from the character and display the result."""
     parsed = parse_input(user_input)
     found, missing = remove_traits(character, parsed)
@@ -21,7 +22,7 @@ async def remove(ctx: discord.ApplicationContext, character: Character, user_inp
 
 
 def build_embed(
-    bot: discord.Bot, character: Character, removed: list[str], not_found: list[str]
+    bot: bot.BotchBot, character: Character, removed: list[str], not_found: list[str]
 ) -> CEmbed:
     """Build the embed."""
     embed = CEmbed(bot, character, title="Traits removed")

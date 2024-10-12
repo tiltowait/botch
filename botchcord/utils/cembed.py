@@ -2,6 +2,7 @@
 
 import discord
 
+import bot
 import botchcord
 from core.characters import Character
 
@@ -10,7 +11,7 @@ class CEmbed(discord.Embed):
     """A standardized embed for displaying character data."""
 
     def __init__(
-        self, bot: discord.Bot, character: Character, show_thumbnail=True, *args, **kwargs
+        self, bot: bot.BotchBot, character: Character, show_thumbnail=True, *args, **kwargs
     ):
         icon_url = None
         if (owner := bot.get_user(character.user)) is not None:

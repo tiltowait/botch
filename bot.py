@@ -2,6 +2,7 @@
 
 import logging
 import os
+from typing import cast
 
 import discord
 
@@ -12,6 +13,10 @@ from config import DEBUG_GUILDS, EMOJI_GUILD
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BOT")
+
+
+class AppCtx(discord.ApplicationContext):
+    bot: "BotchBot"
 
 
 class BotchBot(discord.Bot):
@@ -60,3 +65,7 @@ class BotchBot(discord.Bot):
             except StopIteration:
                 pass
         raise errors.EmojiNotFound
+
+    async def get_application_context(self, interaction: discord.Interaction, cls=AppCtx) -> AppCtx:
+        ctx = await super().get_application_context(interaction, cls=cls)
+        return cast(AppCtx, ctx)

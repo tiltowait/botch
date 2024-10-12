@@ -4,9 +4,10 @@ import functools
 from typing import Any, Callable, Concatenate, Coroutine, ParamSpec, TypeVar
 
 import discord
-from discord import ApplicationContext, ButtonStyle
+from discord import ButtonStyle
 from discord.ui import Button, Select
 
+from bot import AppCtx
 from core.cache import cache
 from core.characters import Character, GameLine, Splat
 from errors import NoCharacterSelected, NoMatchingCharacter
@@ -23,17 +24,17 @@ def haven(
     splat: Splat | None = None,
     filter: Callable[[Character], bool] = lambda _: True,
 ) -> Callable[
-    [Callable[Concatenate[ApplicationContext, Character, P], Coroutine[Any, Any, T]]],
-    Callable[Concatenate[ApplicationContext, str | Character, P], Coroutine[Any, Any, T]],
+    [Callable[Concatenate[AppCtx, Character, P], Coroutine[Any, Any, T]]],
+    Callable[Concatenate[AppCtx, str | Character, P], Coroutine[Any, Any, T]],
 ]:
     def inner(
-        func: Callable[Concatenate[ApplicationContext, Character, P], Coroutine[Any, Any, T]]
-    ) -> Callable[Concatenate[ApplicationContext, str | Character, P], Coroutine[Any, Any, T]]:
+        func: Callable[Concatenate[AppCtx, Character, P], Coroutine[Any, Any, T]]
+    ) -> Callable[Concatenate[AppCtx, str | Character, P], Coroutine[Any, Any, T]]:
         """A decorator that automatically selects a character."""
 
         @functools.wraps(func)
         async def wrapper(
-            ctx: ApplicationContext,
+            ctx: AppCtx,
             char: str | Character,
             *args: P.args,
             **kwargs: P.kwargs,
@@ -55,7 +56,7 @@ class Haven(discord.ui.View):
 
     def __init__(
         self,
-        ctx: ApplicationContext,
+        ctx: AppCtx,
         line: GameLine | None,
         splat: Splat | None,
         character: str | Character | None,
