@@ -3,10 +3,13 @@
 import re
 from types import SimpleNamespace as SN
 from typing import Optional
+from unittest.mock import ANY, AsyncMock
 
 import pytest
 
+import core
 import errors
+from bot import AppCtx, BotchBot
 from botchcord.roll import (
     DICE_CAP,
     DICE_CAP_MESSAGE,
@@ -16,8 +19,9 @@ from botchcord.roll import (
     embed_title,
     emoji_name,
     emojify_dice,
-    textify_dice,
 )
+from botchcord.roll import roll as roll_cmd
+from botchcord.roll import textify_dice
 from core.characters import Character, GameLine, Splat, Trait
 from core.rolls import Roll
 from core.rolls.parse import RollParser
@@ -38,10 +42,17 @@ def ctx() -> SN:
     return SN(bot=EmojiMock())
 
 
+@pytest.fixture(autouse=True)
+async def clear_cache():
+    core.cache._cache = {}
+    yield
+    core.cache._cache = {}
+
+
 @pytest.fixture
 def wod_vampire() -> Character:
     vampire = gen_char(GameLine.WOD, Splat.VAMPIRE, name="Nadea Theron")
-    vampire.profile.images.append("https://tilt-assets.s3-us-west-1.amazonaws.com/avatar.jpg")
+    vampire.profile.add_image("https://tilt-assets.s3-us-west-1.amazonaws.com/avatar.jpg")
     vampire.add_trait("Strength", 3, Trait.Category.ATTRIBUTE)
     vampire.add_trait("Brawl", 4, Trait.Category.ABILITY)
     vampire.add_subtraits("Brawl", ["Throws"])
@@ -304,3 +315,43 @@ def test_dice_caps(ctx):
     r = Roll(line=GameLine.WOD, num_dice=DICE_CAP + 1, target=6).roll()
     assert textify_dice(r) == DICE_CAP_MESSAGE
     assert emojify_dice(ctx, r) == DICE_CAP_MESSAGE
+
+
+@pytest.mark.parametrize(
+    "pool,char,specs,raises",
+    [
+        ("strength+brawl", None, None, False),
+        ("strength+brawl", None, "Vicious", False),
+        ("strength+brawl", "Nadea Theron", None, False),
+        ("strength+brawl", "Nadea", None, True),
+        ("fake", "Nadea", None, True),
+        ("fake", "Nadea Theron", None, True),
+        ("fake", None, None, True),
+    ],
+)
+async def test_roll_command(
+    pool: str,
+    char: str | None,
+    specs: str | None,
+    raises: bool,
+    wod_vampire: Character,
+):
+    bot = BotchBot()
+    inter = AsyncMock()
+    inter.user.id = wod_vampire.user
+    inter.guild.id = wod_vampire.guild
+    ctx = AppCtx(bot, inter)
+
+    await core.cache.register(wod_vampire)  # Register so Haven finds her
+
+    if raises:
+        if char is None or char == wod_vampire.name:
+            with pytest.raises(errors.RollError):
+                await roll_cmd(ctx, pool, 6, specs, None, char)
+        else:
+            with pytest.raises(errors.CharacterNotFound):
+                await roll_cmd(ctx, pool, 6, specs, None, char)
+
+    else:
+        await roll_cmd(ctx, pool, 6, specs, None, char)
+        ctx.respond.assert_called_once_with(embed=ANY)
