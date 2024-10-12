@@ -11,6 +11,8 @@ import db
 import errors
 from config import DEBUG_GUILDS, EMOJI_GUILD
 
+__all__ = ("AppCtx", "BotchBot")
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BOT")
 
@@ -82,5 +84,6 @@ class BotchBot(discord.Bot):
         raise errors.EmojiNotFound
 
     async def get_application_context(self, interaction: discord.Interaction, cls=AppCtx) -> AppCtx:
+        """Make all contexts AppCtx instances."""
         ctx = await super().get_application_context(interaction, cls=cls)
         return cast(AppCtx, ctx)
