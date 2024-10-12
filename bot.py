@@ -18,6 +18,20 @@ logger = logging.getLogger("BOT")
 class AppCtx(discord.ApplicationContext):
     bot: "BotchBot"
 
+    async def send_error(
+        self,
+        title: str,
+        description: str,
+        ephemeral=True,
+        interaction: discord.Interaction | None = None,
+    ):
+        """Send an error embed."""
+        embed = discord.Embed(title=title, description=description, color=discord.Color.brand_red())
+        if interaction:
+            await interaction.respond(embed=embed, ephemeral=ephemeral)
+        else:
+            await self.respond(embed=embed, ephemeral=ephemeral)
+
 
 class BotchBot(discord.Bot):
     """The bot class for Botch."""
