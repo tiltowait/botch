@@ -63,4 +63,3 @@ jobs:
           flags: unittests
           name: github-action
           fail_ci_if_error: true
-          verbose: true
