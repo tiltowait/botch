@@ -1,6 +1,7 @@
 """Basic character tests."""
 
 import random
+from functools import partial
 from unittest.mock import patch
 
 import pydantic
@@ -9,7 +10,7 @@ import pytest
 import api
 import errors
 from config import FC_BUCKET, MAX_NAME_LEN
-from core.characters import Character, Damage, GameLine, Splat, Trait
+from core.characters import Character, Damage, GameLine, Splat, Tracker, Trait
 from tests.characters import gen_char
 
 # Using function-scoped fixture "character" from conftest
@@ -24,7 +25,7 @@ def sample_image() -> str:
 async def test_splat_constraints(splat: str):
     if splat not in list(Splat):
         with pytest.raises(pydantic.ValidationError):
-            gen_char(GameLine.WOD, splat)
+            gen_char(GameLine.WOD, splat)  # type: ignore
     else:
         gen_char(GameLine.WOD, splat)
 
@@ -79,6 +80,63 @@ def test_set_damage(tracker, character: Character):
             + Damage.LETHAL * lethal
             + Damage.AGGRAVATED * agg
         )
+
+
+@pytest.mark.parametrize("tracker", [Tracker.HEALTH, Tracker.WILLPOWER])
+def test_increment_damage(tracker: Tracker):
+    character = gen_char(GameLine.WOD, Splat.VAMPIRE, willpower=Damage.NONE * 7)
+    inc = partial(character.increment_damage, tracker)
+
+    inc(Damage.NONE)
+    assert getattr(character, tracker.value) == "......."
+
+    inc(Damage.BASHING)
+    inc(Damage.BASHING)
+    inc(Damage.BASHING)
+    assert getattr(character, tracker.value) == "....///"
+
+    inc(Damage.LETHAL)
+    inc(Damage.LETHAL)
+    assert getattr(character, tracker.value) == "..///XX"
+
+    inc(Damage.AGGRAVATED)
+    assert getattr(character, tracker.value) == ".///XX*"
+
+    inc(Damage.BASHING)
+    inc(Damage.BASHING)
+    assert getattr(character, tracker.value) == "////XX*"
+
+    inc(Damage.LETHAL)
+    assert getattr(character, tracker.value) == "///XXX*"
+
+    inc(Damage.AGGRAVATED)
+    assert getattr(character, tracker.value) == "//XXX**"
+
+
+def test_decrement_damage():
+    # We don't need to test for both health and willpower, since they behave
+    # the same and we already tested the helper func above.
+    character = gen_char(GameLine.WOD, Splat.VAMPIRE)
+    dec = partial(character.decrement_damage, Tracker.HEALTH)
+
+    dec(Damage.BASHING)
+    assert character.health == Damage.NONE * 7
+
+    character.health = ".///XX*"
+
+    dec(Damage.BASHING)
+    assert character.health == "..//XX*"
+
+    dec(Damage.LETHAL)
+    assert character.health == "...//X*"
+
+    dec(Damage.AGGRAVATED)
+    assert character.health == "....//X"
+    dec(Damage.AGGRAVATED)
+    assert character.health == "....//X"
+
+    dec(Damage.NONE)
+    assert character.health == "....//X"
 
 
 async def test_trait_basics(character: Character):

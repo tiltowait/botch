@@ -57,7 +57,15 @@ class Grounding(BaseModel):
     """Humanity, Paths of Enlightenment, Integrity, etc."""
 
     path: str
-    rating: int
+    rating: int = Field(ge=0, le=10)
+
+    def increment(self):
+        """Increase rating by 1, to a maximum of 10."""
+        self.rating = min(10, self.rating + 1)
+
+    def decrement(self):
+        """Decrease rating by 1, to a minimum of 0."""
+        self.rating = max(0, self.rating - 1)
 
 
 class Tracker(StrEnum):
@@ -292,6 +300,11 @@ class Character(Document):
 
     traits: List[Trait] = Field(default_factory=list)
 
+    @property
+    def has_blood_pool(self) -> bool:
+        """Whether the character is a vampire or a ghoul."""
+        return self.splat in (Splat.GHOUL, Splat.VAMPIRE)
+
     def _all_traits(self) -> list[Trait]:
         """A copy of all the character's rollable traits, including innates."""
         innate = Trait.Category.INNATE
@@ -320,16 +333,31 @@ class Character(Document):
         except errors.ApiError:
             pass
 
+    def _get_tracker_count(self, tracker: Tracker, severity: Damage) -> int:
+        """Get the number of boxes at the indicated damage level."""
+        if tracker == Tracker.HEALTH:
+            track = self.health
+        else:
+            track = self.willpower
+        return track.count(severity.value)
+
+    def increment_damage(self, tracker: Tracker, severity: Damage) -> str:
+        """Increment the damage track. Sets and returns the new track."""
+        count = self._get_tracker_count(tracker, severity)
+        return self.set_damage(tracker, severity, count + 1)
+
+    def decrement_damage(self, tracker: Tracker, severity: Damage) -> str:
+        """Decrement the damage track. Sets and returns the new track."""
+        count = self._get_tracker_count(tracker, severity)
+        return self.set_damage(tracker, severity, max(count - 1, 0))
+
     def set_damage(self, tracker: Tracker, severity: Damage, count: int) -> str:
-        """Set the tracker's new damage rating. Returns the new track."""
+        """Set the tracker's new damage rating. Sets and returns the new track."""
 
         def _track(track: str, severity: Damage, count: int):
             """Inner function handles the actual work."""
             length = len(track)
-            counter = Counter()
-
-            for elem in track:
-                counter[elem] += 1
+            counter = Counter(list(track))
             counter[severity] = count
 
             # Reconstruct the track string. Reverse the damage, because we may
