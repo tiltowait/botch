@@ -160,8 +160,9 @@ class Adjuster(ABC):
                 return i, btn
         raise ValueError(f"No button with ID {custom_id}")
 
+    @abstractmethod
     def _update_buttons(self):
-        pass
+        """Update button states."""
 
     @abstractmethod
     async def callback(self, interaction: discord.Interaction):
