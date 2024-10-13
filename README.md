@@ -38,12 +38,12 @@ Yes, we're saving the most important info for the end, after most people have al
 
 ### Milestones to private beta
 
-- [ ] Vampire character stats adjustment
-- [ ] Ghoul character stats adjustment
-- [ ] Mortal character stats adjustment
 - [ ] Specialties assignment
 - [ ] Specialties display
 - [ ] Specialties removal
+- [x] ~~*Vampire character stats adjustment*~~
+- [x] ~~*Ghoul character stats adjustment*~~
+- [x] ~~*Mortal character stats adjustment*~~
 - [x] ~~*User error messages*~~
 - [x] ~~*Character deletion*~~
 - [x] ~~*Basic (numeric) rolls*~~

@@ -8,6 +8,7 @@ from core.characters.base import (
     GameLine,
     Grounding,
     Splat,
+    Tracker,
     Trait,
 )
 
@@ -19,5 +20,6 @@ __all__ = (
     "GameLine",
     "Grounding",
     "Splat",
+    "Tracker",
     "Trait",
 )

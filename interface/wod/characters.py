@@ -27,6 +27,12 @@ class CharactersCog(Cog, name="General character commands"):
         """Delete a character."""
         await botchcord.character.delete(ctx, character)
 
+    @character.command()
+    @options.character("The character to adjust")
+    async def adjust(self, ctx: AppCtx, character: str):
+        """Adjust character stats."""
+        await botchcord.character.adjust(ctx, character)
+
 
 def setup(bot: BotchBot):
     """Add the cog to the bot."""
