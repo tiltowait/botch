@@ -1,7 +1,7 @@
 """Bot instance tests."""
 
 from unittest import mock
-from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, PropertyMock, patch
 
 import pytest
 from discord import ApplicationCommandInvokeError, NotFound
@@ -90,3 +90,23 @@ async def test_not_found_ignored(bot: BotchBot, ctx: AppCtx):
     err = ApplicationCommandInvokeError(NotFound(MagicMock(), None))
     await bot.on_application_command_error(ctx, err)
     ctx.send_error.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "cmd,exists",
+    [
+        ("roll", True),
+        ("blep", False),
+    ],
+)
+@patch("bot.BotchBot.get_application_command")
+def test_cmd_mention(mock_get_cmd: Mock, bot: BotchBot, cmd: str, exists: bool):
+    # We can't use the real function, so let's just test our logic as we slave
+    # over high code coverage.
+    mock_get_cmd.return_value = Mock() if exists else None
+
+    mention = bot.cmd_mention(cmd)
+    if exists:
+        assert mention is not None
+    else:
+        assert mention is None

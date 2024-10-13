@@ -104,3 +104,13 @@ class BotchBot(discord.Bot):
             case _:
                 # TODO: Error reporter
                 raise err
+
+    def cmd_mention(
+        self,
+        name: str,
+        type: type[discord.ApplicationCommand] = discord.ApplicationCommand,
+    ) -> str | None:
+        """Shorthand for get_application_command(...).mention."""
+        if command := self.get_application_command(name, type=type):
+            return command.mention  # type: ignore
+        return None
