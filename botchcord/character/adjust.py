@@ -239,9 +239,11 @@ class WillpowerAdjuster(Adjuster):
                 self.character.increment_damage(Tracker.WILLPOWER, Damage.BASHING)
             # Permanent willpower
             case 3:
-                self.character.willpower = self.character.willpower[1:]
+                if len(self.character.willpower) > 1:
+                    self.character.willpower = self.character.willpower[1:]
             case 5:
-                self.character.willpower = Damage.NONE + self.character.willpower
+                if len(self.character.willpower) < 10:
+                    self.character.willpower = Damage.NONE + self.character.willpower
 
         await super().callback(interaction)
 
