@@ -323,6 +323,7 @@ def test_dice_caps(ctx):
         ("strength+brawl", None, None, False),
         ("strength+brawl", None, "Vicious", False),
         ("strength+brawl", "Nadea Theron", None, False),
+        ("strength+brawl+1", "Nadea Theron", None, False),
         ("strength+brawl", "Nadea", None, True),
         ("fake", "Nadea", None, True),
         ("fake", "Nadea Theron", None, True),

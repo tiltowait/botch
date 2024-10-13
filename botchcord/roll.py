@@ -107,7 +107,7 @@ def build_embed(
             value=", ".join(roll.specialties),
         )
     if roll.uses_traits:
-        embed.add_field(name="Pool", value=" ".join(roll.pool), inline=False)
+        embed.add_field(name="Pool", value=" ".join(map(str, roll.pool)), inline=False)
 
     embed.set_author(name=author_name, icon_url=icon or None)
 
