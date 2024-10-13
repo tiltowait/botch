@@ -1,7 +1,7 @@
 """Character adjuster tests."""
 
 from typing import cast
-from unittest.mock import AsyncMock, call, patch
+from unittest.mock import ANY, AsyncMock, Mock, call, patch
 
 import pytest
 from discord.ui import Select
@@ -14,6 +14,7 @@ from botchcord.character.adjust import (
     HealthAdjuster,
     Toggler,
     WillpowerAdjuster,
+    adjust,
 )
 from core.characters import Character, GameLine, Splat
 from core.characters.wod import Vampire
@@ -121,6 +122,10 @@ async def test_health_adjuster(idx: int, expected: str, char: Character):
         (2, 2, "./////"),
         (2, 3, "//////"),
         (2, 4, "//////"),
+        (3, 1, "..///"),
+        (3, 10, "/"),
+        (5, 1, "....///"),
+        (5, 10, ".......///"),
     ],
 )
 async def test_willpower_adjuster(
@@ -258,3 +263,71 @@ def test_adjuster_button_states(
 
     for idx, state in expected.items():
         assert adjuster.buttons[idx].disabled == state
+
+
+@patch("bot.AppCtx.respond", new_callable=AsyncMock)
+async def test_adjust_command(mock_respond: AsyncMock, ctx: AppCtx, vamp: Vampire):
+    await adjust(ctx, vamp)
+
+    assert mock_respond.await_count == 2
+    mock_respond.assert_has_awaits([call(embed=ANY), call(view=ANY, ephemeral=True)])
+
+
+async def test_timeout(toggler: Toggler):
+    mock_cmd_mention = Mock()
+    mock_cmd_mention.return_value = "hello"
+    toggler.ctx.bot.cmd_mention = mock_cmd_mention
+
+    message_mock = AsyncMock()
+    toggler.message = message_mock
+
+    await toggler.on_timeout()
+
+    mock_cmd_mention.assert_called_once_with("character adjust")
+    message_mock.edit.assert_called_once_with(
+        content="Adjustments timed out. Please run hello again.", view=None
+    )
+
+
+async def test_select_adjuster(toggler: Toggler):
+    new_selection = toggler.selector.options[1].label  # 0 is default
+
+    # We can't programmatically set Select.values, so we have to mock it
+    selector_mock = Mock()
+    selector_mock.options = toggler.selector.options
+    selector_mock.values = [new_selection]
+    toggler.selector = selector_mock
+
+    inter = AsyncMock()
+    await toggler.select_adjuster(inter)
+    inter.response.edit_message.assert_called_once_with(view=toggler)
+
+    # Check that we've set the select
+    assert not selector_mock.options[0].default
+    assert selector_mock.options[1].default
+
+    # Check that we've got the buttons
+    adjuster = toggler.adjusters[1]
+    for i, view_btn in enumerate(toggler.children[1:]):
+        assert adjuster.buttons[i] == view_btn
+
+
+def test_get_button_bad(toggler: Toggler):
+    adjuster = toggler.adjusters[0]
+    with pytest.raises(ValueError):
+        adjuster.get_button("fake")
+
+
+async def test_health_adjuster_unknown_row(toggler: Toggler):
+    adjuster = toggler.adjusters[0]
+    assert isinstance(adjuster, HealthAdjuster)
+
+    button_mock = Mock()
+    button_mock.row = 100
+    get_button_mock = Mock()
+    get_button_mock.return_value = (0, button_mock)
+    adjuster.get_button = get_button_mock
+
+    inter = AsyncMock()
+    with pytest.raises(ValueError):
+        await adjuster.callback(inter)
