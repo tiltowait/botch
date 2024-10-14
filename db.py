@@ -13,7 +13,7 @@ from interface.models import CommandRecord
 
 load_dotenv()
 
-logger = logging.getLogger("db")
+logger = logging.getLogger("DB")
 DOCUMENT_MODELS = [Character, wod.Vampire, wod.Mortal, Roll, CommandRecord]
 
 
