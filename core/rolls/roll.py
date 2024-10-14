@@ -48,6 +48,8 @@ class Roll(Document):
     rote: bool = False
     dice: list[int] = Field(default_factory=list)
     pool: Optional[list[str | int]] = None
+    num_successes: int = Field(0, alias="successes")
+    botched: bool = False
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
     use_in_stats: bool = True
@@ -117,6 +119,15 @@ class Roll(Document):
             # WP creates an uncancelable success
             successes = max(successes + 1, 1)
 
+        # Computing successes as a stored property is surprisingly complex
+        # and breaks many, many unit tests, so we store it in num_successes,
+        # which is aliased to plain "successes" in the database. This means we
+        # could theoretically end up saving inconsistent data if a roll is
+        # saved without ever calculating successes, but this is unlikely.
+        # Should it ever be a concern, a simple kludge would be to calculate it
+        # in a @before_event(Insert).
+        self.num_successes = successes
+        self.botched = successes < 0
         return successes
 
     @property
