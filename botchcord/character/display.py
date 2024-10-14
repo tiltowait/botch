@@ -75,7 +75,7 @@ def build_embed(
     icon_url: str | None = None,
     image: str | None = None,
     footer: str | None = None,
-):
+) -> CEmbed:
     """Build the character embed."""
     embed = CEmbed(bot, character, title=title or character.name, description=description)
 
@@ -93,7 +93,7 @@ def build_embed(
     return embed
 
 
-def get_field_name(character: Character, field: DisplayField):
+def get_field_name(character: Character, field: DisplayField) -> str:
     """Return the display field's name."""
     match field:
         case DisplayField.GROUNDING:
@@ -104,7 +104,12 @@ def get_field_name(character: Character, field: DisplayField):
             return field.value
 
 
-def get_field_value(bot: bot.BotchBot, character: Character, field: DisplayField, use_emoji: bool):
+def get_field_value(
+    bot: bot.BotchBot,
+    character: Character,
+    field: DisplayField,
+    use_emoji: bool,
+) -> str:
     """Get the value for a particular field."""
     match field:
         case DisplayField.NAME:
@@ -147,7 +152,7 @@ def get_track_string(track: str) -> str:
     return "\n".join(counts)
 
 
-def get_default_fields(character: Character) -> tuple:
+def get_default_fields(character: Character) -> tuple[DisplayField, ...]:
     """Get the appropriate default fields for the character."""
     if character.line not in DEFAULT_FIELDS:
         raise errors.CharacterTemplateNotFound(f"Unknown game line `{character.line}`.")
