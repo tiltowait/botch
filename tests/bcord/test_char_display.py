@@ -134,6 +134,7 @@ def test_build_emoji(use_emojis, bot_mock, wod_vamp):
 
 def test_alt_title(bot_mock, wod_vamp):
     embed = build_embed(bot_mock, wod_vamp, False, title="Custom title")
+    assert embed.author is not None
     assert embed.author.name == wod_vamp.name
     assert embed.title == "Custom title"
 
