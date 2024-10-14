@@ -146,9 +146,9 @@ def test_alt_title(bot_mock, wod_vamp):
         ("X", "leth"),
         ("*", "agg"),
         ("..", "no_dmg no_dmg"),
-        ("./", "no_dmg bash"),
-        ("./X", "no_dmg bash leth"),
-        ("./X*", "no_dmg bash leth agg"),
+        ("./", "bash no_dmg"),
+        ("./X", "leth bash no_dmg"),
+        ("./X*", "agg leth bash no_dmg"),
     ],
 )
 def test_emoji_track(track: str, expected: str):
