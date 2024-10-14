@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import cast
+from typing import cast, overload
 
 import discord
 
@@ -71,7 +71,15 @@ class BotchBot(discord.Bot):
         load("wod")
         load("shared")
 
-    def get_emoji(self, emoji_name: str, count=1) -> str | list[str] | None:
+    @overload
+    def get_emoji(self, emoji_name: str) -> str:
+        ...
+
+    @overload
+    def get_emoji(self, emoji_name: str, count: int) -> str | list[str]:
+        ...
+
+    def get_emoji(self, emoji_name: str, count=1) -> str | list[str]:
         """Get an emoji from the emoji guild."""
         if guild := self.get_guild(EMOJI_GUILD):
             try:
