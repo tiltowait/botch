@@ -28,9 +28,9 @@ def make_john(guild: int, user: int) -> Character:
         "health": Damage.NONE * 7,
         "willpower": Damage.NONE * 6,
         "grounding": Grounding(path="Humanity", rating=8),
-        "generation": 8,
-        "max_bp": 15,
-        "blood_pool": 15,
+        "generation": 13,
+        "max_bp": 10,
+        "blood_pool": 10,
         "virtues": gen_virtues(
             {
                 "Conscience": 4,
