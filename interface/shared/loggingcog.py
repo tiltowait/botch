@@ -20,10 +20,9 @@ class LoggingCog(commands.Cog):
     @commands.Cog.listener()
     async def on_application_command(self, ctx: discord.ApplicationContext):
         """Log command usage."""
+        location = "DMs"
         if ctx.guild is not None:
             location = ctx.guild.name
-        else:
-            location = "DMs"
 
         if selected_options := ctx.selected_options:
             options = []
@@ -35,10 +34,10 @@ class LoggingCog(commands.Cog):
                 else:
                     options.append(f"{name}={value}")
         else:
-            options = "None"
+            options = ["None"]
 
         self.logger.info(
-            "COMMAND: `/%s` invoked by @%s (%s) in %s (%s). Options: %s",
+            "`/%s` invoked by @%s (%s) in %s (%s). Options: %s",
             ctx.command.qualified_name,
             ctx.user.name,
             ctx.user.id,
