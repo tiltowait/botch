@@ -40,6 +40,8 @@ class Roll(Document):
     """Performs a dice roll and calculates the result."""
 
     line: GameLine
+    guild: int
+    user: int
     num_dice: int
     target: int  # WoD: Difficulty; CofD: "again"
     wp: bool = False
@@ -48,7 +50,7 @@ class Roll(Document):
     rote: bool = False
     dice: list[int] = Field(default_factory=list)
     pool: Optional[list[str | int]] = None
-    num_successes: int = Field(0, alias="successes")
+    num_successes: int = 0
     botched: bool = False
     syntax: Optional[str] = None
     character: Optional[Link[Character]] = None
@@ -156,7 +158,14 @@ class Roll(Document):
         return "Phenomenal!"
 
     @classmethod
-    def from_parser(cls, p: RollParser, target: int, line: GameLine | None = None):
+    def from_parser(
+        cls,
+        p: RollParser,
+        guild: int,
+        user: int,
+        target: int,
+        line: GameLine | None = None,
+    ):
         """Create a roll from a RollParser and a target number."""
         if not line:
             if p.character:
@@ -166,6 +175,8 @@ class Roll(Document):
 
         return cls(
             line=line,
+            guild=guild,
+            user=user,
             num_dice=p.num_dice,
             target=target,
             wp=p.using_wp,

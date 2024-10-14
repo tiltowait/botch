@@ -1,9 +1,8 @@
 """Discord roll tests."""
 
 import re
-from types import SimpleNamespace as SN
 from typing import Optional
-from unittest.mock import ANY, AsyncMock
+from unittest.mock import ANY, AsyncMock, Mock
 
 import pytest
 
@@ -38,8 +37,10 @@ class EmojiMock:
 
 
 @pytest.fixture
-def ctx() -> SN:
-    return SN(bot=EmojiMock())
+def ctx() -> Mock:
+    ctx = Mock()
+    ctx.bot = EmojiMock()
+    return ctx
 
 
 @pytest.fixture(autouse=True)
@@ -79,7 +80,15 @@ def dice() -> list[int]:
 def test_textify_dice(
     target: int, expected: str, spec: Optional[list[str]], line: GameLine, dice: list[int]
 ):
-    roll = Roll(line=line, num_dice=len(dice), dice=dice, target=target, specialties=spec)
+    roll = Roll(
+        line=line,
+        guild=0,
+        user=0,
+        num_dice=len(dice),
+        dice=dice,
+        target=target,
+        specialties=spec,
+    )
     assert textify_dice(roll) == expected
 
 
@@ -119,7 +128,7 @@ def test_embed_color(successes: int, expected: Color, line: GameLine):
     else:
         dice = [9 for _ in range(successes)]
 
-    roll = Roll(line=line, num_dice=successes, target=6, dice=dice)
+    roll = Roll(line=line, guild=0, user=0, num_dice=successes, target=6, dice=dice)
     assert embed_color(roll) == expected
 
 
@@ -152,7 +161,7 @@ def test_embed_title(successes: int, expected: str, line: GameLine):
     else:
         dice = [9 for _ in range(successes)]
 
-    roll = Roll(line=line, num_dice=successes, target=6, dice=dice)
+    roll = Roll(line=line, guild=0, user=0, num_dice=successes, target=6, dice=dice)
     assert embed_title(roll) == expected
 
 
@@ -164,7 +173,7 @@ def test_embed_title(successes: int, expected: str, line: GameLine):
     ],
 )
 def test_botch_logic(dice: list[int], should_botch: bool):
-    roll = Roll(line=GameLine.WOD, num_dice=len(dice), target=6, dice=dice)
+    roll = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=len(dice), target=6, dice=dice)
     if should_botch:
         assert "Botch!" in embed_title(roll)
     else:
@@ -182,10 +191,10 @@ def test_wod_roll_embed_with_specialties(
     syntax: str, pool: str, extra_specs: list[str], wod_vampire: Character
 ):
     rp = RollParser(syntax, wod_vampire).parse()
-    roll = Roll.from_parser(rp, 6)
-    roll.specialties.extend(extra_specs)
+    roll = Roll.from_parser(rp, 0, 0, 6)
+    roll.add_specs(extra_specs)
 
-    embed = build_embed(None, roll, extra_specs, None, False)
+    embed = build_embed(Mock(), roll, extra_specs, None, False)
 
     f = 2
     if extra_specs:
@@ -221,6 +230,8 @@ def test_wod_text_embed_with_character(
     # issue in this section
     roll = Roll(
         line=GameLine.WOD,
+        guild=0,
+        user=0,
         num_dice=len(dice),
         dice=dice,
         pool=pool,
@@ -229,11 +240,13 @@ def test_wod_text_embed_with_character(
         character=wod_vampire,
     )
 
-    embed = build_embed(None, roll, spec, comment, False)
+    embed = build_embed(Mock(), roll, spec, comment, False)
 
     # Work our way down from the top
+    assert embed.author is not None
     assert embed.author.name == wod_vampire.name
     assert embed.author.icon_url == wod_vampire.profile.main_image
+    assert embed.color is not None
     assert int(embed.color) == embed_color(roll)
     assert embed.title == title
 
@@ -251,9 +264,10 @@ def test_wod_text_embed_with_character(
         i += 1
     if roll.uses_traits:
         assert embed.fields[i].name == "Pool"
-        assert embed.fields[i].value == " ".join(roll.pool)
+        assert embed.fields[i].value == " ".join(map(str, roll.pool))
 
     if comment:
+        assert embed.footer is not None
         assert embed.footer.text == comment
     else:
         assert embed.footer is None
@@ -300,19 +314,32 @@ def test_emoji_error(ctx):
     ],
 )
 def test_emojify_dice(
-    target: int, expected: list[str], spec: list[str], line: GameLine, dice: list[int], ctx: SN
+    target: int,
+    expected: list[str] | str,
+    spec: list[str],
+    line: GameLine,
+    dice: list[int],
+    ctx: Mock,
 ):
-    roll = Roll(line=line, num_dice=len(dice), dice=dice, target=target, specialties=spec)
+    roll = Roll(
+        line=line,
+        guild=0,
+        user=0,
+        num_dice=len(dice),
+        dice=dice,
+        target=target,
+        specialties=spec,
+    )
     expected = " ".join(expected)
     assert emojify_dice(ctx, roll) == expected
 
 
 def test_dice_caps(ctx):
-    r = Roll(line=GameLine.WOD, num_dice=DICE_CAP, target=6).roll()
+    r = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=DICE_CAP, target=6).roll()
     assert textify_dice(r) != DICE_CAP_MESSAGE
     assert emojify_dice(ctx, r) != DICE_CAP_MESSAGE
 
-    r = Roll(line=GameLine.WOD, num_dice=DICE_CAP + 1, target=6).roll()
+    r = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=DICE_CAP + 1, target=6).roll()
     assert textify_dice(r) == DICE_CAP_MESSAGE
     assert emojify_dice(ctx, r) == DICE_CAP_MESSAGE
 

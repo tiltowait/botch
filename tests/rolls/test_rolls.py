@@ -22,7 +22,7 @@ def test_cofd_explosions():
     def _average_rolled(target: int) -> float:
         total = 0
         for _ in range(TRIALS):
-            roll = Roll(line=GameLine.COFD, num_dice=pool, target=target)
+            roll = Roll(line=GameLine.COFD, guild=0, user=0, num_dice=pool, target=target)
             roll.roll()
             total += len(roll.dice)
 
@@ -85,6 +85,8 @@ def test_wod_successes(
 ):
     roll = Roll(
         line=GameLine.WOD,
+        guild=0,
+        user=0,
         target=difficulty,
         num_dice=len(dice),
         dice=dice,
@@ -97,24 +99,33 @@ def test_wod_successes(
 @pytest.mark.parametrize("pool", list(range(10)))
 def test_cofd_specialties(pool: int):
     # We use target = 11 so we never explode
-    roll = Roll(line=GameLine.COFD, num_dice=pool, target=11, specialties=["Yes"]).roll()
+    roll = Roll(
+        line=GameLine.COFD, guild=0, user=0, num_dice=pool, target=11, specialties=["Yes"]
+    ).roll()
     assert len(roll.dice) == pool + 1
 
 
 def test_cofd_successes(dice: list[int]):
-    roll = Roll(line=GameLine.COFD, num_dice=len(dice), target=10, dice=dice)
+    roll = Roll(line=GameLine.COFD, guild=0, user=0, num_dice=len(dice), target=10, dice=dice)
     assert roll.successes == 5
 
 
 async def test_roll_spec_coalescing():
     # Without specs
-    roll = Roll(line=GameLine.WOD, num_dice=5, target=6).roll()
+    roll = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=5, target=6).roll()
     assert roll.specialties == []
     await roll.insert()
     assert roll.specialties is None
 
     # Now with specs
-    roll = Roll(line=GameLine.WOD, num_dice=5, target=6, specialties=["Throws"]).roll()
+    roll = Roll(
+        line=GameLine.WOD,
+        guild=0,
+        user=0,
+        num_dice=5,
+        target=6,
+        specialties=["Throws"],
+    ).roll()
     assert roll.specialties == ["Throws"]
     await roll.insert()
     assert roll.specialties == ["Throws"]
@@ -132,7 +143,7 @@ def test_roll_parsing(
 ):
     target = 6 if skilled.line == GameLine.WOD else 10
     p = RollParser(syntax, skilled).parse()
-    roll = Roll.from_parser(p, target).roll()
+    roll = Roll.from_parser(p, 0, 0, target).roll()
 
     # We don't test output or dice count, because those are tested above
     assert roll.syntax == syntax
@@ -143,7 +154,7 @@ def test_roll_parsing(
 
 
 def test_autos():
-    roll = Roll(line=GameLine.WOD, num_dice=0, target=6, autos=2).roll()
+    roll = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=0, target=6, autos=2).roll()
     assert roll.successes == 2
 
     roll.dice = [1]
@@ -157,7 +168,7 @@ def test_autos():
 def test_missing_game_line():
     p = RollParser("3", None)
     with pytest.raises(errors.MissingGameLine):
-        Roll.from_parser(p, 6)
+        Roll.from_parser(p, 0, 0, 6)
 
 
 @pytest.mark.parametrize(
@@ -174,7 +185,7 @@ def test_missing_game_line():
     ],
 )
 def test_wod_success_str(dice: list[int], expected: str):
-    roll = Roll(line=GameLine.WOD, num_dice=0, dice=dice, target=6)
+    roll = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=0, dice=dice, target=6)
     assert roll.success_str == expected
 
 
@@ -192,13 +203,13 @@ def test_wod_success_str(dice: list[int], expected: str):
     ],
 )
 def test_cofd_success_str(dice: list[int], expected: str):
-    roll = Roll(line=GameLine.COFD, num_dice=0, dice=dice, target=10)
+    roll = Roll(line=GameLine.COFD, guild=0, user=0, num_dice=0, dice=dice, target=10)
     assert roll.success_str == expected
 
 
 def test_cofd_wp():
     # Set target to 11 so there are no explosions
-    roll = Roll(line=GameLine.COFD, num_dice=10, target=11, wp=True).roll()
+    roll = Roll(line=GameLine.COFD, guild=0, user=0, num_dice=10, target=11, wp=True).roll()
     assert len(roll.dice) == 13
 
 
@@ -206,7 +217,11 @@ def test_cofd_rote():
     def _average_successes(rote: bool):
         total = 0
         for _ in range(TRIALS):
-            total += Roll(line=GameLine.COFD, num_dice=10, target=10, rote=rote).roll().successes
+            total += (
+                Roll(line=GameLine.COFD, guild=0, user=0, num_dice=10, target=10, rote=rote)
+                .roll()
+                .successes
+            )
         return total / TRIALS
 
     assert _average_successes(True) > _average_successes(False)
@@ -221,7 +236,7 @@ def test_cofd_rote():
     ],
 )
 async def test_roll_spec_coalescence(spec: list[str] | None, expected: list[str] | None):
-    r = Roll(line=GameLine.WOD, num_dice=5, target=6, specialties=spec).roll()
+    r = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=5, target=6, specialties=spec).roll()
     assert r.specialties == spec
     await r.insert()
 
