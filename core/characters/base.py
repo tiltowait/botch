@@ -3,10 +3,10 @@ subclasses."""
 
 import bisect
 import copy
-import itertools
 from collections import Counter
 from enum import StrEnum
-from typing import List, Optional
+from itertools import product
+from typing import Literal, Optional, overload
 
 import pymongo
 from beanie import Delete, Document, before_event
@@ -78,7 +78,7 @@ class Profile(BaseModel):
 
     description: Optional[str] = Field(default=None, max_length=1024)
     history: Optional[str] = Field(default=None, max_length=1024)
-    images: List[HttpUrl] = Field(default_factory=list)
+    images: list[HttpUrl] = Field(default_factory=list)
 
     @property
     def main_image(self) -> str | None:
@@ -126,16 +126,16 @@ class Trait(BaseModel):
         rating: int  # In CofD, the rating might be higher than the base Trait's
         exact: bool  # Whether the user exactly searched for this Selection
         key: str  # The exact search key matching this Selection, ("Brawl.Kindred")
-        subtraits: List[str]  # The list of subtraits selected
+        subtraits: list[str]  # The list of subtraits selected
         category: str  # The Trait.Category. Must be str due to placement here
 
     name: str
     rating: int
     category: Category
     subcategory: Subcategory
-    subtraits: List[str] = Field(default_factory=list)
+    subtraits: list[str] = Field(default_factory=list)
 
-    def add_subtraits(self, subtraits: str | list[str]):
+    def add_subtraits(self, subtraits: str | list[str] | set[str]):
         """Add subtraits to the trait."""
         if isinstance(subtraits, str):
             subtraits = {subtraits}
@@ -148,7 +148,7 @@ class Trait(BaseModel):
 
         self.subtraits.sort()
 
-    def remove_subtraits(self, subtraits: str | list[str]):
+    def remove_subtraits(self, subtraits: str | list[str] | set[str]):
         """Remove subtraits from the trait."""
         if isinstance(subtraits, str):
             subtraits = {subtraits}
@@ -168,114 +168,100 @@ class Trait(BaseModel):
         return self.name.casefold().startswith(search.casefold())
 
     def matching(self, identifier: str, exact: bool) -> list[Selection]:
-        """Returns the fully qualified name if a string matches, or None."""
+        """Returns a list of Selections that match the identifier."""
+        expanded_groups = self.expanding(identifier, exact, join=False)
+
+        if not expanded_groups:
+            return []
+
+        normalized = self._normalize_identifier(identifier)
+
+        return [
+            self._create_selection(group, normalized == self._DELIMITER.join(group).casefold())
+            for group in expanded_groups
+        ]
+        # return [
+        #     self._create_selection(
+        #         group if isinstance(group, list) else group.split(self._DELIMITER),
+        #         normalized
+        #         == (group if isinstance(group, str) else self._DELIMITER.join(group)).casefold(),
+        #     )
+        #     for group in expanded_groups
+        # ]
+
+    @overload
+    def expanding(self, identifier: str, exact: bool, join: Literal[True]) -> list[str]:
+        ...
+
+    @overload
+    def expanding(self, identifier: str, exact: bool, join: Literal[False]) -> list[list[str]]:
+        ...
+
+    def expanding(self, identifier: str, exact: bool, join=True) -> list[str] | list[list[str]]:
+        """Expand the user's input to full skill:spec names."""
+        tokens = identifier.lower().split(self._DELIMITER)
+        comp = self._exact_comp if exact else self._starting_comp
+
+        if not comp(tokens[0], self.name):
+            return []
+
+        spec_groups = self._get_matching_spec_groups(tokens[1:], comp)
+
+        if not spec_groups:
+            matches = [[self.name]]
+        else:
+            matches = self._generate_unique_matches(spec_groups)
+
+        return [self._DELIMITER.join(match) for match in matches] if join else matches
+
+    def _normalize_identifier(self, identifier: str) -> str:
+        tokens = identifier.split(self._DELIMITER)
+        return self._DELIMITER.join([tokens[0]] + sorted(tokens[1:])).lower()
+
+    def _create_selection(self, group: list[str], is_exact: bool) -> Selection:
+        full_name = self.name
+        if len(group) > 1:
+            full_name += f" ({', '.join(group[1:])})"
+
+        return Trait.Selection(
+            name=full_name,
+            rating=self.rating,
+            exact=is_exact,
+            key=self._DELIMITER.join(group),
+            subtraits=group[1:],
+            category=self.category,
+        )
+
+    def _get_matching_spec_groups(self, tokens: list[str], comp) -> list[list[str]]:
+        return [
+            [subtrait for subtrait in self.subtraits if comp(token, subtrait)] for token in tokens
+        ]
+
+    def _generate_unique_matches(self, spec_groups: list[list[str]]) -> list[list[str]]:
+        if len(spec_groups) == 1:
+            return [[self.name, spec] for spec in spec_groups[0]]
+
+        combinations = product(*spec_groups)
+        seen_groups = set()
         matches = []
-        if groups := self.expanding(identifier, exact, False):
-            # The expanded values are sorted alphabetically, and we need
-            # that to match our input for testing exactness
-            tokens = identifier.split(self._DELIMITER)
-            tokens = [tokens[0]] + sorted(tokens[1:])
-            normalized = self._DELIMITER.join(tokens).casefold()
 
-            for expanded in groups:
-                full_name = self.name
-                if expanded[1:]:
-                    # Add the subtraits
-                    full_name += f" ({', '.join(expanded[1:])})"
+        for group in combinations:
+            if len(set(group)) < len(group):
+                continue
+            frozen_group = frozenset(group)
+            if frozen_group not in seen_groups:
+                seen_groups.add(frozen_group)
+                matches.append([self.name] + sorted(group))
 
-                key = self._DELIMITER.join(expanded)
-
-                matches.append(
-                    Trait.Selection(
-                        name=full_name,
-                        rating=self.rating,
-                        exact=normalized == key.casefold(),
-                        key=key,
-                        subtraits=expanded[1:],
-                        category=self.category,
-                    )
-                )
         return matches
 
     @staticmethod
     def _exact_comp(t: str, i: str) -> bool:
-        """Return true if t is i."""
-        return t == i.casefold()
+        return t == i.lower()
 
     @staticmethod
     def _starting_comp(t: str, i: str) -> bool:
-        """Return true if i starts with t."""
-        return i.casefold().startswith(t)
-
-    def expanding(self, identifier: str, exact: bool, join=True) -> list[str] | list[list[str]]:
-        """Expand the user's input to full skill:spec names. If join is False, return a list."""
-        tokens = [token.casefold() for token in identifier.split(self._DELIMITER)]
-
-        # The "comp" lambda takes a token and an instance var
-        if exact:
-            # comp = lambda t, i: t == i.casefold()
-            comp = self._exact_comp
-        else:
-            # comp = lambda t, i: i.casefold().startswith(t)
-            comp = self._starting_comp
-
-        if comp(tokens[0], self.name):
-            # A token might match multiple specs in the same skill. Therefore,
-            # we need to make a list of all matching specs. We don't need to
-            # track ratings, however, as we can just sum the spec counts at the
-            # end.
-            spec_groups = []
-            for token in tokens[1:]:
-                found_specs = []
-                for subtrait in self.subtraits:
-                    if comp(token, subtrait):
-                        found_specs.append(subtrait)
-                spec_groups.append(found_specs)
-
-            # If no subtraits were given, then spec_groups is empty. If
-            # subtraits were given but not found, then we have [[]], which
-            # will eventually return [].
-            #
-            # This also holds true if multiple specs are given and only one
-            # fails to match (e.g. [["Kindred"], []]). It works because
-            # itertools.product() will return an empty list if one of its
-            # arguments is itself an empty list. Therefore, we don't need any
-            # "if not group: return None" patterns in this next block.
-
-            if spec_groups:
-                matches = []
-                if len(spec_groups) > 1:
-                    # Multiple matching specs per token; get all combinations:
-                    #     [[1, 2], [3]] -> [(1, 3), (2, 3)]
-                    spec_groups = itertools.product(*spec_groups)
-                else:
-                    # Zero or one match; golden path
-                    spec_groups = spec_groups[0]
-
-                seen_groups = set()
-                for group in spec_groups:
-                    if isinstance(group, str):
-                        group = [group]
-                    if len(set(group)) < len(group):
-                        # Don't add groups with duplicate elements
-                        continue
-
-                    group = frozenset(group)  # frozenset can be hashed
-                    if group in seen_groups:
-                        # Prevent (A, B) and (B, A) from both showing in the results
-                        continue
-
-                    seen_groups.add(group)
-                    matches.append([self.name] + sorted(group))
-            else:
-                matches = [[self.name]]
-
-            if join:
-                return [self._DELIMITER.join(match) for match in matches]
-            return matches
-
-        # No matches
-        return []
+        return i.lower().startswith(t)
 
 
 class Character(Document):
@@ -298,7 +284,7 @@ class Character(Document):
     willpower: str
     grounding: Grounding
 
-    traits: List[Trait] = Field(default_factory=list)
+    traits: list[Trait] = Field(default_factory=list)
 
     @property
     def has_blood_pool(self) -> bool:
