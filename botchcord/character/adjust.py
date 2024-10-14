@@ -111,10 +111,14 @@ class Toggler(View):
         """Remove the controls and prompt user to run the command again."""
         cmd = self.ctx.bot.cmd_mention("character adjust")
         if self.message is not None:
-            await self.message.edit(
-                content=f"Adjustments timed out. Please run {cmd} again.",
-                view=None,
-            )
+            try:
+                await self.message.edit(
+                    content=f"Adjustments timed out. Please run {cmd} again.",
+                    view=None,
+                )
+            except discord.NotFound:
+                # The message was deleted
+                pass
 
 
 class Adjuster(ABC):
