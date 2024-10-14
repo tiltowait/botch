@@ -9,11 +9,12 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from core.characters import Character, wod
 from core.rolls import Roll
+from interface.models import CommandRecord
 
 load_dotenv()
 
 logger = logging.getLogger("db")
-DOCUMENT_MODELS = [Character, wod.Vampire, wod.Mortal, Roll]
+DOCUMENT_MODELS = [Character, wod.Vampire, wod.Mortal, Roll, CommandRecord]
 
 
 async def init():

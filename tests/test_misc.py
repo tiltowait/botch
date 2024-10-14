@@ -95,3 +95,23 @@ def test_debug_guilds():
     os.environ["DEBUG"] = "1,2,3"
     importlib.reload(config)
     assert config.DEBUG_GUILDS == [1, 2, 3]
+
+
+def test_command_record():
+    ctx = mock.Mock()
+
+    ctx.command.qualified_name = "roll"
+    ctx.selected_options = [{"name": "pool", "value": 6}]
+    ctx.guild.id = 0
+    ctx.user.id = 1
+    ctx.interaction.locale = "en-US"
+    ctx.command.type = 1
+
+    record = db.CommandRecord.from_context(ctx)
+
+    assert record.command == ctx.command.qualified_name
+    assert record.options == ctx.selected_options
+    assert record.guild == ctx.guild.id
+    assert record.user == ctx.user.id
+    assert record.locale == ctx.interaction.locale
+    assert record.type == ctx.command.type
