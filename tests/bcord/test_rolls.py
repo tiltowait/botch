@@ -126,8 +126,8 @@ def test_embed_color(successes: int, expected: Color, line: GameLine):
 @pytest.mark.parametrize(
     "successes,expected,line",
     [
-        (-2, "Botch! (-2)", GameLine.WOD),
-        (-1, "Botch! (-1)", GameLine.WOD),
+        (-2, "🤣 Botch! (-2)", GameLine.WOD),
+        (-1, "🤣 Botch! (-1)", GameLine.WOD),
         (0, "Failure", GameLine.WOD),
         (1, "Marginal (1)", GameLine.WOD),
         (2, "Moderate (2)", GameLine.WOD),

@@ -125,7 +125,7 @@ class Roll(Document):
         successes = self.successes  # Prevent recalculation
 
         if successes < 0:
-            return "Botch!"
+            return "🤣 Botch!"
         if successes == 0:
             return "Failure"
 

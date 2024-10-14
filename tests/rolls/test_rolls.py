@@ -163,7 +163,7 @@ def test_missing_game_line():
 @pytest.mark.parametrize(
     "dice,expected",
     [
-        ([1], "Botch!"),
+        ([1], "🤣 Botch!"),
         ([2], "Failure"),
         ([8], "Marginal"),
         ([8, 8], "Moderate"),
