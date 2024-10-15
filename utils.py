@@ -17,3 +17,8 @@ def max_vtm_trait(generation: int) -> int:
     if generation >= 8:
         return 5
     return 10 - (generation - 3)
+
+
+def format_join(collection: list, separator: str, f: str, alt="") -> str:
+    """Join a collection by a separator, formatting each item."""
+    return separator.join(map(lambda c: f"{f}{c}{f}", collection)) or alt
