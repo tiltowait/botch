@@ -16,11 +16,11 @@ from core.characters.wod import Vampire
 
 __all__ = (
     "Adjuster",
-    "BloodAdjuster",
     "GroundingAdjuster",
     "HealthAdjuster",
     "Toggler",
     "WillpowerAdjuster",
+    "WoDVampAdjuster",
 )
 
 
@@ -49,7 +49,7 @@ class Toggler(View):
         self.add_adjuster(f"Adjust: {char.grounding.path}", GroundingAdjuster)
 
         if self.character.has_blood_pool:
-            self.add_adjuster("Adjust: Blood Pool", BloodAdjuster)
+            self.add_adjuster("Adjust: Vampirism", WoDVampAdjuster)
 
     def _populate_menu(self, adjuster: "Adjuster"):
         """Populate the menu."""
@@ -105,6 +105,7 @@ class Toggler(View):
         ]
         if self.character.has_blood_pool:
             fields.append(DisplayField.BLOOD_POOL)
+            fields.append(DisplayField.GENERATION)
         return build_embed(self.ctx.bot, self.character, use_emojis, fields=tuple(fields))
 
     async def on_timeout(self):
@@ -139,7 +140,7 @@ class Adjuster(ABC):
         """Add a button."""
         self.buttons.append(btn)
 
-    def add_row(
+    def add_stepper(
         self,
         row: int,
         label: str,
@@ -180,7 +181,7 @@ class HealthAdjuster(Adjuster):
 
     def _populate(self):
         for i, label in enumerate(["Bashing", "Lethal", "Aggravated"]):
-            self.add_row(i + 1, label)
+            self.add_stepper(i + 1, label)
 
     def _update_buttons(self):
         c = Counter(list(self.character.health))
@@ -223,8 +224,10 @@ class WillpowerAdjuster(Adjuster):
     """Adjust character willpower."""
 
     def _populate(self):
-        self.add_row(1, "Temporary")
-        self.add_row(2, "Permanent")
+        self.add_stepper(1, "Temporary")
+        self.add_stepper(
+            2, "Permanent", dec_color=ButtonStyle.danger, inc_color=ButtonStyle.success
+        )
 
     def _update_buttons(self):
         c = Counter(list(self.character.willpower))
@@ -257,7 +260,12 @@ class GroundingAdjuster(Adjuster):
     """Adjust character grounding (path/humanity)."""
 
     def _populate(self):
-        self.add_row(1, self.character.grounding.path)
+        self.add_stepper(
+            1,
+            self.character.grounding.path,
+            dec_color=ButtonStyle.danger,
+            inc_color=ButtonStyle.success,
+        )
         for btn in self.buttons:
             btn.callback = self.callback
 
@@ -275,25 +283,44 @@ class GroundingAdjuster(Adjuster):
         await super().callback(interaction)
 
 
-class BloodAdjuster(Adjuster):
+class WoDVampAdjuster(Adjuster):
     """Adjust character blood pool. This might be expandable to adjusting
     special attributes--BP, Rage, Pillars, etc."""
 
     character: Vampire
 
     def _populate(self):
-        self.add_row(1, "Blood Pool", dec_color=ButtonStyle.danger, inc_color=ButtonStyle.success)
+        colors = dict(dec_color=ButtonStyle.danger, inc_color=ButtonStyle.success)
+        self.add_stepper(1, "Blood Pool", **colors)
+        self.add_stepper(2, "Max Blood Pool", **colors)
+        self.add_stepper(3, "Generation")
 
     def _update_buttons(self):
         self.buttons[0].disabled = self.character.blood_pool == 0
         self.buttons[2].disabled = self.character.blood_pool == self.character.max_bp
+        self.buttons[3].disabled = self.character.max_bp == 1
+        self.buttons[5].disabled = self.character.max_bp == 50
+        self.buttons[6].disabled = self.character.generation == 3
+        self.buttons[8].disabled = self.character.generation == 15
 
     async def callback(self, interaction: discord.Interaction):
         i, _ = self.get_button(interaction.custom_id)
 
-        if i == 0:
-            self.character.reduce_blood(1)
-        else:
-            self.character.add_blood(1)
+        match i:
+            # BP
+            case 0:
+                self.character.reduce_blood(1)
+            case 2:
+                self.character.add_blood(1)
+            # Max BP
+            case 3:
+                self.character.decrement_max_bp()
+            case 5:
+                self.character.increment_max_bp()
+            # Generation
+            case 6:
+                self.character.lower_generation()
+            case 8:
+                self.character.raise_generation()
 
         await super().callback(interaction)
