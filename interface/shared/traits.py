@@ -9,7 +9,7 @@ from bot import AppCtx, BotchBot
 from botchcord import options
 
 
-class TraitsCog(Cog, name="Character trait commands"):
+class TraitsCog(Cog, name="Character trait/specialty commands"):
     traits = SlashCommandGroup("traits", "Character trait commands")
     specialties = SlashCommandGroup("specialties", "Character specialties commands")
 

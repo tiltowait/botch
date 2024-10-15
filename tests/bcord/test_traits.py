@@ -2,17 +2,19 @@
 
 import importlib
 from functools import partial
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import discord
 import pytest
 
 from botchcord.character.traits.display import (
+    add_specialties_field,
     add_trait_category,
     add_trait_subcategory,
     build_embed,
     categorize_traits,
     display,
+    format_specialties,
     printout,
 )
 from botchcord.utils import CEmbed
@@ -60,6 +62,13 @@ def mixed_traits() -> list[Trait]:
         tf(name="I", subcategory=Trait.Subcategory.SOCIAL),
     ]
     return physical + mental + social
+
+
+@pytest.fixture
+def specced(sample_traits: list[Trait]) -> list[Trait]:
+    sample_traits[0].add_subtraits(["first", "second"])
+    sample_traits[2].add_subtraits(["third"])
+    return sample_traits
 
 
 @pytest.fixture
@@ -144,6 +153,7 @@ def test_build_embed(bot_mock, char: Character, mixed_traits: list[Trait]):
     embed = build_embed(bot_mock, char)
 
     assert embed.title == "Character Traits"
+    assert embed.author is not None
     assert embed.author.name == char.name
     assert embed.author.icon_url == bot_mock.get_user().guild_avatar
     assert len(embed.fields) == 6, "Empty categories should not be added"
@@ -359,3 +369,41 @@ async def test_remove(ctx, skilled: Character, mock_char_save):
     await remove.remove(ctx, skilled, "foo bar")
     ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
     mock_char_save.assert_called_once()
+
+
+def test_format_specialties(specced: list[Trait]):
+    lines = format_specialties(specced)
+
+    assert len(specced) == 3
+    assert len(lines) == 2, "format_specialties should have filtered out non-specs"
+    assert lines[0] == "**dexterity:** `first`, `second`"
+    assert lines[1] == "**stamina:** `third`"
+
+
+def test_add_specialties_field(specced: list[Trait]):
+    embed = discord.Embed()
+    char = Mock()
+    char.traits = specced
+    add_specialties_field(embed, char)
+
+    assert len(embed.fields) == 1
+    assert embed.fields[0].name == "Specialties"
+    assert embed.fields[0].value == "\n".join(format_specialties(specced))
+
+
+def test_specialties_field_not_added(sample_traits):
+    embed = discord.Embed()
+    char = Mock()
+    char.traits = sample_traits
+    add_specialties_field(embed, char)
+
+    assert not embed.fields
+
+
+def test_build_embed_has_specs(bot_mock, char: Character, specced: list[Trait]):
+    char.traits = specced
+    embed = build_embed(bot_mock, char)
+
+    assert embed.fields[-1].name == "Specialties"
+    assert embed.fields[-1].value == "\n".join(format_specialties(specced))
+    assert embed.fields[-1].inline

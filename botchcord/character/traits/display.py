@@ -7,7 +7,7 @@ import discord
 import bot
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
-from botchcord.utils.text import b
+from botchcord.utils.text import b, m
 from core.characters import Character, Trait
 
 
@@ -23,6 +23,7 @@ def build_embed(bot: bot.BotchBot, char: Character) -> discord.Embed:
 
     for category in Trait.Category:
         add_trait_category(embed, char, category)
+    add_specialties_field(embed, char)
 
     return embed
 
@@ -47,6 +48,18 @@ def add_trait_subcategory(
 ):
     """Add a trait category (column) to the embed."""
     embed.add_field(name=name, value=printout(traits), inline=inline)
+
+
+def add_specialties_field(embed: discord.Embed, char: Character):
+    """Add a field displaying specialties."""
+    lines = format_specialties(char.traits)
+    if lines:
+        embed.add_field(name="Specialties", value="\n".join(lines))
+
+
+def format_specialties(traits: list[Trait]) -> list[str]:
+    """Given a list of traits, prep the formatted lines for the embed."""
+    return [f"**{t.name}:** {', '.join(map(m, t.subtraits))}" for t in traits if t.subtraits]
 
 
 def categorize_traits(category: Trait.Category, traits: list[Trait]) -> dict[str, list[Trait]]:
