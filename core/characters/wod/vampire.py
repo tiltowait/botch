@@ -4,7 +4,7 @@ from pydantic import Field
 
 from core.characters.base import GameLine, Splat
 from core.characters.wod.mortal import Mortal
-from utils import max_vtm_bp, max_vtm_trait
+from utils import max_vtm_bp
 
 
 class Vampire(Mortal):
