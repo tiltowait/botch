@@ -48,9 +48,9 @@ class TraitsCog(Cog, name="Character trait/specialty commands"):
         required=True,
     )
     @options.character("The character receiving the specialties")
-    async def assign_specialties(self, ctx: AppCtx, traits: str, character: str):
+    async def assign_specialties(self, ctx: AppCtx, specialties: str, character: str):
         """Assign specialties to a character's trait(s)."""
-        await botchcord.character.specialties.assign(ctx, character, traits)
+        await botchcord.character.specialties.assign(ctx, character, specialties)
 
     @specialties.command(name="remove")
     @option(
@@ -59,9 +59,9 @@ class TraitsCog(Cog, name="Character trait/specialty commands"):
         required=True,
     )
     @options.character("The character losing the specialties")
-    async def remove_specialties(self, ctx: AppCtx, traits: str, character: str):
+    async def remove_specialties(self, ctx: AppCtx, specialties: str, character: str):
         """Remove specialties from a character's trait(s)."""
-        await botchcord.character.specialties.remove(ctx, character, traits)
+        await botchcord.character.specialties.remove(ctx, character, specialties)
 
 
 def setup(bot: BotchBot):
