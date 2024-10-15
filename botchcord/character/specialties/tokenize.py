@@ -4,17 +4,27 @@ from pyparsing import DelimitedList, Group, OneOrMore, ParseException, Word, alp
 
 import errors
 
-SYNTAX = "```trait1=spec1 trait2=spec2,spec3 ...```"
+VALID_CHARS = alphas + "_"
 
 
 def tokenize(syntax: str) -> list[tuple[str, list[str]]]:
-    """Tokenize subtrait syntax."""
-    alphascore = alphas + "_"
+    """
+    Tokenize subtrait syntax.
+
+    Args:
+        syntax (str): The input string to tokenize.
+
+    Returns:
+        list[tuple[str, list[str]]]: A list of tuples, each containing a trait and its subtraits.
+
+    Raises:
+        errors.InvalidSyntax: If the input syntax is invalid.
+    """
     trait_group = OneOrMore(
         Group(
-            Word(alphascore).set_results_name("trait")
+            Word(VALID_CHARS).set_results_name("trait")
             + "="
-            + DelimitedList(Word(alphascore), allow_trailing_delim=True).set_results_name(
+            + DelimitedList(Word(VALID_CHARS), allow_trailing_delim=True).set_results_name(
                 "subtraits"
             )
         )
