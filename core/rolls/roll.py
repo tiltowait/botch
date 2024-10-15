@@ -1,15 +1,23 @@
 """Dice rolls!"""
 
 import re
-from typing import Optional, overload
+from typing import TYPE_CHECKING, Optional, TypeAlias, TypeVar, overload
 
-from beanie import Document, Insert, Link, before_event
+from beanie import Document, Insert
+from beanie import Link as BeanieLink
+from beanie import before_event
 from numpy.random import default_rng
 from pydantic import Field
 
 import errors
 from core.characters import Character, GameLine
 from core.rolls.parse import RollParser
+
+if TYPE_CHECKING:
+    _T = TypeVar("_T", bound=Document)
+    Link: TypeAlias = _T
+else:
+    Link = BeanieLink
 
 _rng = default_rng()  # numpy's default RNG is PCG64 (superior to builtin)
 
