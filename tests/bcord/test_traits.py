@@ -382,13 +382,17 @@ def test_format_specialties(specced: list[Trait]):
 
 def test_add_specialties_field(specced: list[Trait]):
     embed = discord.Embed()
+    # add_specialties_field checks the field two before it, so we need to add
+    # some blank fields to get it to behave
+    embed.add_field(name=" ", value="** **")
+    embed.add_field(name=" ", value="** **")
     char = Mock()
     char.traits = specced
     add_specialties_field(embed, char)
 
-    assert len(embed.fields) == 1
-    assert embed.fields[0].name == "Specialties"
-    assert embed.fields[0].value == "\n".join(format_specialties(specced))
+    assert len(embed.fields) == 3
+    assert embed.fields[-1].name == "Specialties"
+    assert embed.fields[-1].value == "\n".join(format_specialties(specced))
 
 
 def test_specialties_field_not_added(sample_traits):
