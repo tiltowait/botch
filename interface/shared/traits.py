@@ -11,6 +11,7 @@ from botchcord import options
 
 class TraitsCog(Cog, name="Character trait commands"):
     traits = SlashCommandGroup("traits", "Character trait commands")
+    specialties = SlashCommandGroup("specialties", "Character specialties commands")
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
@@ -39,6 +40,28 @@ class TraitsCog(Cog, name="Character trait commands"):
     async def remove(self, ctx: AppCtx, traits: str, character: str):
         """Remove traits from a character."""
         await botchcord.character.traits.remove(ctx, character, traits)
+
+    @specialties.command(name="assign")
+    @option(
+        "specialties",
+        description="The trait + specialties to add. Ex: Brawl=Kindred,Kine",
+        required=True,
+    )
+    @options.character("The character receiving the specialties")
+    async def assign_specialties(self, ctx: AppCtx, traits: str, character: str):
+        """Assign specialties to a character's trait(s)."""
+        await botchcord.character.specialties.assign(ctx, character, traits)
+
+    @specialties.command(name="remove")
+    @option(
+        "specialties",
+        description="The trait + specialties to remove. Ex: Brawl=Kindred,Kine",
+        required=True,
+    )
+    @options.character("The character losing the specialties")
+    async def remove_specialties(self, ctx: AppCtx, traits: str, character: str):
+        """Remove specialties from a character's trait(s)."""
+        await botchcord.character.specialties.remove(ctx, character, traits)
 
 
 def setup(bot: BotchBot):
