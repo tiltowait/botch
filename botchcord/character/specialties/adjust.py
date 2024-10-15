@@ -7,6 +7,7 @@ from bot import AppCtx
 from botchcord.character.specialties.tokenize import tokenize
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
+from botchcord.utils.text import b, i, m
 from core.characters import Character
 from utils import format_join
 
@@ -30,43 +31,27 @@ async def remove(ctx: AppCtx, character: Character, syntax: str):
     await _add_or_remove(ctx, character, syntax, Action.REMOVE)
 
 
-async def _add_or_remove(
-    ctx: AppCtx,
-    character: Character,
-    syntax: str,
-    _action: Action,
-):
+async def _add_or_remove(ctx: AppCtx, character: Character, syntax: str, action: Action):
     """Perform the actual work of adding or removing a spec."""
-    if _action == Action.ADD:
-        action = add_specialties
-        title = "Specialties added"
-    else:
-        action = remove_specialties
-        title = "Specialties removed"
+    action_func = add_specialties if action == Action.ADD else remove_specialties
+    title = "Specialties added" if action == Action.ADD else "Specialties removed"
 
-    additions = action(character, syntax)
+    additions = action_func(character, syntax)
     embed = _make_embed(ctx, character, additions, title)
 
     await ctx.respond(embed=embed, ephemeral=True)
     await character.save()
 
 
-def _make_embed(
-    ctx: AppCtx,
-    character: Character,
-    additions: list,
-    title: str,
-):
+def _make_embed(ctx: AppCtx, character: Character, additions: list, title: str):
     """Create the embed."""
     entries = []
     for trait, delta in additions:
         delta_str = format_join(delta, ", ", "`", "*No change*")
-
         entry = f"**{trait.name}:** {delta_str}"
         if len(delta) != len(trait.subtraits):
-            specs_str = format_join(trait.subtraits, ", ", "*", "*None*")
-            entry += f"\n***All:*** {specs_str}\n"
-            entry = "\n" + entry
+            specs_str = format_join(trait.subtraits, ", ", "*", i("None"))
+            entry = f"\n{entry}\n***All:*** {specs_str}\n"
         entries.append(entry)
 
     content = "\n".join(entries).strip()
@@ -74,7 +59,6 @@ def _make_embed(
     embed.set_footer(
         text="See all attributes, skills, custom traits, and specialties with /traits list."
     )
-
     return embed
 
 
@@ -93,37 +77,26 @@ def _mod_specialties(character: Character, syntax: str, adding: bool):
     tokens = tokenize(syntax)
     validate_tokens(character, tokens)
 
-    # We have the traits; add the specialties
-    traits = []
-    for trait, specs in tokens:
-        if adding:
-            new_trait, delta = character.add_subtraits(trait, specs)
-        else:
-            new_trait, delta = character.remove_subtraits(trait, specs)
-        traits.append((new_trait, delta))
-
-    return traits
+    mod_func = character.add_subtraits if adding else character.remove_subtraits
+    return [mod_func(trait, specs) for trait, specs in tokens]
 
 
 def validate_tokens(character: Character, tokens: list[tuple[str, list[str]]]):
     """Raise an exception if the character is missing one of the traits."""
-    missing = []
+    missing = [trait for trait, _ in tokens if not character.has_trait(trait)]
     errs = []
-    for trait, subtraits in tokens:
-        if not character.has_trait(trait):
-            missing.append(trait)
-        if not errs:
-            for subtrait in map(str.lower, subtraits):
-                if subtrait == trait.lower():
-                    errs.append("A subtrait can't have the same name as the parent trait.")
 
     if missing:
         if len(missing) == 1:
-            # We want the part of the error with the character name to come first
-            errs.insert(0, f"**{character.name}** has no trait named `{missing[0]}`.")
+            errs.append(f"{b(character.name)} has no trait named `{missing[0]}`.")
         else:
-            missing = ", ".join(map(lambda t: f"`{t}`", missing))
-            errs.insert(0, f"**{character.name}** doesn't have the following traits: {missing}.")
+            missing_str = ", ".join(m(t) for t in missing)
+            errs.append(f"{b(character.name)} doesn't have the following traits: {missing_str}.")
+
+    for trait, subtraits in tokens:
+        if any(subtrait.lower() == trait.lower() for subtrait in subtraits):
+            errs.append("A subtrait can't have the same name as the parent trait.")
+            break
 
     if errs:
         raise errors.TraitError("\n\n".join(errs))
