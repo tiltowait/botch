@@ -1,6 +1,5 @@
 """Functions for adding/updating character traits. Not inclusive of subtraits."""
 
-
 from pyparsing import (
     Dict,
     Group,
@@ -23,7 +22,7 @@ from core.characters import Character, Trait
 async def assign(ctx: bot.AppCtx, character: Character, user_input: str):
     """Assign the traits and inform the user."""
     parsed = parse_input(user_input)
-    traits = assign_traits(character, parsed)
+    traits = assign_traits(character, parsed, subcategory=Trait.Subcategory.CUSTOM)
     embed = build_embed(ctx.bot, character, traits)
 
     await character.save()

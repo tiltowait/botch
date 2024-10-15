@@ -115,6 +115,7 @@ class Trait(BaseModel):
         SKILLS = "skills"
         KNOWLEDGES = "knowledges"
         BLANK = "\u200b"  # Discord doesn't allow empty field names
+        CUSTOM = "custom"
 
     class Selection(BaseModel):
         """When the user invokes a Trait, they receive a Trait.Selection. This
