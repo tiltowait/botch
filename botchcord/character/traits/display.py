@@ -35,6 +35,8 @@ def add_trait_category(
 ):
     traits = categorize_traits(category, char.traits)
     if traits:
+        if category == Trait.Category.CUSTOM:
+            category = " "  # type: ignore
         embed.add_field(name=" ", value=b(category.upper()), inline=False)
         for sub, traits in traits.items():
             add_trait_subcategory(embed, sub.title(), traits)
@@ -54,6 +56,9 @@ def add_specialties_field(embed: discord.Embed, char: Character):
     """Add a field displaying specialties."""
     lines = format_specialties(char.traits)
     if lines:
+        if embed.fields[-2].value != "** **":
+            # For consistency's sake, let's add that blank embed first
+            embed.add_field(name=" ", value="** **", inline=False)
         embed.add_field(name="Specialties", value="\n".join(lines))
 
 
