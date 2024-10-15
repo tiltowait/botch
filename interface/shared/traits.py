@@ -1,13 +1,11 @@
 """Character traits command interface."""
 
-
-import discord
 from discord import option
 from discord.commands import SlashCommandGroup
 from discord.ext.commands import Cog
 
 import botchcord
-from bot import BotchBot
+from bot import AppCtx, BotchBot
 from botchcord import options
 
 
@@ -19,7 +17,7 @@ class TraitsCog(Cog, name="Character trait commands"):
 
     @traits.command(name="list")
     @options.character("The character to display")
-    async def display(self, ctx: discord.ApplicationContext, character: str):
+    async def display(self, ctx: AppCtx, character: str):
         """Display a character's traits."""
         await botchcord.character.traits.display(ctx, character)
 
@@ -28,7 +26,7 @@ class TraitsCog(Cog, name="Character trait commands"):
     @options.character("The character to modify")
     async def assign(
         self,
-        ctx: discord.ApplicationContext,
+        ctx: AppCtx,
         traits: str,
         character: str,
     ):
@@ -38,7 +36,7 @@ class TraitsCog(Cog, name="Character trait commands"):
     @traits.command()
     @option("traits", description="The traits to remove (separate with spaces)", required=True)
     @options.character("The character to modify")
-    async def remove(self, ctx: discord.ApplicationContext, traits: str, character: str):
+    async def remove(self, ctx: AppCtx, traits: str, character: str):
         """Remove traits from a character."""
         await botchcord.character.traits.remove(ctx, character, traits)
 
