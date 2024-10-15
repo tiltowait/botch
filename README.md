@@ -38,9 +38,10 @@ Yes, we're saving the most important info for the end, after most people have al
 
 ### Milestones to private beta
 
-- [ ] Specialties assignment
-- [ ] Specialties display
-- [ ] Specialties removal
+- [ ] Character image uploads (premium feature)
+- [x] ~~*Specialties assignment*~~
+- [x] ~~*Specialties display*~~
+- [x] ~~*Specialties removal*~~
 - [x] ~~*Vampire character stats adjustment*~~
 - [x] ~~*Ghoul character stats adjustment*~~
 - [x] ~~*Mortal character stats adjustment*~~
@@ -72,7 +73,6 @@ The following features will be added during the private beta period:
 - [ ] A command to turn a mortal character into a ghoul ("enghoul")
 - [ ] Lookup commands for STs
 - [ ] Logging facilities for STs
-- [ ] Character image uploads (premium feature)
 
 And maybe ...
 
