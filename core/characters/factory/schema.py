@@ -31,6 +31,7 @@ class TraitGroup(BaseModel):
         for sub in self.subcategories:
             if trait in sub.traits:
                 return sub.name
+        return None
 
 
 class Schema(BaseModel):

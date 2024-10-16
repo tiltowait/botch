@@ -458,17 +458,6 @@ class Character(Document):
                 return trait.name
         raise errors.TraitNotFound(self, name)
 
-    def add_specialties(self, name: str, subtraits: list[str] | str) -> tuple[Trait, set[str]]:
-        """Add specialties to a trait.
-        Args:
-            name (str): The name of the trait to add to
-            subtraits (list[str]): The specialties to add.
-
-        Returns: A copy of the Trait with specialties added, and the set of
-            the added specialties.
-        Raises TraitNotFound."""
-        raise NotImplementedError("This function is not implemented in the base class.")
-
     def add_subtraits(self, name: str, subtraits: list[str] | str) -> tuple[Trait, list[str]]:
         """Add subtraits to a trait.
         Args:
