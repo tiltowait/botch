@@ -1,7 +1,6 @@
 from unittest.mock import Mock, patch
 
 import pytest
-from discord.ext import commands
 
 import errors
 from botchcord.premium import _check_supporter, is_supporter, premium
