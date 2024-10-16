@@ -5,6 +5,14 @@ class BotchError(Exception):
     """Base error class."""
 
 
+class NotReady(Exception):
+    """Raised when the bot isn't ready yet."""
+
+
+class NotPremium(Exception):
+    """Raised when the user isn't a premium supporter."""
+
+
 class EmojiNotFound(Exception):
     """Raised when an emoji isn't found."""
 
