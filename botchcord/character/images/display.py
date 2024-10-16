@@ -30,7 +30,6 @@ async def display_images(
         ctx: The command context
         character: The character being displayed
         invoker_controls: Whether only the invoking user can control the buttons"""
-    print("hi?")
     pager = ImagePager(ctx, character, invoker_controls)
     await pager.respond()
 
@@ -50,7 +49,6 @@ class ImagePager(discord.ui.View):
         invoker_controls: bool,
     ):
         self.ctx = ctx
-        self.message = None
         self.character = character
         self.invoker_controls = invoker_controls
         self.current_page = 0
@@ -156,7 +154,7 @@ class ImagePager(discord.ui.View):
 
     async def respond(self):
         """Display the pager."""
-        await self.ctx.respond(embed=self.embed, view=self)
+        self.message = await self.ctx.respond(embed=self.embed, view=self)
 
     async def previous_page(self, interaction: discord.Interaction):
         """Go to the next page."""
