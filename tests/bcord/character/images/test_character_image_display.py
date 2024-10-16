@@ -2,7 +2,7 @@
 
 from random import randint
 from typing import AsyncGenerator
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
 
@@ -248,6 +248,16 @@ async def test_management_mode(pager: ImagePager, uinter: AsyncMock):
     ]
 
     assert uinter.response.edit_message.await_count == 6
+
+
+async def test_delete_all_images(pager: ImagePager, uinter: AsyncMock):
+    pager.stop = Mock()
+    for _ in range(pager.num_pages):
+        await pager._delete_image(uinter)
+
+    assert uinter.response.edit_message.await_count == 5
+    uinter.response.edit_message.assert_awaited_with(embed=ANY, view=None)
+    pager.stop.assert_called_once()
 
 
 # All that ... just to test the display command in < 10 lines
