@@ -36,6 +36,10 @@ Why Botch? Botches are bad! Yes, they are. Over the years, many users have conta
 
 Yes, we're saving the most important info for the end, after most people have already given up. Here's a rough roadmap:
 
+### Milestones to v1.0
+
+[View the tracker here!](https://github.com/tiltowait/botch/milestone/2)
+
 ### Milestones to private beta
 
 - [x] ~~*Character image uploads (premium feature)*~~
@@ -57,23 +61,3 @@ Yes, we're saving the most important info for the end, after most people have al
 - [x] ~~*Traits assignment*~~
 - [x] ~~*Traits display*~~
 - [x] ~~*Traits removal*~~
-
-Once the above are finished, Botch will enter private beta for Patreon supporters. This will be a true beta period, and not a Big Tech "release finished product but call it beta forever" beta. The bot will not be available to add to other servers during this time, and the database may be wiped at any moment to facilitate backend changes (in reality, I don't expect this to happen, but I can't make any promises). In addition to testing the bot, beta users will be able to make suggestions and help influence the direction of the bot's development.
-
-### Milestones to v1.0
-
-The following features will be added during the private beta period:
-
-- [ ] Macro creation
-- [ ] Macro deletion
-- [ ] Macro updates
-- [ ] Macro display
-- [ ] QoL commands, particularly for vampire characters (e.g. a `/vampire blood` command that allows the player to quickly add/remove blood points from their pool without using the more complex `/vampire adjust` command)
-- [ ] An `/embrace` command
-- [ ] A command to turn a mortal character into a ghoul ("enghoul")
-- [ ] Lookup commands for STs
-- [ ] Logging facilities for STs
-
-And maybe ...
-
-- [ ] Metamacros
