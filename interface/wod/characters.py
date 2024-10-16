@@ -9,6 +9,7 @@ from discord.ext.commands import Cog
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
+from botchcord.premium import premium
 
 
 class CharactersCog(Cog, name="General character commands"):
@@ -51,6 +52,7 @@ class CharactersCog(Cog, name="General character commands"):
     @images.command(name="upload")
     @option("image", description="The image file to upload")
     @options.character("The character to upload the image to")
+    @premium()
     async def upload_image(self, ctx: AppCtx, image: discord.Attachment, character: str):
         """[PREMIUM] Upload an image."""
         await botchcord.character.images.upload(ctx, character, image)

@@ -1,7 +1,7 @@
 """Bot instance tests."""
 
 from unittest import mock
-from unittest.mock import AsyncMock, MagicMock, Mock, PropertyMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, Mock, PropertyMock, patch
 
 import pytest
 from discord import ApplicationCommandInvokeError, NotFound
@@ -20,6 +20,8 @@ def bot():
 def ctx(bot: BotchBot) -> AppCtx:
     ctx = AppCtx(bot, AsyncMock())
     ctx.send_error = AsyncMock()
+    ctx.command = Mock()
+    ctx.command.qualified_name = "command"
     return ctx
 
 
@@ -71,12 +73,16 @@ async def test_get_ctx(bot: BotchBot):
     assert isinstance(ctx, AppCtx)
 
 
-async def test_send_error_message(bot: BotchBot, ctx: AppCtx):
+@pytest.mark.parametrize("error_cls", [errors.BotchError, errors.NotPremium])
+async def test_send_error_message(bot: BotchBot, ctx: AppCtx, error_cls: type[errors.BotchError]):
     msg = "This is a test"
-    err = ApplicationCommandInvokeError(errors.BotchError(msg))
+    err = ApplicationCommandInvokeError(error_cls(msg))
 
     await bot.on_application_command_error(ctx, err)
-    ctx.send_error.assert_awaited_once_with("Error", msg, ephemeral=True)
+    if isinstance(err.original, errors.NotPremium):
+        ctx.send_error.assert_awaited_once_with("This is a premium feature", ANY, ephemeral=True)
+    else:
+        ctx.send_error.assert_awaited_once_with("Error", msg, ephemeral=True)
 
 
 async def test_re_raise_error_message(bot: BotchBot, ctx: AppCtx):

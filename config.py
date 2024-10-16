@@ -12,6 +12,8 @@ logger = logging.getLogger("CONFIG")
 BOTCH_TOKEN = os.getenv("BOTCH_TOKEN")
 DEBUG_GUILDS = [int(g) for g in os.getenv("DEBUG", "").split(",") if g and g.isdigit()] or None
 EMOJI_GUILD = int(os.getenv("EMOJI_GUILD", 0))
+SUPPORTER_GUILD = int(os.getenv("SUPPORTER_GUILD", 0))
+SUPPORTER_ROLE = int(os.getenv("SUPPORTER_ROLE", 0))
 BOT_ID: int | None = None
 
 # Bucket for storing character images

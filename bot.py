@@ -10,7 +10,7 @@ import config
 import db
 import errors
 from config import DEBUG_GUILDS, EMOJI_GUILD
-from errors import BotchError
+from errors import BotchError, NotPremium
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -46,6 +46,7 @@ class BotchBot(discord.Bot):
             *args,
             **kwargs,
         )
+        self.welcomed = False
         if DEBUG_GUILDS:
             logger.info("Debugging on %s", DEBUG_GUILDS)
 
@@ -56,6 +57,7 @@ class BotchBot(discord.Bot):
 
     async def on_ready(self):
         assert self.user is not None
+        self.welcomed = True
         config.set_bot_id(self.user.id)
         logger.info("Ready!")
 
@@ -109,6 +111,16 @@ class BotchBot(discord.Bot):
                 pass
             case BotchError():
                 await ctx.send_error("Error", str(err), ephemeral=True)
+            case NotPremium():
+                cmd_mention = ctx.bot.cmd_mention(ctx.command.qualified_name)
+                await ctx.send_error(
+                    "This is a premium feature",
+                    (
+                        f"Only patrons can use {cmd_mention}. Click "
+                        "[this link](https://patreon.com/tiltowait) to get started!"
+                    ),
+                    ephemeral=True
+                )
             case _:
                 # TODO: Error reporter
                 raise err
