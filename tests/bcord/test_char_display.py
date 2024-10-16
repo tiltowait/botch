@@ -27,7 +27,7 @@ def bot_mock() -> Mock:
 
     bot = Mock()
     bot.get_user.return_value = user
-    bot.get_emoji = lambda e: e
+    bot.find_emoji = lambda e: e
 
     return bot
 
@@ -154,6 +154,6 @@ def test_alt_title(bot_mock, wod_vamp):
 )
 def test_emoji_track(track: str, expected: str):
     bot = Mock()
-    bot.get_emoji = lambda e: e
+    bot.find_emoji = lambda e: e
     emoji = emojify_track(bot, track)
     assert emoji == expected

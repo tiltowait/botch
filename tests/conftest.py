@@ -54,7 +54,7 @@ def bot_mock() -> Mock:
 
     bot = Mock()
     bot.get_user.return_value = user
-    bot.get_emoji = lambda e: e
+    bot.find_emoji = lambda e: e
 
     return bot
 

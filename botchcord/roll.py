@@ -135,7 +135,7 @@ def emojify_dice(ctx: discord.ApplicationContext, roll: Roll) -> str:
 
     emojis = []
     for e in map(lambda d: emoji_name(d, roll.difficulty, special, roll.wod), roll.dice):
-        emojis.append(ctx.bot.get_emoji(e))
+        emojis.append(ctx.bot.find_emoji(e))
 
     return " ".join(emojis)
 

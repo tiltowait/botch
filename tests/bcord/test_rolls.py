@@ -28,9 +28,9 @@ from tests.characters import gen_char
 
 
 class EmojiMock:
-    """For mocking the ctx.bot.get_emoji() calls."""
+    """For mocking the ctx.bot.find_emoji() calls."""
 
-    def get_emoji(self, name):
+    def find_emoji(self, name):
         if re.match(r"^(ss?|f|b)\d+$", name):
             return name  # The real deal adds \u200b, but we don't need that here
         raise errors.EmojiNotFound
@@ -298,7 +298,7 @@ def test_emoji_name(die: int, target: int, special: int, botchable: bool, expect
 
 def test_emoji_error(ctx):
     with pytest.raises(errors.EmojiNotFound):
-        ctx.bot.get_emoji("this should fail")
+        ctx.bot.find_emoji("this should fail")
 
 
 @pytest.mark.parametrize(

@@ -74,14 +74,14 @@ class BotchBot(discord.Bot):
         load("shared")
 
     @overload
-    def get_emoji(self, emoji_name: str) -> str:
+    def find_emoji(self, emoji_name: str) -> str:
         ...
 
     @overload
-    def get_emoji(self, emoji_name: str, count: int) -> str | list[str]:
+    def find_emoji(self, emoji_name: str, count: int) -> str | list[str]:
         ...
 
-    def get_emoji(self, emoji_name: str, count=1) -> str | list[str]:
+    def find_emoji(self, emoji_name: str, count=1) -> str | list[str]:
         """Get an emoji from the emoji guild."""
         if guild := self.get_guild(EMOJI_GUILD):
             try:
@@ -119,7 +119,7 @@ class BotchBot(discord.Bot):
                         f"Only patrons can use {cmd_mention}. Click "
                         "[this link](https://patreon.com/tiltowait) to get started!"
                     ),
-                    ephemeral=True
+                    ephemeral=True,
                 )
             case _:
                 # TODO: Error reporter
