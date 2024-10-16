@@ -38,7 +38,7 @@ Yes, we're saving the most important info for the end, after most people have al
 
 ### Milestones to private beta
 
-- [ ] Character image uploads (premium feature)
+- [x] ~~*Character image uploads (premium feature)*~~
 - [x] ~~*Specialties assignment*~~
 - [x] ~~*Specialties display*~~
 - [x] ~~*Specialties removal*~~
