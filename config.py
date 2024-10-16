@@ -20,6 +20,7 @@ BOT_ID: int | None = None
 FC_BUCKET = "pcs-dev.botch.lol" if "TESTING" in os.environ else "pcs.botch.lol"
 
 MAX_NAME_LEN = 37  # Because of modal length restrictions
+VERSION = os.getenv("VERSION_TAG", "local")
 
 
 def set_bot_id(bot_id: int):

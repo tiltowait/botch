@@ -1,7 +1,12 @@
+"""Miscellaneous commands."""
+
+import discord
 from discord.commands import slash_command
 from discord.ext.commands import Cog
 
 from bot import AppCtx, BotchBot
+from botchcord.utils.text import m
+from config import VERSION
 from core.rolls import Roll
 
 
@@ -23,6 +28,12 @@ class MiscCog(Cog, name="Miscellaneous commands"):
             await ctx.respond(f"You've got **{count}** botches on this server 🤣🤣🤣")
         else:
             await ctx.respond("You haven't botched here yet. Good job, I guess 😔")
+
+    @slash_command()
+    async def info(self, ctx: AppCtx):
+        """View bot information."""
+        embed = discord.Embed(title="Botch", description=f"**Version:** {m(VERSION)}")
+        await ctx.respond(embed=embed)
 
 
 def setup(bot: BotchBot):
