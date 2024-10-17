@@ -4,6 +4,7 @@ import re
 from typing import Optional
 from unittest.mock import ANY, AsyncMock, Mock
 
+import discord
 import pytest
 
 import core
@@ -203,6 +204,22 @@ def test_wod_roll_embed_with_specialties(
         f += 1
     assert embed.fields[f].name == "Pool"
     assert embed.fields[f].value == pool
+
+
+def test_build_embed_author_no_char():
+    rp = RollParser("6", None).parse()
+    roll = Roll.from_parser(rp, 0, 0, 6, GameLine.WOD)
+
+    ctx = Mock()
+    ctx.author = Mock(spec=discord.User)  # Make it a User to finish testing get_avatar()
+    ctx.author.display_name = "Jimmy Maxwell"
+    ctx.author.display_avatar = "https://example.com/icon.png"
+
+    embed = build_embed(ctx, roll, None, None, True)
+    assert embed.author is not None
+    assert embed.author.name == "Jimmy Maxwell"
+    assert embed.author.icon_url == "https://example.com/icon.png"
+    assert isinstance(ctx.author, discord.User)
 
 
 @pytest.mark.parametrize(

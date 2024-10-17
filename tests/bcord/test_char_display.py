@@ -1,20 +1,22 @@
 """Character display tests."""
 
-from unittest.mock import Mock
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
 
 import errors
+from bot import AppCtx, BotchBot
 from botchcord.character.display import (
     DisplayField,
     build_embed,
+    display,
     emojify_track,
     get_default_fields,
     get_field_name,
     get_field_value,
     get_track_string,
 )
-from core.characters import Damage, Experience, GameLine, Splat
+from core.characters import Character, Damage, Experience, GameLine, Splat
 from core.characters.wod import Vampire
 from tests.characters import gen_char
 
@@ -33,7 +35,7 @@ def bot_mock() -> Mock:
 
 
 @pytest.fixture
-def wod_vamp():
+def wod_vamp() -> Character:
     return gen_char(
         GameLine.WOD,
         Splat.VAMPIRE,
@@ -159,3 +161,21 @@ def test_emoji_track(track: str, expected: str):
     bot.find_emoji = lambda e: e
     emoji = emojify_track(bot, track)
     assert emoji == expected
+
+
+@patch("botchcord.settings.use_emojis")
+@patch("bot.BotchBot.find_emoji")
+async def test_display(
+    emoji_mock: Mock,
+    settings_mock: AsyncMock,
+    wod_vamp: Vampire,
+):
+    emoji_mock.return_value = "e"
+    settings_mock.return_value = True
+
+    bot = BotchBot()
+    ctx = AppCtx(bot, AsyncMock())
+
+    await display(ctx, wod_vamp)
+    settings_mock.assert_awaited_once_with(ctx)
+    ctx.respond.assert_awaited_once_with(embed=ANY)

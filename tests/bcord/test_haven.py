@@ -2,7 +2,7 @@
 
 from functools import partial
 from typing import Callable
-from unittest.mock import ANY, AsyncMock
+from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
 from discord.ui import Button, Select
@@ -105,6 +105,30 @@ async def test_character_ineligible(ctx: AsyncMock, vamp: Character):
     haven = Haven(ctx, None, None, vamp.name, lambda _: False)
     with pytest.raises(errors.CharacterIneligible):
         await haven.get_match()
+
+
+@patch("botchcord.haven.Haven._populate", new_callable=AsyncMock)
+async def test_character_match_character(populate_mock: AsyncMock, ctx: AsyncMock, vamp: Character):
+    haven = Haven(ctx, None, None, vamp)
+    v = await haven.get_match()
+    assert v == vamp
+    populate_mock.assert_not_awaited()
+
+
+@patch("botchcord.haven.Haven.wait", new_callable=AsyncMock)
+async def test_no_character_selected(
+    wait_mock: AsyncMock, ctx: AsyncMock, vamp: Character, mortal: Character
+):
+    await vamp.save()
+    await mortal.save()
+
+    haven = Haven(ctx, None, None, None)
+    with pytest.raises(errors.NoCharacterSelected):
+        await haven.get_match()
+
+    ctx.respond.assert_called_once_with(embed=ANY, view=haven, ephemeral=True)
+    ctx.delete.assert_awaited_once()
+    wait_mock.assert_awaited_once()
 
 
 async def test_buttons(ctx: AsyncMock, vamp: Character, mortal: Character):

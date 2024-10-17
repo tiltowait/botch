@@ -3,6 +3,7 @@
 from typing import cast
 from unittest.mock import ANY, AsyncMock, Mock, call, patch
 
+import discord
 import pytest
 from discord.ui import Select
 
@@ -322,6 +323,18 @@ async def test_timeout(toggler: Toggler):
     message_mock.edit.assert_called_once_with(
         content="Adjustments timed out. Please run hello again.", view=None
     )
+
+
+@pytest.mark.parametrize("err", [discord.NotFound, discord.Forbidden])
+@patch("botchcord.character.adjust.Toggler.message", new_callable=AsyncMock)
+async def test_timeout_error_handling(
+    mock_message: AsyncMock, toggler: Toggler, err: type[Exception]
+):
+    mock_message.edit.side_effect = err(Mock(), "fake")
+    try:
+        await toggler.on_timeout()
+    except (discord.Forbidden, discord.NotFound):
+        pytest.fail("Exception should have been caught!")
 
 
 async def test_select_adjuster(toggler: Toggler):
