@@ -4,7 +4,7 @@ import pytest
 
 import errors
 from core.characters import Character, GameLine
-from core.rolls.parse import RollParser
+from core.rolls.parse import RollParser, eval_expr
 from core.rolls.roll import Roll
 
 TRIALS = 1000
@@ -153,6 +153,11 @@ def test_roll_parsing(
     assert roll.character == skilled
 
 
+def test_needs_character():
+    with pytest.raises(errors.RollError):
+        RollParser("strength + brawl", None).parse()
+
+
 def test_autos():
     roll = Roll(line=GameLine.WOD, guild=0, user=0, num_dice=0, target=6, autos=2).roll()
     assert roll.successes == 2
@@ -244,3 +249,9 @@ async def test_roll_spec_coalescence(spec: list[str] | None, expected: list[str]
     assert r2 is not None
     assert r.id == r2.id
     assert r2.specialties == expected
+
+
+def test_remaining_eval():
+    assert eval_expr("-1") == -1, "unary op didn't run"
+    with pytest.raises(TypeError):
+        eval_expr("noop")
