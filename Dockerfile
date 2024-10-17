@@ -23,7 +23,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY . .
+COPY src .
 
 # Copy only the virtual environment
 COPY --from=builder /app/.venv/lib/python3.12/site-packages /usr/local/lib/python3.12/dist-packages
