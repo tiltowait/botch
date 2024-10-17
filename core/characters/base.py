@@ -181,14 +181,10 @@ class Trait(BaseModel):
             self._create_selection(group, normalized == self._DELIMITER.join(group).casefold())
             for group in expanded_groups
         ]
-        # return [
-        #     self._create_selection(
-        #         group if isinstance(group, list) else group.split(self._DELIMITER),
-        #         normalized
-        #         == (group if isinstance(group, str) else self._DELIMITER.join(group)).casefold(),
-        #     )
-        #     for group in expanded_groups
-        # ]
+
+    @overload
+    def expanding(self, identifier: str, exact: bool) -> list[str]:
+        ...
 
     @overload
     def expanding(self, identifier: str, exact: bool, join: Literal[True]) -> list[str]:

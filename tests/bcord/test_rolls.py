@@ -247,7 +247,7 @@ def test_wod_text_embed_with_character(
     assert embed.author.name == wod_vampire.name
     assert embed.author.icon_url == wod_vampire.profile.main_image
     assert embed.color is not None
-    assert int(embed.color) == embed_color(roll)
+    assert embed.color.value == embed_color(roll)
     assert embed.title == title
 
     # Fields

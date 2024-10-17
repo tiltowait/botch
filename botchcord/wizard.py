@@ -26,7 +26,7 @@ class Wizard(discord.ui.View):
 
     def _add_select(self, max_rating: int):
         """Add the select menu from 0-max_rating."""
-        select = discord.ui.Select(
+        select: discord.ui.Select = discord.ui.Select(
             placeholder="Select the rating",
             options=[discord.SelectOption(label=str(n)) for n in range(0, max_rating + 1)],
             max_values=1,
@@ -79,6 +79,7 @@ class Wizard(discord.ui.View):
     async def rating_selected(self, interaction: discord.Interaction):
         """Apply the rating to the current trait, then prompt for the next one."""
         if values := interaction.data.get("values"):  # type: ignore
+            assert isinstance(values, list)
             rating = int(values[0])
         else:
             for child in self.children:

@@ -73,7 +73,7 @@ def parse_input(user_input: str) -> dict[str, int]:
     alphascore = alphas + "_"
     equals = Suppress("=")
     trait = Group(Word(alphas, alphascore + nums) + equals + Word(nums))
-    traits = Dict(OneOrMore(trait))
+    traits = Dict(OneOrMore(trait))  # type: ignore
 
     try:
         parsed = traits.parse_string(user_input, parse_all=True)
@@ -81,7 +81,7 @@ def parse_input(user_input: str) -> dict[str, int]:
         raise SyntaxError("Invalid syntax! **Example:** `Brawl=3 Strength=2`")
 
     # Create dictionary, converting ratings to ints
-    traits_dict = {}
+    traits_dict: dict[str, int] = {}
     seen = set()
     for trait, rating in parsed:
         if trait in seen:

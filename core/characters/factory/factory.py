@@ -20,7 +20,7 @@ class Factory:
         self.char_class = char_class
         self.schema = self.load_schema()
         self.traits = deque(self.schema.all_traits)
-        self.assignments = OrderedDict()
+        self.assignments: dict[str, int] = OrderedDict()
         self.args = args
 
         for k, v in self.args.items():

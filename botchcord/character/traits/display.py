@@ -38,8 +38,8 @@ def add_trait_category(
         if category == Trait.Category.CUSTOM:
             category = " "  # type: ignore
         embed.add_field(name=" ", value=b(category.upper()), inline=False)
-        for sub, traits in traits.items():
-            add_trait_subcategory(embed, sub.title(), traits)
+        for _sub, _traits in traits.items():
+            add_trait_subcategory(embed, _sub.title(), _traits)
 
 
 def add_trait_subcategory(
@@ -72,7 +72,7 @@ def categorize_traits(category: Trait.Category, traits: list[Trait]) -> dict[str
     categorized = defaultdict(list)
     for trait in traits:
         if trait.category == category:
-            categorized[trait.subcategory].append(trait)
+            categorized[trait.subcategory.value].append(trait)
 
     return categorized
 

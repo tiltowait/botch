@@ -86,10 +86,10 @@ class BotchBot(discord.Bot):
         if guild := self.get_guild(EMOJI_GUILD):
             try:
                 emoji = next(e for e in guild.emojis if e.name == emoji_name)
-                emoji = str(emoji) + "\u200b"  # Add zero-width space to fix Discord embed bug
+                emoji_str = str(emoji) + "\u200b"  # Add zero-width space to fix Discord embed bug
                 if count > 1:
-                    return [emoji] * count
-                return emoji
+                    return [emoji_str] * count
+                return emoji_str
             except StopIteration:
                 pass
         raise errors.EmojiNotFound
