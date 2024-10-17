@@ -76,8 +76,6 @@ jobs:
           python-version: "3.12"
           cache: poetry
       - name: Install dependencies
-        run: |
-          poetry install --with dev
-          poetry add mypy
+        run: poetry install --with dev
       - name: Mypy check
-        run: mypy .
+        run: poetry run mypy .
