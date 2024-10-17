@@ -117,7 +117,7 @@ class Toggler(View):
                     content=f"Adjustments timed out. Please run {cmd} again.",
                     view=None,
                 )
-            except discord.NotFound:
+            except (discord.Forbidden, discord.NotFound):
                 # The message was deleted
                 pass
 
