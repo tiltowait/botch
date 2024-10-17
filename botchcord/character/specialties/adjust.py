@@ -43,7 +43,7 @@ async def _add_or_remove(ctx: AppCtx, character: Character, syntax: str, action:
     await character.save()
 
 
-def _make_embed(ctx: AppCtx, character: Character, additions: list, title: str):
+def _make_embed(ctx: AppCtx, character: Character, additions: list, title: str) -> CEmbed:
     """Create the embed."""
     entries = []
     for trait, delta in additions:
