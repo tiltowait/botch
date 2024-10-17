@@ -286,6 +286,11 @@ async def test_assign(ctx, skilled: Character):
         skilled.save.assert_called_once()
 
 
+def test_parse_duplicates():
+    with pytest.raises(SyntaxError):
+        assign.parse_input("strength=3 strength=5")
+
+
 # TRAIT DELETION
 
 

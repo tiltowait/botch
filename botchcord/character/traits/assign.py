@@ -83,7 +83,7 @@ def parse_input(user_input: str) -> dict[str, int]:
     # Create dictionary, converting ratings to ints
     traits_dict: dict[str, int] = {}
     seen: set[str] = set()
-    for trait_name, rating in parsed.as_dict().items():
+    for trait_name, rating in parsed:
         if trait_name in seen:
             raise SyntaxError(f"Duplicate trait: {trait}")
 
