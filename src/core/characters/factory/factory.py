@@ -1,9 +1,9 @@
 """Character creation utilities."""
 
-import glob
 import json
 from collections import OrderedDict, deque
-from typing import Type
+from pathlib import Path
+from typing import Any
 
 import errors
 import utils
@@ -14,7 +14,7 @@ from core.characters.factory.schema import Schema
 class Factory:
     """Factory for creating characters based on JSON schema."""
 
-    def __init__(self, line: GameLine, splat: Splat, char_class: Type[Character], args: dict):
+    def __init__(self, line: GameLine, splat: Splat, char_class: type[Character], args: dict):
         self.line = line
         self.splat = splat
         self.char_class = char_class
@@ -34,16 +34,22 @@ class Factory:
 
     def load_schema(self) -> Schema:
         """Loads the schema file and sets it in self.schema."""
-        path = f"./core/characters/schemas/{self.line}/*"
-        for schema_file in glob.glob(path):
-            with open(schema_file, "r", encoding="utf-8") as f:
-                schema = json.load(f)
-                if self.splat in schema["splats"]:
-                    return Schema(**schema)
+        current_dir = Path(__file__).parent
+        schemas_dir = current_dir.parent / "schemas" / self.line
+        for schema_file in schemas_dir.glob("*.json"):
+            schema = self._load_json(schema_file)
+            if self.splat in schema.get("splats", []):
+                return Schema(**schema)
 
         raise errors.MissingSchema(
             f"Unable to locate character schema for {self.line} -> {self.splat}."
         )
+
+    @staticmethod
+    def _load_json(file_path: Path) -> dict[str, Any]:
+        """Helper method to load a JSON file."""
+        with file_path.open() as f:
+            return json.load(f)
 
     def next_trait(self) -> str | None:
         """Get the next trait, if it exists."""

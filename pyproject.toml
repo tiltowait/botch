@@ -6,7 +6,8 @@ profile = "black"
 
 [tool.poetry]
 name = "botch"
-version = "0.1.0"
+version = "0.9.0-BETA"
+packages = [{ include = "*", from = "src" }]
 description = ""
 authors = ["tiltowait <208040+tiltowait@users.noreply.github.com>"]
 readme = "README.md"
@@ -21,7 +22,6 @@ numpy = "^1.25.1"
 py-cord = "^2.4.1"
 async-timeout = "^4.0.3"
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.1"
@@ -33,6 +33,9 @@ setuptools = "^72.2.0"
 codespell = "^2.3.0"
 mypy = "^1.12.0"
 
+[tool.poetry.scripts]
+botch = "main:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -43,3 +46,13 @@ disable_error_code = ["method-assign"]
 [[tool.mypy.overrides]]
 module = "tests.*"
 disable_error_code = ["attr-defined", "import-untyped"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: not covered",
+    "@overload"
+]

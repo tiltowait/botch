@@ -36,7 +36,7 @@ def factory() -> Factory:
 
 
 def test_load_schema():
-    loc = "core/characters/schemas/wod/vtm.json"
+    loc = "src/core/characters/schemas/wod/vtm.json"
     schema = Schema.load(loc)
     assert isinstance(schema, Schema)
 
@@ -52,7 +52,7 @@ def test_valid_schema():
 
 
 def test_wod_trait_categories_and_subcategories(factory: Factory):
-    with open("./core/characters/schemas/wod/vtm.json") as f:
+    with open("src/core/characters/schemas/wod/vtm.json") as f:
         data = json.load(f)
 
     sections = ["inherent", "learned"]

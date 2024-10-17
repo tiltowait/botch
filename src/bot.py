@@ -2,6 +2,7 @@
 
 import logging
 import os
+from pathlib import Path
 from typing import cast, overload
 
 import discord
@@ -61,17 +62,23 @@ class BotchBot(discord.Bot):
         config.set_bot_id(self.user.id)
         logger.info("Ready!")
 
-    def load_cogs(self):
-        """Load cogs based on configuration parameters."""
-        # Add the cogs
-        def load(dir: str):
-            for filename in os.listdir(f"./interface/{dir}"):
-                if filename[0] != "_" and filename.endswith(".py"):
-                    logging.getLogger("COGS").debug("Loading %s", filename)
-                    self.load_extension(f"interface.{dir}.{filename[:-3]}")
+    def load_cogs(self, directories: list[str]) -> None:
+        """Load cogs from specified directories relative to this script."""
+        logger = logging.getLogger("COGS")
 
-        load("wod")
-        load("shared")
+        # Get the directory of the current script
+        base_path = Path(__file__).parent
+
+        for directory in directories:
+            cog_dir = base_path / "interface" / directory
+            for filename in os.listdir(cog_dir):
+                if filename.endswith(".py") and not filename.startswith("_"):
+                    cog_path = f"interface.{directory}.{filename[:-3]}"
+                    try:
+                        self.load_extension(cog_path)
+                        logger.debug(f"Loaded cog: {cog_path}")
+                    except Exception as e:
+                        logger.error(f"Failed to load cog {cog_path}: {str(e)}")
 
     @overload
     def find_emoji(self, emoji_name: str) -> str:
