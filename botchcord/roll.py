@@ -191,27 +191,21 @@ def textify_dice(roll: Roll) -> str:
 def embed_color(roll: Roll) -> int:
     """Determine the embed color for the roll."""
     if roll.successes < 0:
-        return Color.BOTCH
+        return Color.BOTCH.value
     if roll.successes == 0:
-        return Color.FAILURE
+        return Color.FAILURE.value
     if roll.successes >= 5:
-        # CofD calls this exceptional, but we use the WoD convention here
-        return Color.PHENOMENAL_SUCCESS
+        return Color.PHENOMENAL_SUCCESS.value
 
     if roll.cofd:
-        # It's a regular success
-        return Color.COMPLETE_SUCCESS
+        return Color.COMPLETE_SUCCESS.value
 
-    # The number of successes is between 1 and 4, so we can just construct
-    # the enum rather than switching through
-    match roll.successes:
-        case 1:
-            return Color.MARGINAL_SUCCESS
-        case 2:
-            return Color.MODERATE_SUCCESS
-        case 3:
-            return Color.COMPLETE_SUCCESS
-        case 4:
-            return Color.EXCEPTIONAL_SUCCESS
-        case _:
-            raise ValueError("Unexpected success count")
+    # Use a dictionary for WoD success levels
+    wod_success_colors = {
+        1: Color.MARGINAL_SUCCESS,
+        2: Color.MODERATE_SUCCESS,
+        3: Color.COMPLETE_SUCCESS,
+        4: Color.EXCEPTIONAL_SUCCESS,
+    }
+
+    return wod_success_colors[roll.successes].value
