@@ -138,6 +138,14 @@ def test_add_trait_category(char: Character):
         i += 1
 
 
+async def test_add_custom_category(char: Character):
+    char.add_trait("custom", 1)
+    embed = discord.Embed()
+    add_trait_category(embed, char, Trait.Category.CUSTOM)
+
+    assert embed.fields[0].name == " "
+
+
 def test_build_embed(bot_mock, char: Character, mixed_traits: list[Trait]):
     extra = [
         Trait(
