@@ -1,7 +1,10 @@
 <p align="center">
-	<img src="https://img.shields.io/github/license/tiltowait/botch" alt="MIT license" />
+	<a href="https://discord.gg/QHnCdSPeEE" title="Join the Inconnu server"><img src="https://img.shields.io/discord/935219170176532580?color=5765F2&label=discord&logo=discord&logoColor=white" alt="Discord member count" /></a>
+	<a href="https://www.patreon.com/tiltowait" title="Support me on Patreon!"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dtiltowait%26type%3Dpatrons&style=flat" alt="Patreon" /></a>
+	<br>
+	<a href="https://github.com/tiltowait/botch/blob/master/LICENSE" title="License"><img src="https://img.shields.io/github/license/tiltowait/botch" alt="MIT license" /></a>
 	<img src="https://img.shields.io/github/actions/workflow/status/tiltowait/botch/ci.yml" alt="Build status">
-	<img src="https://img.shields.io/codecov/c/github/tiltowait/botch" alt="Code coverage">
+	<a href="https://app.codecov.io/gh/tiltowait/botch", title="Code coverage report"><img src="https://img.shields.io/codecov/c/github/tiltowait/botch" alt="Code coverage"></a>
 </p>
 
 # Botch
@@ -10,9 +13,11 @@ Botch is a WIP Discord bot for playing Vampire: The Masquerade (V20) games. It f
 
 Botch is being designed from the ground up to be modular and extensible, meaning it can eventually expand to other World of Darkness—and Chronicles of Darkness!—game lines, depending on community interest.
 
-As a work-in-progress, Botch isn't ready yet, nor is it available for public use. Once certain features are ironed out, it will enter private beta testing before a minimum viable product (MVP) is ready for general use.
+## Currunt status
 
-Need a bot now? Check out [[Tzimisce]](https://tzimisce.app) for a basic X20 Wod/CofD dice bot without character tracking features. Or add [Inconnu](https://inconnu.app) for a fully-featured V5 dice bot and character manager.
+Botch is currently in private beta available to supporters. After a short testing period, it will open to all users on The Second City (link above). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
+
+**Need a bot now?** Check out [[Tzimisce]](https://tzimisce.app) for a basic X20 Wod/CofD dice bot without character tracking features. Or add [Inconnu](https://inconnu.app) for a fully-featured V5 dice bot and character manager.
 
 ## Background
 
@@ -22,7 +27,7 @@ I'd call this the FAQ section, only that feels disingenuous when no one's asked 
 
 [Tzimisce] is my first-ever bot, and my first "real" Python project. While I have a lot of nostalgia for it, it is ... something of a mess, to put it mildly. Adding complex features is a challenge, modules are constructed strangely, and the effort to improve it to the point that it would work with Botch's planned feature set would be more work than simply starting over.
 
-There's also something to be said for familiarity. A new bot allows me to create new interaction conventions that don't mesh well with [Tzimisce]'s design. Inevitably, there will be people who just want to stick with what they know, and it wouldn't be fair to them to take away something that, from their perspective, already works just fine.
+There's also something to be said for familiarity. A new bot allows me to create new interaction conventions that don't mesh well with [Tzimisce]'s design. [Tzimisce] has thousands of users. Inevitably, there will be people who just want to stick with what they know, and it wouldn't be fair to them to take away something that, from their perspective, already works just fine.
 
 ### Okay, so why not add to Inconnu?
 
@@ -32,32 +37,6 @@ Inconnu's a far more advanced bot than [Tzimisce], and it has many of the featur
 
 Why Botch? Botches are bad! Yes, they are. Over the years, many users have contacted me to complain that botch too often. In reality, it's just confirmation bias at work: you remember the bad rolls more strongly than you remember the good rolls. It's human nature. In actuality, a good PRNG (programmable random number generator), like these bots use, is more random than any set of dice you'll buy at your FLGS.
 
-## When will it be ready?
+### Will it support <insert game here>?
 
-Yes, we're saving the most important info for the end, after most people have already given up. Here's a rough roadmap:
-
-### Milestones to v1.0
-
-[View the tracker here!](https://github.com/tiltowait/botch/milestone/2)
-
-### Milestones to private beta
-
-- [x] ~~*Character image uploads (premium feature)*~~
-- [x] ~~*Specialties assignment*~~
-- [x] ~~*Specialties display*~~
-- [x] ~~*Specialties removal*~~
-- [x] ~~*Vampire character stats adjustment*~~
-- [x] ~~*Ghoul character stats adjustment*~~
-- [x] ~~*Mortal character stats adjustment*~~
-- [x] ~~*User error messages*~~
-- [x] ~~*Character deletion*~~
-- [x] ~~*Basic (numeric) rolls*~~
-- [x] ~~*Character trait pool rolls ("Strength + Brawl")*~~
-- [x] ~~*Vampire character creation*~~
-- [x] ~~*Ghoul character creation*~~
-- [x] ~~*Mortal character creation*~~
-- [x] ~~*Character stats display*~~
-- [x] ~~*Character selection*~~
-- [x] ~~*Traits assignment*~~
-- [x] ~~*Traits display*~~
-- [x] ~~*Traits removal*~~
+If your hypothetical game is a WoD20 or CofD 2E game, then: Maybe!
