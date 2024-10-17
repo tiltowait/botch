@@ -4,6 +4,7 @@
 makejohn.py
 README.md
 .coverage
+.coveragerc
 htmlcov
 tests
 
