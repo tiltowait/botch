@@ -13,7 +13,7 @@ from core.characters.wod import Vampire, gen_virtues
 
 
 @pytest.fixture
-def factory():
+def factory() -> Factory:
     args = {
         "name": "Test",
         "guild": 0,
@@ -35,9 +35,14 @@ def factory():
     return Factory(GameLine.WOD, Splat.VAMPIRE, Vampire, args)
 
 
+def test_load_schema():
+    loc = "core/characters/schemas/wod/vtm.json"
+    schema = Schema.load(loc)
+
+
 def test_invalid_schema():
     with pytest.raises(errors.MissingSchema):
-        _ = Factory("fake", "fake", None, None)
+        _ = Factory("fake", "fake", None, None)  # type: ignore
 
 
 def test_valid_schema():
@@ -71,21 +76,41 @@ def test_wod_trait_categories_and_subcategories(factory: Factory):
     assert schema.subcategory("Brawl") == Trait.Subcategory.TALENTS
     assert schema.subcategory("Academics") == Trait.Subcategory.KNOWLEDGES
 
+    with pytest.raises(ValueError):
+        schema.category("fake")
+
+    with pytest.raises(ValueError):
+        schema.subcategory("fake")
+
 
 def test_assignment(factory: Factory):
     assigned = OrderedDict()
 
+    assert factory.remaining > 0
     while trait := factory.next_trait():
         rating = random.randint(0, 5)
         assigned[trait] = rating
         factory.assign_next(rating)
 
     assert assigned == factory.assignments
+    assert factory.remaining == 0
 
 
 def test_premature_create(factory):
     with pytest.raises(errors.Unfinished):
         factory.create()
+
+
+def test_peek_last(factory: Factory):
+    assert factory.peek_last() is None
+
+    trait = factory.next_trait()
+    factory.assign_next(3)
+    assert factory.peek_last() == (trait, 3)
+
+    trait2 = factory.next_trait()
+    factory.assign_next(4)
+    assert factory.peek_last() == (trait2, 4)
 
 
 def test_create(factory):
