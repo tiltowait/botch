@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install poetry
-      run: pip install poetry --break-system-packages
+      run: pip install poetry
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
-        run: pip install poetry --break-system-packages
+        run: pip install poetry
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
