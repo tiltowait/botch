@@ -26,7 +26,7 @@ class RollParser:
         self.pool: list[str | int] = []
         self.equation: list[str | int] = []
         self.num_dice: int = 0
-        self.specialties = []
+        self.specialties: list[str] = []
 
     @property
     def using_wp(self) -> bool:

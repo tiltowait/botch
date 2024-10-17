@@ -181,14 +181,10 @@ class Trait(BaseModel):
             self._create_selection(group, normalized == self._DELIMITER.join(group).casefold())
             for group in expanded_groups
         ]
-        # return [
-        #     self._create_selection(
-        #         group if isinstance(group, list) else group.split(self._DELIMITER),
-        #         normalized
-        #         == (group if isinstance(group, str) else self._DELIMITER.join(group)).casefold(),
-        #     )
-        #     for group in expanded_groups
-        # ]
+
+    @overload
+    def expanding(self, identifier: str, exact: bool) -> list[str]:
+        ...
 
     @overload
     def expanding(self, identifier: str, exact: bool, join: Literal[True]) -> list[str]:
@@ -457,17 +453,6 @@ class Character(Document):
                     trait.rating = 0
                 return trait.name
         raise errors.TraitNotFound(self, name)
-
-    def add_specialties(self, name: str, subtraits: list[str] | str) -> tuple[Trait, set[str]]:
-        """Add specialties to a trait.
-        Args:
-            name (str): The name of the trait to add to
-            subtraits (list[str]): The specialties to add.
-
-        Returns: A copy of the Trait with specialties added, and the set of
-            the added specialties.
-        Raises TraitNotFound."""
-        raise NotImplementedError("This function is not implemented in the base class.")
 
     def add_subtraits(self, name: str, subtraits: list[str] | str) -> tuple[Trait, list[str]]:
         """Add subtraits to a trait.

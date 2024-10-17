@@ -3,6 +3,7 @@
 import logging
 
 import discord
+from discord.ui import Button
 
 import api
 from bot import AppCtx
@@ -42,6 +43,17 @@ class ImagePager(discord.ui.View):
     character's owner.
     """
 
+    first_button: Button
+    prev_button: Button
+    indicator: Button
+    next_button: Button
+    last_button: Button
+    manage_button: Button
+    delete_button: Button
+    promote_button: Button
+    demote_button: Button
+    cancel_button: Button
+
     def __init__(
         self,
         ctx: AppCtx,
@@ -55,62 +67,62 @@ class ImagePager(discord.ui.View):
         self.management_mode = False
 
         # Standard paging buttons
-        self.first_button = discord.ui.Button(
+        self.first_button = Button(
             label="<<",
             style=discord.ButtonStyle.primary,
             disabled=True,
             row=0,
         )
         self.first_button.callback = self.first_page
-        self.prev_button = discord.ui.Button(
+        self.prev_button = Button(
             label="<",
             style=discord.ButtonStyle.danger,
             row=0,
         )
         self.prev_button.callback = self.previous_page
-        self.indicator = discord.ui.Button(
+        self.indicator = Button(
             label=self.indicator_label,
             disabled=True,
             row=0,
         )
-        self.next_button = discord.ui.Button(
+        self.next_button = Button(
             label=">",
             style=discord.ButtonStyle.success,
             row=0,
         )
         self.next_button.callback = self.next_page
-        self.last_button = discord.ui.Button(
+        self.last_button = Button(
             label=">>",
             style=discord.ButtonStyle.primary,
             row=0,
         )
         self.last_button.callback = self.last_page
 
-        self.manage_button = discord.ui.Button(label="Manage", row=1)
+        self.manage_button = Button(label="Manage", row=1)
         self.manage_button.callback = self.mode_toggle
 
         # Management mode buttons
-        self.delete_button = discord.ui.Button(
+        self.delete_button = Button(
             label="Delete",
             style=discord.ButtonStyle.danger,
             row=0,
         )
         self.delete_button.callback = self._delete_image
-        self.promote_button = discord.ui.Button(
+        self.promote_button = Button(
             label="Make First",
             style=discord.ButtonStyle.primary,
             disabled=True,
             row=0,
         )
         self.promote_button.callback = self._promote_image
-        self.demote_button = discord.ui.Button(
+        self.demote_button = Button(
             label="Make Last",
             style=discord.ButtonStyle.primary,
             disabled=self.num_pages == 1,
             row=0,
         )
         self.demote_button.callback = self._demote_image
-        self.cancel_button = discord.ui.Button(label="Done", row=1)
+        self.cancel_button = Button(label="Done", row=1)
         self.cancel_button.callback = self.mode_toggle
 
         super().__init__(timeout=300)

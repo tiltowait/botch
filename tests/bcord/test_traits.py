@@ -147,7 +147,7 @@ def test_build_embed(bot_mock, char: Character, mixed_traits: list[Trait]):
             rating=1,
         )
     ]
-    mixed_traits.append(extra)
+    mixed_traits.extend(extra)
     char.traits.append(extra[0])
 
     embed = build_embed(bot_mock, char)
@@ -266,6 +266,7 @@ def test_build_assignment_embed(bot_mock, skilled: Character):
     assert isinstance(embed, CEmbed)
     assert embed.title == "Traits assigned"
     assert embed.description == "Strength: `2`\nBrawl: `3`"
+    assert embed.author is not None
     assert embed.author.name == skilled.name
 
 

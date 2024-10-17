@@ -54,9 +54,9 @@ class MortalCog(Cog, name="WoD Mortal Commands"):
         path: str,
         path_rating: int,
         integrity: str,
-        integrity_rating: str,
+        integrity_rating: int,
         control: str,
-        control_rating: str,
+        control_rating: int,
         courage: int,
         max_trait: int,
     ):

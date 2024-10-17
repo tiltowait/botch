@@ -40,7 +40,7 @@ class Toggler(View):
         self.character = char
         self.adjusters: list["Adjuster"] = []
 
-        self.selector = Select(placeholder="Select a stat to adjust")
+        self.selector: Select = Select(placeholder="Select a stat to adjust")
         self.selector.callback = self.select_adjuster
         self.add_item(self.selector)
 
@@ -148,7 +148,7 @@ class Adjuster(ABC):
         inc_color=ButtonStyle.danger,
     ):
         """Adds an adjuster row."""
-        btn = Button(emoji="➖", style=dec_color, row=row)
+        btn: Button = Button(emoji="➖", style=dec_color, row=row)
         btn.callback = self.callback
         self.add_item(btn)
         btn = Button(label=label, style=ButtonStyle.secondary, row=row, disabled=True)

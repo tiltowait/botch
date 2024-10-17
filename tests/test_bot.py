@@ -61,9 +61,9 @@ def test_get_emoji(emoji_name, count, expected, bot):
     with patch.object(bot, "get_guild", return_value=mock_guild):
         if expected == errors.EmojiNotFound:
             with pytest.raises(errors.EmojiNotFound):
-                bot.get_emoji(emoji_name, count)
+                bot.find_emoji(emoji_name, count)
         else:
-            result = bot.get_emoji(emoji_name, count)
+            result = bot.find_emoji(emoji_name, count)
             assert result == expected
 
 

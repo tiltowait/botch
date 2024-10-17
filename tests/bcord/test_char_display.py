@@ -27,7 +27,7 @@ def bot_mock() -> Mock:
 
     bot = Mock()
     bot.get_user.return_value = user
-    bot.get_emoji = lambda e: e
+    bot.find_emoji = lambda e: e
 
     return bot
 
@@ -105,7 +105,7 @@ def test_get_field_name(field: DisplayField, expected: str | None, wod_vamp):
 )
 def test_get_field_value(field: DisplayField, expected: str | None, wod_vamp):
     expected = expected or field.value
-    assert get_field_value(None, wod_vamp, field, False) == expected
+    assert get_field_value(Mock(), wod_vamp, field, False) == expected
 
 
 @pytest.mark.parametrize("use_emojis", [True, False])
@@ -113,8 +113,10 @@ def test_build_emoji(use_emojis, bot_mock, wod_vamp):
     embed = build_embed(bot_mock, wod_vamp, False, footer="Vampire")
 
     assert embed.title == wod_vamp.name
+    assert embed.author is not None
     assert embed.author.name == "tiltowait"
     assert embed.author.icon_url == "https://example.com/img.png"
+    assert embed.footer is not None
     assert embed.footer.text == "Vampire"
 
     for i, field in enumerate(get_default_fields(wod_vamp)):
@@ -154,6 +156,6 @@ def test_alt_title(bot_mock, wod_vamp):
 )
 def test_emoji_track(track: str, expected: str):
     bot = Mock()
-    bot.get_emoji = lambda e: e
+    bot.find_emoji = lambda e: e
     emoji = emojify_track(bot, track)
     assert emoji == expected

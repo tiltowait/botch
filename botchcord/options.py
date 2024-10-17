@@ -1,6 +1,7 @@
 """Commonly used slash command options and helpers."""
 
 import logging
+from typing import cast
 
 import discord
 from discord.commands import Option, OptionChoice
@@ -61,8 +62,11 @@ async def _available_characters(ctx: discord.AutocompleteContext):
     if (guild := ctx.interaction.guild) is None:
         return []
 
+    # Set up some casts so the type checker is happy
+    bot_user = cast(discord.ClientUser, ctx.bot.user)
+    user = cast(discord.Member, ctx.interaction.user)
+
     # Check if they're looking up a player and have lookup permissions
-    user = ctx.interaction.user
     spcs = []
 
     if (owner := (ctx.options.get("owner") or ctx.options.get("current_owner"))) is not None:
@@ -73,11 +77,11 @@ async def _available_characters(ctx: discord.AutocompleteContext):
 
         if user.guild_permissions.administrator:
             # Add SPCs
-            spcs = await core.cache.fetchnames(guild.id, ctx.bot.user.id)
+            spcs = await core.cache.fetchnames(guild.id, bot_user.id)
             logger.info(
                 "%s: admin %s fetched %s SPCs",
-                ctx.interaction.guild.name,
-                ctx.interaction.user.name,
+                guild.name,
+                user.name,
                 len(spcs),
             )
 

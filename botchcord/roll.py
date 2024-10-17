@@ -67,7 +67,7 @@ async def roll(
 
 
 def build_embed(
-    ctx: discord.ApplicationContext,
+    ctx: bot.AppCtx,
     roll: Roll,
     extra_specs: list[str] | None,
     comment: str | None,
@@ -107,6 +107,7 @@ def build_embed(
             value=", ".join(roll.specialties),
         )
     if roll.uses_traits:
+        assert roll.pool is not None
         embed.add_field(name="Pool", value=" ".join(map(str, roll.pool)), inline=False)
 
     embed.set_author(name=author_name, icon_url=icon or None)
@@ -125,7 +126,7 @@ def embed_title(roll: Roll):
     return title
 
 
-def emojify_dice(ctx: discord.ApplicationContext, roll: Roll) -> str:
+def emojify_dice(ctx: bot.AppCtx, roll: Roll) -> str:
     """Generate the emoji for the roll."""
     if len(roll.dice) > DICE_CAP:
         return DICE_CAP_MESSAGE
@@ -135,7 +136,7 @@ def emojify_dice(ctx: discord.ApplicationContext, roll: Roll) -> str:
 
     emojis = []
     for e in map(lambda d: emoji_name(d, roll.difficulty, special, roll.wod), roll.dice):
-        emojis.append(ctx.bot.get_emoji(e))
+        emojis.append(ctx.bot.find_emoji(e))
 
     return " ".join(emojis)
 

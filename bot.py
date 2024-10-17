@@ -74,22 +74,22 @@ class BotchBot(discord.Bot):
         load("shared")
 
     @overload
-    def get_emoji(self, emoji_name: str) -> str:
+    def find_emoji(self, emoji_name: str) -> str:
         ...
 
     @overload
-    def get_emoji(self, emoji_name: str, count: int) -> str | list[str]:
+    def find_emoji(self, emoji_name: str, count: int) -> str | list[str]:
         ...
 
-    def get_emoji(self, emoji_name: str, count=1) -> str | list[str]:
+    def find_emoji(self, emoji_name: str, count=1) -> str | list[str]:
         """Get an emoji from the emoji guild."""
         if guild := self.get_guild(EMOJI_GUILD):
             try:
                 emoji = next(e for e in guild.emojis if e.name == emoji_name)
-                emoji = str(emoji) + "\u200b"  # Add zero-width space to fix Discord embed bug
+                emoji_str = str(emoji) + "\u200b"  # Add zero-width space to fix Discord embed bug
                 if count > 1:
-                    return [emoji] * count
-                return emoji
+                    return [emoji_str] * count
+                return emoji_str
             except StopIteration:
                 pass
         raise errors.EmojiNotFound
@@ -101,9 +101,13 @@ class BotchBot(discord.Bot):
 
     async def on_application_command_error(
         self,
-        ctx: AppCtx,
-        exception: discord.ApplicationCommandInvokeError,
+        ctx: discord.ApplicationContext,
+        exception: discord.DiscordException,
     ):
+        # Fix some mypy complaints
+        ctx = cast(AppCtx, ctx)
+        exception = cast(discord.ApplicationCommandInvokeError, exception)
+
         err = exception.original
         match err:
             case discord.NotFound():
@@ -119,7 +123,7 @@ class BotchBot(discord.Bot):
                         f"Only patrons can use {cmd_mention}. Click "
                         "[this link](https://patreon.com/tiltowait) to get started!"
                     ),
-                    ephemeral=True
+                    ephemeral=True,
                 )
             case _:
                 # TODO: Error reporter

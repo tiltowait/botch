@@ -1,7 +1,7 @@
 """Character selection utilities."""
 
 import functools
-from typing import Any, Callable, Concatenate, Coroutine, ParamSpec, TypeVar
+from typing import Any, Callable, Concatenate, Coroutine, ParamSpec, TypeVar, cast
 
 import discord
 from discord import ButtonStyle
@@ -149,6 +149,7 @@ class Haven(discord.ui.View):
         self.stop()
 
         for i, child in enumerate(self.children):
+            child = cast(Button, child)
             if child.custom_id == interaction.custom_id:
                 self.selected = self.chars[i]
                 break

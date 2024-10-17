@@ -158,7 +158,7 @@ def test_subtrait_matching(
     needle: str,
     exact: bool,
     count: int,
-    expectations: list[tuple[str, int, bool]],
+    expectations: list[tuple[str, int, bool, str | None]],
     skill: Trait,
     subtraits: list[str],
 ):

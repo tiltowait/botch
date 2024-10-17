@@ -27,7 +27,7 @@ async def test_splat_constraints(splat: str):
         with pytest.raises(pydantic.ValidationError):
             gen_char(GameLine.WOD, splat)  # type: ignore
     else:
-        gen_char(GameLine.WOD, splat)
+        gen_char(GameLine.WOD, splat)  # type: ignore
 
 
 async def test_char_saving(character):
@@ -197,14 +197,6 @@ def test_remove_core_trait(skilled: Character):
     assert t, "Core trait should not have been removed!"
     assert t[0].name == b
     assert t[0].rating == 0
-
-
-def test_add_specialties_not_implemented():
-    char = gen_char(GameLine.WOD, Splat.VAMPIRE)
-    char.add_trait("Brawl", 3)
-
-    with pytest.raises(NotImplementedError):
-        char.add_specialties("Brawl", ["Throws"])
 
 
 def test_trait_not_found_str_value(character: Character):

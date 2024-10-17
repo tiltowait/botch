@@ -28,9 +28,9 @@ from tests.characters import gen_char
 
 
 class EmojiMock:
-    """For mocking the ctx.bot.get_emoji() calls."""
+    """For mocking the ctx.bot.find_emoji() calls."""
 
-    def get_emoji(self, name):
+    def find_emoji(self, name):
         if re.match(r"^(ss?|f|b)\d+$", name):
             return name  # The real deal adds \u200b, but we don't need that here
         raise errors.EmojiNotFound
@@ -247,7 +247,7 @@ def test_wod_text_embed_with_character(
     assert embed.author.name == wod_vampire.name
     assert embed.author.icon_url == wod_vampire.profile.main_image
     assert embed.color is not None
-    assert int(embed.color) == embed_color(roll)
+    assert embed.color.value == embed_color(roll)
     assert embed.title == title
 
     # Fields
@@ -298,7 +298,7 @@ def test_emoji_name(die: int, target: int, special: int, botchable: bool, expect
 
 def test_emoji_error(ctx):
     with pytest.raises(errors.EmojiNotFound):
-        ctx.bot.get_emoji("this should fail")
+        ctx.bot.find_emoji("this should fail")
 
 
 @pytest.mark.parametrize(
