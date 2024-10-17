@@ -33,7 +33,7 @@ def build_embed(
         embed.add_field(name="Not found!", value="\n".join(not_found))
 
     if not_found and not removed:
-        embed.color = discord.Color.red()
+        embed.colour = discord.Colour.red()
 
     return embed
 

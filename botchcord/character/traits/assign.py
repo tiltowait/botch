@@ -1,5 +1,7 @@
 """Functions for adding/updating character traits. Not inclusive of subtraits."""
 
+from typing import cast
+
 from pyparsing import (
     Dict,
     Group,
@@ -82,12 +84,12 @@ def parse_input(user_input: str) -> dict[str, int]:
 
     # Create dictionary, converting ratings to ints
     traits_dict: dict[str, int] = {}
-    seen = set()
-    for trait, rating in parsed:
-        if trait in seen:
+    seen: set[str] = set()
+    for trait_name, rating in parsed.as_dict().items():
+        if trait_name in seen:
             raise SyntaxError(f"Duplicate trait: {trait}")
 
-        seen.add(trait)
-        traits_dict[trait] = int(rating)
+        seen.add(trait_name)
+        traits_dict[trait_name] = int(rating)
 
     return traits_dict

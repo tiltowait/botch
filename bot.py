@@ -101,9 +101,13 @@ class BotchBot(discord.Bot):
 
     async def on_application_command_error(
         self,
-        ctx: AppCtx,
-        exception: discord.ApplicationCommandInvokeError,
+        ctx: discord.ApplicationContext,
+        exception: discord.DiscordException,
     ):
+        # Fix some mypy complaints
+        ctx = cast(AppCtx, ctx)
+        exception = cast(discord.ApplicationCommandInvokeError, exception)
+
         err = exception.original
         match err:
             case discord.NotFound():
