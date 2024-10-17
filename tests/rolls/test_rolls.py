@@ -1,5 +1,7 @@
 """Roll tests."""
 
+from unittest.mock import patch
+
 import pytest
 
 import errors
@@ -129,6 +131,26 @@ async def test_roll_spec_coalescing():
     assert roll.specialties == ["Throws"]
     await roll.insert()
     assert roll.specialties == ["Throws"]
+
+
+@patch("core.rolls.Roll.save")
+async def test_add_specs(mocked):
+    roll = Roll(
+        line=GameLine.WOD,
+        guild=0,
+        user=0,
+        num_dice=5,
+        target=6,
+    ).roll()
+    mocked.side_effect = roll.reset_specialties
+
+    assert roll.specialties == []
+    await roll.save()
+    mocked.assert_awaited_once()
+
+    assert roll.specialties is None
+    roll.add_specs(["spec"])
+    assert roll.specialties == ["spec"]
 
 
 @pytest.mark.parametrize(

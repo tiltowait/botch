@@ -220,6 +220,9 @@ class Roll(Document):
     def add_specs(self, specs: list[str]):
         """Add a specialty."""
         if self.specialties is None:
+            # Realistically, this will never happen unless the roll is loaded
+            # from the database. Currently no plans for that, but we can always
+            # plan ahead.
             self.specialties = []
         self.specialties.extend(specs)
 
