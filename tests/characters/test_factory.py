@@ -38,6 +38,7 @@ def factory() -> Factory:
 def test_load_schema():
     loc = "core/characters/schemas/wod/vtm.json"
     schema = Schema.load(loc)
+    assert isinstance(schema, Schema)
 
 
 def test_invalid_schema():
