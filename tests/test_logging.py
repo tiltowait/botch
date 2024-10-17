@@ -66,9 +66,6 @@ def test_log_format(setup_and_teardown):
     log_output = stdout.getvalue().strip()
     expected_pattern = r"INFO     \| \S+(\s+\S+)* \| Test format"
     match = re.match(expected_pattern, log_output)
-    if match is None:
-        print(f"Expected pattern: {expected_pattern}")
-        print(f"Actual log output: {log_output}")
     assert match is not None
 
 
@@ -100,9 +97,3 @@ def test_logger_name_padding(setup_and_teardown):
     long_name_logger.info("Test long logger name")
     log_output = stdout.getvalue()
     assert re.search(r"\| very_long_name \|", log_output) is not None
-
-    # Print debug information if the assertion fails
-    if not re.search(r"\| very_long_name \|", log_output):
-        print("Actual log output:")
-        print(log_output)
-        print("Expected to find: | very_long_name |")
