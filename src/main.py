@@ -10,7 +10,7 @@ def main():
     logconfig.configure_logging()
 
     bot = BotchBot()
-    bot.load_cogs()
+    bot.load_cogs(["shared", "wod"])
     bot.run(BOTCH_TOKEN)
 
 
