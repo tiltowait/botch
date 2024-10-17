@@ -7,11 +7,12 @@ import pytest
 
 import errors
 from bot import AppCtx, BotchBot
-from botchcord.character.specialties.adjust import add_specialties
+from botchcord.character.specialties.adjust import _make_embed, add_specialties
 from botchcord.character.specialties.adjust import assign as assign_cmd
 from botchcord.character.specialties.adjust import remove as remove_cmd
 from botchcord.character.specialties.adjust import remove_specialties, validate_tokens
 from botchcord.character.specialties.tokenize import tokenize
+from botchcord.utils.text import b
 from core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
 
@@ -203,3 +204,23 @@ async def test_remove_cmd(ctx: AppCtx, character: Character, assignments: str, f
             await remove_cmd(ctx, character, assignments)
             ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
             mock_save.assert_awaited_once()
+
+
+def test_validate_tokens_multi_missing(character: Character):
+    tokens = [("First", ["Spec"]), ("Second", ["Spec"])]
+    with pytest.raises(errors.TraitError) as exc_info:
+        validate_tokens(character, tokens)
+
+    assert (
+        str(exc_info.value)
+        == f"{b(character.name)} doesn't have the following traits: `First`, `Second`."
+    )
+
+
+def test_adding_subtraits_to_subtraited(ctx: AppCtx, specced: Character):
+    specced.traits[1].add_subtraits(["Painting"])
+    additions = [[specced.traits[1], ["Painting"]]]
+    embed = _make_embed(ctx, specced, additions, "Specialties added")
+
+    assert embed.description is not None
+    assert "***All:*** *Knives*, *Painting*" in embed.description, "Should show all specs"

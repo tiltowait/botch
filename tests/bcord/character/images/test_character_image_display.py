@@ -259,6 +259,10 @@ async def test_delete_all_images(pager: ImagePager, uinter: AsyncMock):
     uinter.response.edit_message.assert_awaited_with(embed=ANY, view=None)
     pager.stop.assert_called_once()
 
+    with patch.object(pager, "_display_no_images", new_callable=AsyncMock) as mocked:
+        await pager.goto_page(0, uinter)
+        mocked.assert_awaited_once_with(uinter)
+
 
 # All that ... just to test the display command in < 10 lines
 
