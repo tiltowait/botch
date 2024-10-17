@@ -1,7 +1,5 @@
 """Functions for adding/updating character traits. Not inclusive of subtraits."""
 
-from typing import cast
-
 from pyparsing import (
     Dict,
     Group,
