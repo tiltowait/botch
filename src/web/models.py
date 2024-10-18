@@ -12,10 +12,11 @@ class WizardSchema(BaseModel):
 
     # We have to use Annotated so Pyright stops complaining
     guild_name: Annotated[str, Field(alias="guildName")]
+    user_id: int
     traits: TraitSchema
 
     @classmethod
-    def create(cls, guild_name: str, schema_file: str):
+    def create(cls, guild_name: str, user_id: int, schema_file: str):
         """Create a WizardSchema.
 
         Args:
@@ -28,7 +29,7 @@ class WizardSchema(BaseModel):
             ValidationError if unable to load the schema.
         """
         trait_schema = TraitSchema.load(schema_file)
-        return cls(guild_name=guild_name, traits=trait_schema)
+        return cls(guild_name=guild_name, user_id=user_id, traits=trait_schema)
 
     class Config:
         populate_by_name = True

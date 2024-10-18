@@ -14,7 +14,7 @@ def client():
 
 
 def test_get_wizard_schema_valid_token(client):
-    ws = WizardSchema.create("Guildy", get_schema_file("vtm"))
+    ws = WizardSchema.create("Guildy", 0, get_schema_file("vtm"))
     token = cache.register(ws)
 
     response = client.get(f"/character/create/{token}")

@@ -13,7 +13,7 @@ from web.models import WizardSchema
 def test_wizard_schema_create():
     # Test both get_schema_file() and WizardSchema.create()
     sf = get_schema_file("vtm")
-    ws = WizardSchema.create("guildy", sf)
+    ws = WizardSchema.create("guildy", 0, sf)
 
     assert ws.guild_name == "guildy"
     assert isinstance(ws.traits, Schema)
@@ -21,7 +21,7 @@ def test_wizard_schema_create():
 
 def test_wizard_schema_fail():
     with pytest.raises(FileNotFoundError):
-        WizardSchema.create("guildy", "fake")
+        WizardSchema.create("guildy", 0, "fake")
 
 
 @pytest.mark.parametrize("era", ["vtm", "dav20", "a"])

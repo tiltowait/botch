@@ -83,5 +83,18 @@
         ]
       }
     ]
-  }
+  },
+  "virtues": [
+    [
+      "Conscience",
+      "Conviction"
+    ],
+    [
+      "Self-Control",
+      "Instinct"
+    ],
+    [
+      "Courage"
+    ]
+  ]
 }
