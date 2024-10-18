@@ -25,9 +25,7 @@ class WizardSchema(BaseModel):
 
         Returns: The generated WizardSchema.
         Raises:
-            FileNotFoundError if the schema file can't be found.
-            JSONDecoderError if the shema file isn't valid JSON.
-            ValueError if the schema file JSON is the wrong format.
+            ValidationError if unable to load the schema.
         """
         trait_schema = TraitSchema.load(schema_file)
         return cls(guild_name=guild_name, traits=trait_schema)

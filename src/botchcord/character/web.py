@@ -19,7 +19,7 @@ async def wizard(ctx: bot.AppCtx, era: str):
     minutes = web.app.cache.ttl // 60
     embed = discord.Embed(
         title="Click here to create your character",
-        description=f"Your character creation schema is valid for {minutes} minutes.",
+        description=f"This link is valid for **{minutes} minutes**.",
         url=web.app.wizard_url(token),
     )
     await ctx.respond(embed=embed, ephemeral=True)

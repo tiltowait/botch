@@ -16,7 +16,7 @@ async def get_wizard_schema(token: str):
     if token not in cache:
         raise HTTPException(
             status_code=404,
-            detail="Unknown token. Either it expired, was already used, or never existed.",
+            detail="Invalid token. Either it expired, was already used, or never existed.",
         )
     return cache.get(token)
 

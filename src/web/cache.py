@@ -11,7 +11,7 @@ from web.models import WizardSchema
 class WizardCache:
     """Maintains a cache for character creation wizard web tokens."""
 
-    def __init__(self, ttl=1200, token_size=16):
+    def __init__(self, ttl: int = 1200, token_size: int = 16):
         self._cache: TTLCache[str, WizardSchema] = TTLCache(maxsize=100, ttl=ttl)
         self.ttl = ttl
         self.token_size = token_size
