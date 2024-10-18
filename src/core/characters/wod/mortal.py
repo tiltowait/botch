@@ -1,7 +1,5 @@
 """Mortal character templates."""
 
-from typing import List
-
 from core.characters.base import GameLine, Splat, Trait
 from core.characters.wod.base import WoD
 
@@ -25,7 +23,7 @@ class Mortal(WoD):
     line: GameLine = GameLine.WOD
     splat: Splat = Splat.MORTAL
 
-    virtues: List[Trait]
+    virtues: list[Trait]
 
 
 class Ghoul(Mortal):

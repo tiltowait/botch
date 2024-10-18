@@ -13,7 +13,12 @@ from config import GAME_LINE
 async def wizard(ctx: bot.AppCtx, era: str):
     """Generate a link to the web wizard."""
     schema_file = get_schema_file(era)
-    wizard_schema = web.models.WizardSchema.create(ctx.guild.name, ctx.user.id, str(schema_file))
+    wizard_schema = web.models.WizardSchema.create(
+        ctx.guild.name,
+        ctx.guild.id,
+        ctx.user.id,
+        str(schema_file),
+    )
     token = web.app.cache.register(wizard_schema)
 
     minutes = web.app.cache.ttl // 60
