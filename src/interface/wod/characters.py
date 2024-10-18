@@ -37,6 +37,16 @@ class CharactersCog(Cog, name="General character commands"):
         """Adjust character stats."""
         await botchcord.character.adjust(ctx, character)
 
+    @character.command()
+    @option(
+        "era",
+        description="Which era of sheet do you need?",
+        choices=[OptionChoice("Modern", "vtm"), OptionChoice("Dark Ages", "dav20")],
+    )
+    async def wizard(self, ctx: AppCtx, era: str):
+        """Create a character over the web."""
+        await botchcord.character.web.wizard(ctx, era)
+
     @character.command(name="images")
     @options.character("The character to display")
     @option(

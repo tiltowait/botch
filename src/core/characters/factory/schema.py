@@ -2,6 +2,7 @@
 
 
 import json
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -34,6 +35,12 @@ class TraitGroup(BaseModel):
         return None
 
 
+class Virtue(BaseModel):
+    """Represents a Virtue."""
+
+    name_options: list[str]
+
+
 class Schema(BaseModel):
     """The Schema class handles loading and validation of character schemas
     and provides a model for the Factory class to build characters. Schemas
@@ -44,6 +51,7 @@ class Schema(BaseModel):
     splats: list[Splat]
     inherent: TraitGroup
     learned: TraitGroup
+    virtues: Optional[list[Virtue]] = None
 
     @classmethod
     def load(cls, loc: str):
