@@ -1,0 +1,87 @@
+{
+  "line": "wod",
+  "splats": [
+    "vampire",
+    "mortal",
+    "ghoul"
+  ],
+  "inherent": {
+    "category": "attributes",
+    "subcategories": [
+      {
+        "name": "physical",
+        "traits": [
+          "Strength",
+          "Dexterity",
+          "Stamina"
+        ]
+      },
+      {
+        "name": "social",
+        "traits": [
+          "Charisma",
+          "Manipulation",
+          "Appearance"
+        ]
+      },
+      {
+        "name": "mental",
+        "traits": [
+          "Perception",
+          "Intelligence",
+          "Wits"
+        ]
+      }
+    ]
+  },
+  "learned": {
+    "category": "abilities",
+    "subcategories": [
+      {
+        "name": "talents",
+        "traits": [
+          "Alertness",
+          "Athletics",
+          "Awareness",
+          "Brawl",
+          "Empathy",
+          "Expression",
+          "Intimidation",
+          "Leadership",
+          "Legerdemain",
+          "Subterfuge"
+        ]
+      },
+      {
+        "name": "skills",
+        "traits": [
+          "AnimalKen",
+          "Archery",
+          "Commerce",
+          "Crafts",
+          "Etiquette",
+          "Melee",
+          "Performance",
+          "Ride",
+          "Stealth",
+          "Survival"
+        ]
+      },
+      {
+        "name": "knowledges",
+        "traits": [
+          "Academics",
+          "Enigmas",
+          "Hearth Wisdom",
+          "Investigation",
+          "Law",
+          "Medicine",
+          "Occult",
+          "Politics",
+          "Seneschal",
+          "Technology"
+        ]
+      }
+    ]
+  }
+}
