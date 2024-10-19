@@ -10,18 +10,18 @@ from core.characters.factory import Schema
 from web.models import WizardSchema
 
 
-def test_wizard_schema_create():
+def test_wizard_schema_create(guild):
     # Test both get_schema_file() and WizardSchema.create()
     sf = get_schema_file("vtm")
-    ws = WizardSchema.create("guildy", 0, 0, sf)
+    ws = WizardSchema.create(guild, 0, sf)
 
-    assert ws.guild_name == "guildy"
+    assert ws.guild_name == guild.name
     assert isinstance(ws.traits, Schema)
 
 
-def test_wizard_schema_fail():
+def test_wizard_schema_fail(guild):
     with pytest.raises(FileNotFoundError):
-        WizardSchema.create("guildy", 0, 0, "fake")
+        WizardSchema.create(guild, 0, "fake")
 
 
 @pytest.mark.parametrize("era", ["vtm", "dav20", "a"])

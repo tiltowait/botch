@@ -19,12 +19,13 @@ def token() -> str:
 
 
 @pytest.fixture
-def wizard_schema():
+def wizard_schema(guild):
     mock = Mock()
-    mock.guild_id = 0
+    mock.guild_id = guild.id
+    mock.guild_name = guild.name
+    mock.guild_icon = guild.icon.url
     mock.user_id = 1
     mock.traits.line = GameLine.WOD
-    mock.guild_name = "The Fake Guild"
     mock.traits.category.return_value = Trait.Category.ATTRIBUTE
     mock.traits.subcategory.return_value = Trait.Subcategory.PHYSICAL
 
@@ -62,8 +63,8 @@ def expected_message(character_data, wizard_schema):
     }
 
 
-def test_get_wizard_schema_valid_token(client):
-    ws = WizardSchema.create("Guildy", 0, 0, get_schema_file("vtm"))
+def test_get_wizard_schema_valid_token(client, guild):
+    ws = WizardSchema.create(guild, 0, get_schema_file("vtm"))
     token = cache.register(ws)
 
     response = client.get(f"/character/create/{token}")

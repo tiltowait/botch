@@ -2,6 +2,7 @@
 
 from typing import Annotated, Optional
 
+import discord
 from pydantic import BaseModel, Field
 
 from core.characters import Grounding
@@ -13,12 +14,13 @@ class WizardSchema(BaseModel):
 
     # We have to use Annotated so Pyright stops complaining
     guild_name: Annotated[str, Field(alias="guildName")]
+    guild_icon: Annotated[Optional[str], Field(alias="guildIcon")]
     guild_id: int
     user_id: int
     traits: TraitSchema
 
     @classmethod
-    def create(cls, guild_name: str, guild_id: int, user_id: int, schema_file: str):
+    def create(cls, guild: discord.Guild, user_id: int, schema_file: str):
         """Create a WizardSchema.
 
         Args:
@@ -31,7 +33,14 @@ class WizardSchema(BaseModel):
             ValidationError if unable to load the schema.
         """
         trait_schema = TraitSchema.load(schema_file)
-        return cls(guild_name=guild_name, guild_id=guild_id, user_id=user_id, traits=trait_schema)
+        icon_url = guild.icon.url if guild.icon else None
+        return cls(
+            guild_name=guild.name,
+            guild_id=guild.id,
+            guild_icon=icon_url,
+            user_id=user_id,
+            traits=trait_schema,
+        )
 
     class Config:
         populate_by_name = True
