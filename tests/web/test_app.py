@@ -1,6 +1,6 @@
 """Test the FastAPI app."""
 
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,7 +10,7 @@ from botchcord.character.web import get_schema_file
 from core.characters import GameLine, Trait
 from core.characters.wod import Ghoul, Mortal, Vampire
 from web.app import app, cache
-from web.models import CharacterData, Grounding, Virtue, WizardSchema
+from web.models import CharacterData, Grounding, NameCheck, Virtue, WizardSchema
 
 
 @pytest.fixture
@@ -110,3 +110,20 @@ async def test_create_character(
     assert isinstance(char, character_class)
     await core.cache.remove(char)
     assert wizard_schema.token not in cache
+
+
+@pytest.mark.parametrize("valid", [True, False])
+@patch("core.cache.CharCache.has_character", new_callable=AsyncMock)
+@patch("web.cache.WizardCache.get")
+async def test_name_check(mock_get, mock_has, client, valid):
+    mock_cache = Mock()
+    mock_cache.guild_id = 0
+    mock_cache.user_id = 0
+    mock_get.return_value = mock_cache
+    mock_has.return_value = valid
+
+    check = NameCheck(token="token", name="Name")
+    r = client.post("/character/valid-name", json=check.model_dump())
+    d = r.json()
+
+    assert d["valid"] == valid

@@ -9,7 +9,7 @@ from core.characters import Damage, Grounding
 from core.characters.wod import Ghoul, Mortal, Vampire, gen_virtues
 from utils import max_vtm_bp
 from web.cache import WizardCache
-from web.models import CharacterData, WizardSchema
+from web.models import CharacterData, NameCheck, WizardSchema
 
 CharacterType = Ghoul | Mortal | Vampire
 SPLAT_MAPPING: dict[str, type[CharacterType]] = {
@@ -83,6 +83,21 @@ async def create_character(data: CharacterData):
     cache.remove(data.token)
 
     return {"message": f"Successfully created {char.name} on {wizard.guild_name}!"}
+
+
+@app.post("/character/valid-name")
+async def check_name_validity(check: NameCheck):
+    """Check whether the user is allowed to create a character with that name."""
+    try:
+        schema = cache.get(check.token)
+    except ValueError:
+        raise HTTPException(
+            status_code=404,
+            detail="Invalid token. Either it expired, was already used, or never existed.",
+        )
+
+    already_exists = await core.cache.has_character(schema.guild_id, schema.user_id, check.name)
+    return {"valid": already_exists}
 
 
 def wizard_url(token: str) -> str:

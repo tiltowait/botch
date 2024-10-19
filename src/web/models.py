@@ -70,3 +70,10 @@ class CharacterData(BaseModel):
     def virtue_dict(self) -> dict[str, int]:
         """The Virtues as a dictionary."""
         return {v.name: v.rating for v in self.virtues}
+
+
+class NameCheck(BaseModel):
+    """A type for checking name validity."""
+
+    token: str
+    name: str
