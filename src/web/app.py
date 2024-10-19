@@ -74,7 +74,13 @@ async def create_character(data: CharacterData):
         virtues=gen_virtues(data.virtue_dict),
         **extra_args,  # type: ignore
     )
+    for trait, rating in data.traits.items():
+        category = wizard.traits.category(trait)
+        subcategory = wizard.traits.subcategory(trait)
+        char.add_trait(trait, rating, category, subcategory)
+
     await core.cache.register(char)
+    cache.remove(data.token)
 
     return {"message": f"Successfully created {char.name} on {wizard.guild_name}!"}
 
