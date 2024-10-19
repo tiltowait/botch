@@ -4,6 +4,8 @@ from functools import partial
 
 import discord
 
+import core
+import errors
 import utils
 from botchcord.wizard import Wizard
 from core.characters import Damage, GameLine, Grounding, Splat, Trait
@@ -27,10 +29,13 @@ async def create(
     *,
     generation: int | None = None,
     max_bp: int | None = None,
-    bond_strength: int | None = None
+    bond_strength: int | None = None,
 ):
     """Start a WoD character creation wizard."""
     # Because they have unique names, virtues are separate from regular traits
+    if await core.cache.has_character(ctx.guild.id, ctx.user.id, name):
+        raise errors.CharacterAlreadyExists(f"You already have a character named {name}!")
+
     tv = partial(Trait, category=Trait.Category.VIRTUE, subcategory=Trait.Subcategory.BLANK)
     virtues = [
         tv(name=integrity, rating=integrity_rating),

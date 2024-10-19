@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 import core
 from botchcord.character.web import get_schema_file
+from config import GAME_LINE, MAX_NAME_LEN
 from core.characters import GameLine, Trait
 from core.characters.wod import Ghoul, Mortal, Vampire
 from web.app import app, cache
@@ -127,3 +128,28 @@ async def test_name_check(mock_get, mock_has, client, valid):
     d = r.json()
 
     assert d["valid"] == valid
+
+
+@pytest.mark.parametrize(
+    "name,exists,needle",
+    [
+        ("Billy", True, "You already have"),
+        ("AA" * MAX_NAME_LEN, False, "is too long"),
+    ],
+)
+@patch("core.cache.CharCache.has_character", new_callable=AsyncMock)
+@patch("web.cache.WizardCache.get")
+async def test_create_exceptions(mock_get, mock_has, client, character_data, name, exists, needle):
+    mock_cache = Mock()
+    mock_cache.guild_id = 0
+    mock_cache.user_id = 0
+    mock_cache.traits.line = GAME_LINE
+    mock_get.return_value = mock_cache
+    mock_has.return_value = exists
+
+    character_data["name"] = name
+
+    r = client.post("/character/create", json=CharacterData(**character_data).model_dump())
+    assert r.status_code == 422
+    d = r.json()
+    assert needle in d["detail"]

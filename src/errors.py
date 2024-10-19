@@ -21,6 +21,10 @@ class CharacterError(BotchError):
     """Base class for character errors."""
 
 
+class CharacterAlreadyExists(CharacterError):
+    """Raised if the user tries to create a character that already exists."""
+
+
 class CharacterTemplateNotFound(CharacterError):
     """A supplied game line or splat is not found."""
 

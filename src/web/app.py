@@ -4,10 +4,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 import core
-from config import BOTCH_URL, GAME_LINE
+from config import BOTCH_URL, GAME_LINE, MAX_NAME_LEN
 from core.characters import Damage, Grounding
 from core.characters.wod import Ghoul, Mortal, Vampire, gen_virtues
-from utils import max_vtm_bp
+from utils import max_vtm_bp, normalize_text
 from web.cache import WizardCache
 from web.models import CharacterData, NameCheck, WizardSchema
 
@@ -48,6 +48,17 @@ async def create_character(data: CharacterData):
     # First, determine the splat. TODO: Make system-agnostic
     wizard = cache.get(data.token)
     assert wizard.traits.line == GAME_LINE
+
+    data.name = normalize_text(data.name)
+    if len(data.name) > MAX_NAME_LEN:
+        raise HTTPException(
+            status_code=422, detail=f"{data.name} is too long. Max name length is {MAX_NAME_LEN}."
+        )
+    if await core.cache.has_character(wizard.guild_id, wizard.user_id, data.name):
+        raise HTTPException(
+            status_code=422,
+            detail=f"You already have a character named {data.name} on {wizard.guild_name}!",
+        )
 
     cls = SPLAT_MAPPING[data.splat]
     grounding = Grounding(**data.grounding.model_dump())
