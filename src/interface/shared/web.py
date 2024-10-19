@@ -21,7 +21,7 @@ class APIServerCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        config = uvicorn.Config(app, host="0.0.0.0", port=8000, loop="asyncio")
+        config = uvicorn.Config(app, host="::", port=8000, loop="asyncio")
         server = uvicorn.Server(config)
         self.server_task = asyncio.create_task(server.serve())
         logger.info("API server started")
