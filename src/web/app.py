@@ -107,8 +107,21 @@ async def check_name_validity(check: NameCheck):
             detail="Invalid token. Either it expired, was already used, or never existed.",
         )
 
+    if len(check.name) > MAX_NAME_LEN:
+        diff = len(check.name) - MAX_NAME_LEN
+        return dict(
+            valid=False,
+            details=f"{check.name} is too long by {diff}.",
+        )
+
     already_exists = await core.cache.has_character(schema.guild_id, schema.user_id, check.name)
-    return {"valid": already_exists}
+    if already_exists:
+        return dict(
+            valid=False,
+            details=f"You already have a character named {check.name}.",
+        )
+
+    return {"valid": True}
 
 
 def wizard_url(token: str) -> str:

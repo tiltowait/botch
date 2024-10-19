@@ -113,21 +113,31 @@ async def test_create_character(
     assert wizard_schema.token not in cache
 
 
-@pytest.mark.parametrize("valid", [True, False])
+@pytest.mark.parametrize(
+    "exists,name",
+    [
+        (True, "Name"),
+        (False, "AA" * MAX_NAME_LEN),
+        (False, "A"),
+    ],
+)
 @patch("core.cache.CharCache.has_character", new_callable=AsyncMock)
 @patch("web.cache.WizardCache.get")
-async def test_name_check(mock_get, mock_has, client, valid):
+async def test_name_check(mock_get, mock_has, client, exists, name):
     mock_cache = Mock()
     mock_cache.guild_id = 0
     mock_cache.user_id = 0
     mock_get.return_value = mock_cache
-    mock_has.return_value = valid
+    mock_has.return_value = exists
 
-    check = NameCheck(token="token", name="Name")
+    check = NameCheck(token="token", name=name)
     r = client.post("/character/valid-name", json=check.model_dump())
     d = r.json()
 
-    assert d["valid"] == valid
+    if exists or len(name) > MAX_NAME_LEN:
+        assert not d["valid"]
+    else:
+        assert d["valid"]
 
 
 @pytest.mark.parametrize(
