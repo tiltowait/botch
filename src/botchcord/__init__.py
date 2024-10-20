@@ -2,9 +2,9 @@
 
 import discord
 
-from botchcord import character, haven, roll, settings
+from botchcord import character, haven, macro, roll, settings
 
-__all__ = ("character", "haven", "roll", "settings", "get_avatar")
+__all__ = ("character", "haven", "macro", "roll", "settings", "get_avatar")
 
 
 def get_avatar(user: discord.User | discord.Member):
