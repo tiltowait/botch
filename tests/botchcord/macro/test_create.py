@@ -73,7 +73,10 @@ def test_build_embed(bot_mock, char):
 
 @pytest.mark.parametrize(
     "pool,should_err",
-    [("dex+ath", True), ("str+b", False)],
+    [
+        ("dex+ath", True),
+        ("Strength + Brawl", False),
+    ],
 )
 @patch("botchcord.macro.create.build_embed")
 async def test_create_cmd(
@@ -94,3 +97,11 @@ async def test_create_cmd(
     else:
         ctx.respond.assert_awaited_once_with(embed=expected_cembed, ephemeral=True)
         mock_char_save.assert_awaited_once()
+
+        assert len(char.macros) == 1
+        macro = char.find_macro("test")
+        assert macro is not None
+        assert macro.name == "test"
+        assert " ".join(map(str, macro.pool)) == pool
+        assert macro.difficulty == 7
+        assert macro.comment is None
