@@ -112,3 +112,15 @@ class CharacterIneligible(HavenError):
 
 class NoCharacterSelected(HavenError):
     """Raised when a character isn't selected."""
+
+
+class MacroError(BotchError):
+    """Base macro error class."""
+
+
+class MacroNotFound(MacroError):
+    """Raised if the user tries to delete a non-existent macro."""
+
+
+class MacroAlreadyExists(MacroError):
+    """Raised if the user tries to add a macro by an existing name."""

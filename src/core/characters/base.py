@@ -94,6 +94,17 @@ class Profile(BaseModel):
         self.images.remove(AnyUrl(url))
 
 
+class Macro(BaseModel):
+    """A roll macro."""
+
+    name: str = Field(max_length=20)
+    pool: list[str | int]
+    difficulty: int = Field(ge=2, le=10)
+    rote: bool
+    hunt: bool
+    comment: Optional[str]
+
+
 class Trait(BaseModel):
     """A trait represents an Attribute, Ability, Discipline, etc."""
 
@@ -282,6 +293,7 @@ class Character(Document):
     grounding: Grounding
 
     traits: list[Trait] = Field(default_factory=list)
+    macros: list[Macro] = Field(default_factory=list)
 
     @property
     def has_blood_pool(self) -> bool:
@@ -494,6 +506,36 @@ class Character(Document):
                 return copy.deepcopy(trait), delta
 
         raise errors.TraitNotFound(self, name)
+
+    # Macros
+
+    def add_macro(self, new_macro: Macro):
+        """Add a macro in-order."""
+        if self.find_macro(new_macro.name):
+            raise errors.MacroAlreadyExists(
+                f"**{self.name}** already has a macro named `{new_macro.name}`."
+            )
+
+        bisect.insort(self.macros, new_macro, key=lambda m: m.name.casefold())
+
+    def remove_macro(self, macro_name: str):
+        """Remove a macro by name."""
+        index = next(
+            (i for i, m in enumerate(self.macros) if m.name.casefold() == macro_name.casefold()),
+            None,
+        )
+        if index is None:
+            raise errors.MacroNotFound(f"**{self.name}** has no macro named `{macro_name}`.")
+
+        del self.macros[index]
+
+    def find_macro(self, macro_name: str) -> Macro | None:
+        """Finds a macro via case-insensitive find. Returns None if not found."""
+        for macro in self.macros:
+            if macro.name.casefold() == macro_name.casefold():
+                return macro
+
+        return None
 
     # Image handling
 
