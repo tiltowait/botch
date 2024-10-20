@@ -2,6 +2,7 @@
 
 
 import json
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -44,6 +45,7 @@ class Schema(BaseModel):
     splats: list[Splat]
     inherent: TraitGroup
     learned: TraitGroup
+    virtues: Optional[list[list[str]]] = None
 
     @classmethod
     def load(cls, loc: str):

@@ -1,0 +1,9 @@
+coverage:
+  range: 80..90
+
+  round: nearest
+  precision: 2
+
+ignore:
+  - tests/*
+  - interface/*

@@ -152,3 +152,8 @@ async def test_splat_line_filtering(
 ):
     assert await fcache.count(0, 0, line=line, splat=splat) == count
     assert await fcache.fetchnames(0, 0, line=line, splat=splat) == names
+
+
+async def test_has_character(fcache):
+    assert await fcache.has_character(0, 0, "One")
+    assert not await fcache.has_character(0, 0, "One Million")

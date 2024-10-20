@@ -62,6 +62,8 @@ def bot_mock() -> Mock:
 @pytest.fixture
 def ctx(bot_mock) -> AsyncMock:
     ctx = AsyncMock()
+    ctx.guild.name = "Great Guildy!"
+    ctx.guild.icon.url = "https://example.com/icon.png"
     ctx.bot = bot_mock
     ctx.respond.return_value = None
 

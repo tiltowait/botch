@@ -48,7 +48,7 @@
           "Expression",
           "Intimidation",
           "Leadership",
-          "Streetwise",
+          "Legerdemain",
           "Subterfuge"
         ]
       },
@@ -56,13 +56,13 @@
         "name": "skills",
         "traits": [
           "AnimalKen",
+          "Archery",
+          "Commerce",
           "Crafts",
-          "Drive",
           "Etiquette",
-          "Firearms",
-          "Larceny",
           "Melee",
           "Performance",
+          "Ride",
           "Stealth",
           "Survival"
         ]
@@ -71,14 +71,14 @@
         "name": "knowledges",
         "traits": [
           "Academics",
-          "Computer",
-          "Finance",
+          "Enigmas",
+          "Hearth Wisdom",
           "Investigation",
           "Law",
           "Medicine",
           "Occult",
           "Politics",
-          "Science",
+          "Seneschal",
           "Technology"
         ]
       }

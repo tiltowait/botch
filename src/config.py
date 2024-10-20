@@ -15,6 +15,8 @@ EMOJI_GUILD = int(os.getenv("EMOJI_GUILD", 0))
 SUPPORTER_GUILD = int(os.getenv("SUPPORTER_GUILD", 0))
 SUPPORTER_ROLE = int(os.getenv("SUPPORTER_ROLE", 0))
 BOT_ID: int | None = None
+GAME_LINE = "wod"
+BOTCH_URL = os.getenv("BOTCH_URL", "http://localhost:5173")
 
 # Bucket for storing character images
 FC_BUCKET = "pcs-dev.botch.lol" if "TESTING" in os.environ else "pcs.botch.lol"

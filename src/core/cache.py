@@ -5,6 +5,7 @@ import bisect
 
 import errors
 from core.characters import Character, GameLine, Splat
+from utils import normalize_text
 
 
 class CharCache:
@@ -70,6 +71,25 @@ class CharCache:
             if char.name.casefold() == name.casefold():
                 return char
         raise errors.CharacterNotFound(f"**{name}** not found.")
+
+    async def has_character(self, guild: int, user: int, name: str) -> bool:
+        """Whether the user has a character by the given name.
+
+        Args:
+            guild (int): The guild to check
+            user (int): The user owning the character
+            name (str): The name to check
+
+        Returns:
+            True if the user already has a character by that name.
+        """
+        chars = await self.fetchall(guild, user)
+        name = normalize_text(name).casefold()
+        for char in chars:
+            if char.name.casefold() == name:
+                return True
+
+        return False
 
     async def register(self, character: Character):
         """Insert the character and register it in the cache."""
