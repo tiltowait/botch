@@ -90,8 +90,17 @@ class Haven(discord.ui.View):
             self._populated = True
 
     async def get_match(self) -> Character:
-        """Get the match, assuming there's only one. If there are multiple,
-        returns None."""
+        """Get the sole matching character, given the parameters. If there are
+        multiple matches, then it presents a selection menu to the user.
+
+        Returns: The sole matching or user-selected character.
+
+        Raises:
+            CharacterIneligible if the user specified a non-matching character.
+            CharacterNotFound if the user specified a nonexistent character.
+            NoMatchingCharacter if none of the user's characters match.
+
+        """
         if isinstance(self.character, Character):
             # We were given a character already
             return self.character
