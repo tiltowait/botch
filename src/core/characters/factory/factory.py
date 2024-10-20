@@ -14,10 +14,18 @@ from core.characters.factory.schema import Schema
 class Factory:
     """Factory for creating characters based on JSON schema."""
 
-    def __init__(self, line: GameLine, splat: Splat, char_class: type[Character], args: dict):
+    def __init__(
+        self,
+        line: GameLine,
+        splat: Splat,
+        char_class: type[Character],
+        args: dict,
+        schema_filter="*.json",
+    ):
         self.line = line
         self.splat = splat
         self.char_class = char_class
+        self.schema_filter = schema_filter
         self.schema = self.load_schema()
         self.traits = deque(self.schema.all_traits)
         self.assignments: dict[str, int] = OrderedDict()
@@ -36,7 +44,7 @@ class Factory:
         """Loads the schema file and sets it in self.schema."""
         current_dir = Path(__file__).parent
         schemas_dir = current_dir.parent / "schemas" / self.line
-        for schema_file in schemas_dir.glob("*.json"):
+        for schema_file in schemas_dir.glob(self.schema_filter):
             schema = self._load_json(schema_file)
             if self.splat in schema.get("splats", []):
                 return Schema(**schema)

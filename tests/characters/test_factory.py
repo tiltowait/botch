@@ -32,7 +32,7 @@ def factory() -> Factory:
             }
         ),
     }
-    return Factory(GameLine.WOD, Splat.VAMPIRE, Vampire, args)
+    return Factory(GameLine.WOD, Splat.VAMPIRE, Vampire, args, schema_filter="vtm.json")
 
 
 def test_load_schema():
