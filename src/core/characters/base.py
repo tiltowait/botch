@@ -549,6 +549,10 @@ class Character(Document):
 
         return None
 
+    def has_macro(self, macro_name: str) -> bool:
+        """Whether the character has the macro."""
+        return self.find_macro(macro_name) is not None
+
     # Image handling
 
     async def add_image(self, discord_url: str) -> str:

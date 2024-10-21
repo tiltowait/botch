@@ -42,6 +42,13 @@ class MacrosCog(Cog, name="Macro commands"):
         """Display a character's macros."""
         await botchcord.macro.display(ctx, character)
 
+    @macro.command(name="delete")
+    @option("macro_name", description="The name of the macro to delete")
+    @options.character("The character with the macro to delete")
+    async def delete_macro(self, ctx: AppCtx, macro_name: str, character: str):
+        """Delete a macro from a character."""
+        await botchcord.macro.delete(ctx, character, macro_name)
+
     @slash_command()
     @option("name", description="The name of the macro to roll")
     @options.promoted_choice(
