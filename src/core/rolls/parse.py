@@ -68,7 +68,7 @@ class RollParser:
         except ParseException as err:
             raise errors.InvalidSyntax(err) from err
 
-    def parse(self):
+    def parse(self, use_key=False):
         """Parse the roll, populating pool, equation, and dice."""
         if self.needs_character and self.character is None:
             raise errors.RollError(f"You need a character to roll `{self.raw_syntax}`.")
@@ -81,6 +81,7 @@ class RollParser:
                 self.pool.append("WP")
                 self.equation.append(0)
             else:
+                assert self.character is not None
                 traits = self.character.match_traits(elem)
                 if not traits:
                     raise errors.TraitNotFound(self.character, elem)
@@ -89,7 +90,10 @@ class RollParser:
 
                 # Single trait found!
                 match = traits[0]
-                self.pool.append(match.name)
+                if use_key:
+                    self.pool.append(match.key)
+                else:
+                    self.pool.append(match.name)
                 self.equation.append(match.rating)
 
                 if match.subtraits:

@@ -1,6 +1,6 @@
 """Macro creation tests."""
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -11,26 +11,6 @@ from botchcord.macro.create import create as create_cmd
 from botchcord.macro.create import create_macro
 from botchcord.utils import CEmbed
 from core.characters import Character
-
-
-@pytest.fixture
-def bot_mock() -> Mock:
-    user = Mock()
-    user.display_name = "tiltowait"
-    user.guild_avatar = "https://example.com/img.png"
-
-    bot = Mock()
-    bot.get_user.return_value = user
-    bot.find_emoji = lambda e: e
-
-    return bot
-
-
-@pytest.fixture
-async def ctx(bot_mock):
-    with patch.multiple("bot.AppCtx", send_error=AsyncMock(), respond=AsyncMock()):
-        ctx = AppCtx(bot_mock, AsyncMock())
-        yield ctx
 
 
 @pytest.fixture
@@ -63,6 +43,12 @@ def test_create_macro(char):
     assert macro.pool == ["Strength", "+", "Brawl"]
     assert macro.difficulty == 6
     assert macro.comment == "punch a guy"
+
+
+def test_create_with_specs(char: Character):
+    char.add_subtraits("Brawl", ["Grappling"])
+    macro = create_macro(char, "grapple", ".g", 6, None)
+    assert macro.pool[-1] == "Brawl.Grappling"
 
 
 def test_build_embed(bot_mock, char):

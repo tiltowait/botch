@@ -53,7 +53,7 @@ def can_use_macro(char: Character, pool: str) -> bool:
 
 def create_macro(char: Character, name: str, pool: str, diff: int, comment: str | None) -> Macro:
     """Create a macro."""
-    rp = RollParser(pool, char).parse()
+    rp = RollParser(pool, char).parse(use_key=True)
     return Macro(name=name, pool=rp.pool, difficulty=diff, rote=False, hunt=False, comment=comment)
 
 
