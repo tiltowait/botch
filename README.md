@@ -13,7 +13,7 @@ Botch is a WIP Discord bot for playing Vampire: The Masquerade (V20) games. It f
 
 Botch is being designed from the ground up to be modular and extensible, meaning it can eventually expand to other World of Darkness—and Chronicles of Darkness!—game lines, depending on community interest.
 
-## Currunt status
+## Current status
 
 Botch is currently in private beta available to supporters. After a short testing period, it will open to all users on The Second City (link above). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
 
