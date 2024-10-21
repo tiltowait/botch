@@ -9,7 +9,7 @@ from bot import AppCtx
 from botchcord.macro.display import create_macro_entry, create_paginator
 from botchcord.macro.display import display as display_cmd
 from botchcord.macro.display import paginate_macros
-from botchcord.utils.text import b, i, m
+from botchcord.utils.text import i, m
 from core.characters import Character, Macro
 
 
@@ -50,9 +50,9 @@ def test_paginate_macros(macro: Macro):
     per_entry = len(create_macro_entry(macro)) + 1  # Add for \n
     macros_per_page = 2000 // per_entry
     print(macros_per_page, per_entry)
-    pages = 3
+    num_pages = 3
 
-    macros = [macro] * (macros_per_page * pages)
+    macros = [macro] * (macros_per_page * num_pages)
     pages = paginate_macros(macros)
 
     assert len(pages) == 3

@@ -4,12 +4,12 @@ Macros are displayed inside paginated embeds. Each macro is made into its
 own "entry", which is how we avoid them being split across pages."""
 
 from discord.ext.commands import Paginator as Chunker
-from discord.ext.pages import Paginator
+from discord.ext.pages import Page, Paginator
 
 import bot
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
-from botchcord.utils.text import b, i, m
+from botchcord.utils.text import i, m
 from core.characters import Character, Macro
 
 
@@ -22,12 +22,12 @@ async def display(ctx: bot.AppCtx, character: Character):
 
 def create_paginator(bot: bot.BotchBot, char: Character) -> Paginator:
     """Create the macro paginator."""
-    embeds = []
-    for page in paginate_macros(char.macros):
-        embed = CEmbed(bot, char, title="Macros", description=page)
-        embeds.append(embed)
+    pages = []
+    for page_content in paginate_macros(char.macros):
+        embed = CEmbed(bot, char, title="Macros", description=page_content)
+        pages.append(Page(embeds=[embed]))
 
-    return Paginator(embeds)
+    return Paginator(pages)
 
 
 def paginate_macros(macros: list[Macro]) -> list[str]:
