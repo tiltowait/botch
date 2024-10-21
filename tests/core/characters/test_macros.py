@@ -10,6 +10,7 @@ from core.characters import Character, Macro
 mc = partial(
     Macro,
     pool=["Strength", "+", "Brawl", "-", 1],
+    keys=["Strength", "+", "Brawl", "-", 1],
     difficulty=6,
     rote=False,
     hunt=False,

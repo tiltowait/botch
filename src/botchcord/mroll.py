@@ -24,12 +24,11 @@ async def mroll(
     macro = char.find_macro(macro_name)
     assert macro is not None  # Guaranteed
 
-    pool = " ".join(map(str, macro.pool))
     difficulty = diff_override or macro.difficulty
     comment = comment_override or macro.comment
 
     try:
-        await botchcord.roll.roll(ctx, pool, difficulty, None, comment, char)
+        await botchcord.roll.roll(ctx, macro.key_str, difficulty, None, comment, char)
     except errors.RollError:
         await ctx.send_error(
             "Error",

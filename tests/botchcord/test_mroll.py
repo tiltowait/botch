@@ -48,7 +48,7 @@ async def test_mroll(
 
     roll_mock.assert_awaited_once_with(
         ctx,
-        " ".join(map(str, macro.pool)),
+        macro.key_str,
         diff,
         None,
         comment,
@@ -68,7 +68,9 @@ async def test_mroll_no_mock(mock_roll_save: AsyncMock, ctx: AppCtx, char: Chara
 @patch("botchcord.roll.Roll.save", new_callable=AsyncMock)
 async def test_mroll_specs(mock_roll_save: AsyncMock, ctx: AppCtx, char: Character):
     char.add_subtraits("Brawl", ["Grappling"])
-    await mroll(ctx, char.macros[0].name, None, None, char)  # type: ignore
+    macro = create_macro(char, "specs", "str+b.g", 6, None)
+    char.add_macro(macro)
+    await mroll(ctx, macro.name, None, None, char)  # type: ignore
 
     ctx.respond.assert_awaited_once_with(embed=ANY)
     mock_roll_save.assert_awaited_once()  # This is our proof it rolled

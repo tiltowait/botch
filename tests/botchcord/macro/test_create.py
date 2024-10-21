@@ -48,7 +48,8 @@ def test_create_macro(char):
 def test_create_with_specs(char: Character):
     char.add_subtraits("Brawl", ["Grappling"])
     macro = create_macro(char, "grapple", ".g", 6, None)
-    assert macro.pool[-1] == "Brawl.Grappling"
+    assert macro.pool[-1] == "Brawl (Grappling)"
+    assert macro.keys[-1] == "Brawl.Grappling"
 
 
 def test_build_embed(bot_mock, char):
@@ -88,6 +89,6 @@ async def test_create_cmd(
         macro = char.find_macro("test")
         assert macro is not None
         assert macro.name == "test"
-        assert " ".join(map(str, macro.pool)) == pool
+        assert macro.pool_str == pool
         assert macro.difficulty == 7
         assert macro.comment is None

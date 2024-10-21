@@ -99,10 +99,22 @@ class Macro(BaseModel):
 
     name: str = Field(max_length=20)
     pool: list[str | int]
+    keys: list[str | int]
     difficulty: int = Field(ge=2, le=10)
     rote: bool
     hunt: bool
     comment: Optional[str]
+
+    @property
+    def pool_str(self) -> str:
+        """The pool as a joined string."""
+        return " ".join(map(str, self.pool))
+
+    @property
+    def key_str(self) -> str:
+        """The keys as a joined string. This is what should be used for
+        performing rolls, as the pool_str is the human-readable version."""
+        return " ".join(map(str, self.keys))
 
 
 class Trait(BaseModel):
