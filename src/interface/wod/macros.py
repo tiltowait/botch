@@ -36,6 +36,12 @@ class MacrosCog(Cog, name="Macro commands"):
         """Create a macro."""
         await botchcord.macro.create(ctx, character, name, pool, difficulty, comment)
 
+    @macro.command(name="list")
+    @options.character("The character whose macros to display")
+    async def display_macros(self, ctx: AppCtx, character: str):
+        """Display a character's macros."""
+        await botchcord.macro.display(ctx, character)
+
     @slash_command()
     @option("name", description="The name of the macro to roll")
     @options.promoted_choice(
