@@ -63,7 +63,7 @@ async def roll(
     embed = build_embed(ctx, roll, extra_specs, comment, emojis)
 
     await ctx.respond(embed=embed)
-    await roll.insert()
+    await roll.save()
 
 
 def build_embed(

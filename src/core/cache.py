@@ -97,7 +97,7 @@ class CharCache:
         # character in the list after insort if this is the first fetchone has
         # been used for this user.
         chars = await self.fetchall(character.guild, character.user)
-        await character.insert()
+        await character.save()
         bisect.insort(chars, character, key=lambda c: c.name.casefold())
 
     async def remove(self, character: Character):
