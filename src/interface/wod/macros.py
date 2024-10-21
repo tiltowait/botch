@@ -1,6 +1,6 @@
 """Macro command cog."""
 
-from discord import SlashCommandGroup, option
+from discord import SlashCommandGroup, option, slash_command
 from discord.ext.commands import Cog
 
 import botchcord
@@ -35,6 +35,22 @@ class MacrosCog(Cog, name="Macro commands"):
     ):
         """Create a macro."""
         await botchcord.macro.create(ctx, character, name, pool, difficulty, comment)
+
+    @slash_command()
+    @option("name", description="The name of the macro to roll")
+    @options.promoted_choice(
+        "difficulty",
+        "Override the default difficulty",
+        start=2,
+        end=10,
+        first=6,
+        required=False,
+    )
+    @option("comment", description="Override the default comment", required=False)
+    @options.character("The character performing the roll")
+    async def mroll(self, ctx: AppCtx, name: str, difficulty: int, comment: str, character: str):
+        """Roll using a macro."""
+        await botchcord.mroll(ctx, name, difficulty, comment, character)
 
 
 def setup(bot: BotchBot):

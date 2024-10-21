@@ -103,7 +103,9 @@ class Haven(discord.ui.View):
         """
         if isinstance(self.character, Character):
             # We were given a character already
-            return self.character
+            if self.filter(self.character):
+                return self.character
+            raise NoMatchingCharacter(f"**{self.character.name}** does not match.")
 
         await self._populate()
         if self.character:
