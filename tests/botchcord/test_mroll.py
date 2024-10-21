@@ -72,3 +72,9 @@ async def test_mroll_specs(mock_roll_save: AsyncMock, ctx: AppCtx, char: Charact
 
     ctx.respond.assert_awaited_once_with(embed=ANY)
     mock_roll_save.assert_awaited_once()  # This is our proof it rolled
+
+
+async def test_mroll_missing_trait(ctx: AppCtx, char: Character):
+    char.remove_trait("Brawl")
+    await mroll(ctx, char.macros[0].name, None, None, char)  # type: ignore
+    ctx.send_error.assert_awaited_once_with("Error", ANY)
