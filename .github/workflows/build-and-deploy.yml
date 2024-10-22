@@ -48,7 +48,7 @@ jobs:
           push-to-registry: true
 
   security-scan:
-    needs: build
+    needs: build-attested-image
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
