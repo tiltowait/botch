@@ -30,6 +30,13 @@ class Color(IntEnum):
     PHENOMENAL_SUCCESS = 0x5865F2
 
 
+def add_wp(pool: str) -> str:
+    """Add '+ WP' to the pool syntax if it's not there already."""
+    if not re.search(r"\bWP\b", pool, re.I):
+        return pool + " + WP"
+    return pool
+
+
 async def roll(
     ctx: bot.AppCtx,
     pool: str,
@@ -37,8 +44,12 @@ async def roll(
     specialties: Optional[str],
     comment: Optional[str],
     character: Optional[str | Character],
+    wp=False,
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
+    if wp:
+        pool = add_wp(pool)
+
     rp = RollParser(pool, None)
     if rp.needs_character or character:
         haven = Haven(ctx, None, None, character, lambda c: RollParser.can_roll(c, pool))

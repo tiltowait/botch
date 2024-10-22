@@ -13,6 +13,7 @@ async def mroll(
     diff_override: int | None,
     comment_override: str | None,
     character: str | None,
+    use_wp=False,
 ):
     """Perform a macro roll.
 
@@ -28,7 +29,7 @@ async def mroll(
     comment = comment_override or macro.comment
 
     try:
-        await botchcord.roll.roll(ctx, macro.key_str, difficulty, None, comment, char)
+        await botchcord.roll.roll(ctx, macro.key_str, difficulty, None, comment, char, use_wp)
     except errors.RollError:
         await ctx.send_error(
             "Error",

@@ -31,6 +31,11 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         required=False,
         max_length=300,
     )
+    @option(
+        "use_wp",
+        description="Use WP on the roll. Can also add + WP to your pool",
+        default=False,
+    )
     @options.character("[Optional] The character performing the roll")
     async def roll(
         self,
@@ -39,10 +44,11 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         difficulty: int,
         specialty: str,
         comment: str,
+        use_wp: bool,
         character: str,
     ):
         """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
-        await botchcord.roll.roll(ctx, pool, difficulty, specialty, comment, character)
+        await botchcord.roll.roll(ctx, pool, difficulty, specialty, comment, character, use_wp)
 
 
 def setup(bot: BotchBot):

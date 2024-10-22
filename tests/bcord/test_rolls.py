@@ -2,7 +2,7 @@
 
 import re
 from typing import Optional
-from unittest.mock import ANY, AsyncMock, Mock
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import discord
 import pytest
@@ -14,6 +14,7 @@ from botchcord.roll import (
     DICE_CAP,
     DICE_CAP_MESSAGE,
     Color,
+    add_wp,
     build_embed,
     embed_color,
     embed_title,
@@ -400,3 +401,21 @@ async def test_roll_command(
     else:
         await roll_cmd(ctx, pool, 6, specs, None, char)
         ctx.respond.assert_called_once_with(embed=ANY)
+
+
+@pytest.mark.parametrize(
+    "pool,expected",
+    [
+        ("strength+brawl", "strength+brawl + WP"),
+        ("strength+brawl+wp", "strength+brawl+wp"),
+        ("wp+strength+brawl", "wp+strength+brawl"),
+        ("strength + wp", "strength + wp"),
+        ("1", "1 + WP"),
+        ("strength+wp+brawl", "strength+wp+brawl"),
+        ("wpwp", "wpwp + WP"),
+        ("STRENGTH + WP", "STRENGTH + WP"),
+        ("wP", "wP"),
+    ],
+)
+def test_add_wp(pool: str, expected: str):
+    assert add_wp(pool) == expected
