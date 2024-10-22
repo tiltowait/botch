@@ -78,7 +78,7 @@ class Roll(Document):
         if self.pool is None:
             return False
         pool = " ".join(map(str, self.pool))
-        return re.match(r"[A-Za-z]", pool) is not None
+        return re.search(r"[A-Za-z]", pool) is not None
 
     @property
     def wod(self) -> bool:
