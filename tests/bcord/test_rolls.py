@@ -2,7 +2,7 @@
 
 import re
 from typing import Optional
-from unittest.mock import ANY, AsyncMock, Mock, patch
+from unittest.mock import ANY, AsyncMock, Mock
 
 import discord
 import pytest
