@@ -2,7 +2,7 @@
 
 import re
 from typing import Optional
-from unittest.mock import ANY, AsyncMock, Mock
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import discord
 import pytest
@@ -10,17 +10,9 @@ import pytest
 import core
 import errors
 from bot import AppCtx, BotchBot
-from botchcord.roll import (
-    DICE_CAP,
-    DICE_CAP_MESSAGE,
-    Color,
-    add_wp,
-    build_embed,
-    embed_color,
-    embed_title,
-    emoji_name,
-    emojify_dice,
-)
+from botchcord.roll import DICE_CAP, DICE_CAP_MESSAGE, Color, add_wp, build_embed
+from botchcord.roll import chance as chance_cmd
+from botchcord.roll import embed_color, embed_title, emoji_name, emojify_dice
 from botchcord.roll import roll as roll_cmd
 from botchcord.roll import textify_dice
 from core.characters import Character, GameLine, Splat, Trait
@@ -401,6 +393,38 @@ async def test_roll_command(
     else:
         await roll_cmd(ctx, pool, 6, specs, None, char)
         ctx.respond.assert_called_once_with(embed=ANY)
+
+
+@pytest.mark.parametrize(
+    "die, title",
+    [
+        (8, "Failure"),
+        (1, "Critical failure"),
+        (10, "Marginal success"),
+    ],
+)
+@patch("bot.BotchBot.find_emoji")
+@patch("botchcord.roll.emoji_name")
+@patch("botchcord.roll.d10")
+async def test_chance_cmd(
+    find_emoji_mock: Mock, emoji_mock: Mock, d10_mock: Mock, die: int, title: str
+):
+    bot = BotchBot()
+    inter = AsyncMock()
+    inter.user.id = 0
+    inter.guild.id = 0
+    ctx = AppCtx(bot, inter)
+
+    find_emoji_mock.return_value = die
+    emoji_mock.return_value = die
+    d10_mock.return_value = die
+
+    await chance_cmd(ctx)
+    ctx.respond.assert_awaited_once_with(embed=ANY)
+
+    embed: discord.Embed = ctx.respond.await_args.kwargs["embed"]
+    assert embed.title is not None
+    assert title in embed.title
 
 
 @pytest.mark.parametrize(

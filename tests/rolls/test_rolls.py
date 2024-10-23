@@ -192,12 +192,6 @@ def test_autos():
     assert roll.successes == 0  # autos override botch possibility
 
 
-def test_missing_game_line():
-    p = RollParser("3", None)
-    with pytest.raises(errors.MissingGameLine):
-        Roll.from_parser(p, 0, 0, 6)
-
-
 @pytest.mark.parametrize(
     "dice,expected",
     [

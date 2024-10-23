@@ -10,6 +10,7 @@ from numpy.random import default_rng
 from pydantic import Field
 
 import errors
+from config import GAME_LINE
 from core.characters import Character, GameLine
 from core.rolls.parse import RollParser
 
@@ -165,6 +166,21 @@ class Roll(Document):
             return "Exceptional"
         return "Phenomenal!"
 
+    @property
+    def dice_readout(self) -> str:
+        """Just the number of dice if WoD, or dice + WP if CofD and WP in use."""
+        readout = str(self.num_dice)
+        if self.line == GameLine.COFD:
+            explosions = len(self.dice) - self.num_dice
+            if self.wp:
+                explosions -= 3
+            if explosions > 0:
+                readout += f" *+ {explosions}*"
+            if self.wp:
+                readout += " *+ WP*"
+
+        return readout
+
     @classmethod
     def from_parser(
         cls,
@@ -172,7 +188,7 @@ class Roll(Document):
         guild: int,
         user: int,
         target: int,
-        line: GameLine | None = None,
+        line: GameLine | None = GAME_LINE,
     ):
         """Create a roll from a RollParser and a target number."""
         if not line:

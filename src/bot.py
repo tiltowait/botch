@@ -65,6 +65,7 @@ class BotchBot(discord.Bot):
     def load_cogs(self, directories: list[str]) -> None:
         """Load cogs from specified directories relative to this script."""
         logger = logging.getLogger("COGS")
+        logger.info("Opening interfaces: %s", directories)
 
         # Get the directory of the current script
         base_path = Path(__file__).parent

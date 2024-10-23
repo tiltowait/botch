@@ -2,7 +2,7 @@
 
 import logconfig
 from bot import BotchBot
-from config import BOTCH_TOKEN
+from config import BOTCH_TOKEN, GAME_LINE
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
     logconfig.configure_logging()
 
     bot = BotchBot()
-    bot.load_cogs(["shared", "wod"])
+    bot.load_cogs(["shared", GAME_LINE])
     bot.run(BOTCH_TOKEN)
 
 

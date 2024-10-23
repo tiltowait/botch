@@ -11,13 +11,13 @@ import botchcord
 import errors
 import utils
 from botchcord.haven import Haven
-from core.characters import Character, GameLine
-from core.rolls import Roll
+from config import GAME_LINE
+from core.characters import Character
+from core.rolls import Roll, d10
 from core.rolls.parse import RollParser
 
 DICE_CAP = 40
 DICE_CAP_MESSAGE = "***Too many to show.***"
-GAME_LINE = GameLine.WOD  # TODO: Use a global config
 
 
 class Color(IntEnum):
@@ -77,6 +77,31 @@ async def roll(
     await roll.save()
 
 
+async def chance(ctx: bot.AppCtx):
+    """Roll a chance die."""
+    die = d10()
+    print(die)
+    if await botchcord.settings.use_emojis(ctx):
+        diemoji = ctx.bot.find_emoji(emoji_name(die, 10, 10, True))
+    else:
+        diemoji = str(die)
+
+    if die == 1:
+        title = "🤣 Critical failure!"
+        color = Color.BOTCH.value
+    elif die < 10:
+        title = "Failure"
+        color = Color.FAILURE.value
+    else:
+        title = "Marginal success!"
+        color = Color.MARGINAL_SUCCESS.value
+
+    embed = discord.Embed(title=title, description=diemoji, colour=color)
+    embed.set_author(name=ctx.author.display_name, icon_url=botchcord.get_avatar(ctx.author))
+
+    await ctx.respond(embed=embed)
+
+
 def build_embed(
     ctx: bot.AppCtx,
     roll: Roll,
@@ -108,7 +133,7 @@ def build_embed(
         description=dice_description,
         color=embed_color(roll),
     )
-    embed.add_field(name="Dice", value=str(roll.num_dice))
+    embed.add_field(name="Dice", value=roll.dice_readout)
 
     if roll.wod:
         embed.add_field(name="Difficulty", value=str(roll.target))
