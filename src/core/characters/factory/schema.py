@@ -35,6 +35,22 @@ class TraitGroup(BaseModel):
         return None
 
 
+class SpecialTrait(BaseModel):
+    """An individual splat trait."""
+
+    name: str
+    type: str
+    options: Optional[list[str] | list[int]]
+    default: Optional[str | int]
+
+
+class Special(BaseModel):
+    """Special, splat-specific traits."""
+
+    splat: str
+    traits: list[SpecialTrait]
+
+
 class Schema(BaseModel):
     """The Schema class handles loading and validation of character schemas
     and provides a model for the Factory class to build characters. Schemas
@@ -46,6 +62,7 @@ class Schema(BaseModel):
     inherent: TraitGroup
     learned: TraitGroup
     virtues: Optional[list[list[str]]] = None
+    special: Optional[list[Special]] = None
 
     @classmethod
     def load(cls, loc: str):

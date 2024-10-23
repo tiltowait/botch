@@ -96,5 +96,31 @@
     [
       "Courage"
     ]
+  ],
+  "special": [
+    {
+      "splat": "vampire",
+      "traits": [
+        {
+          "name": "Generation",
+          "type": "select",
+          "options": [
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,
+            7,
+            6,
+            5,
+            4
+          ],
+          "default": 13
+        }
+      ]
+    }
   ]
 }
