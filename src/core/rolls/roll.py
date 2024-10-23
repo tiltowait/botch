@@ -188,7 +188,7 @@ class Roll(Document):
         guild: int,
         user: int,
         target: int,
-        line: GameLine | None = GAME_LINE,
+        line: GameLine | str | None = GAME_LINE,
     ):
         """Create a roll from a RollParser and a target number."""
         if not line:
