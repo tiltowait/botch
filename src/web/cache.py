@@ -5,13 +5,14 @@ from string import ascii_letters, digits
 
 from cachetools import TTLCache
 
+from config import GAME_LINE
 from web.models import WizardSchema
 
 
 class WizardCache:
     """Maintains a cache for character creation wizard web tokens."""
 
-    def __init__(self, ttl: int = 1200, token_size: int = 16):
+    def __init__(self, ttl: int = 1200, token_size: int = 8):
         self._cache: TTLCache[str, WizardSchema] = TTLCache(maxsize=100, ttl=ttl)
         self.ttl = ttl
         self.token_size = token_size
@@ -21,7 +22,8 @@ class WizardCache:
 
     def _generate_token(self) -> str:
         """Generates a securerandom token."""
-        return "".join(secrets.choice(ascii_letters + digits) for _ in range(self.token_size))
+        token = "".join(secrets.choice(ascii_letters + digits) for _ in range(self.token_size))
+        return f"{GAME_LINE}_{token}"
 
     def register(self, schema: WizardSchema) -> str:
         """Caches the schema, then returns the access token."""
