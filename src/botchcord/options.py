@@ -7,6 +7,8 @@ import discord
 from discord.commands import Option, OptionChoice
 
 import core
+from config import GAME_LINE
+from core.characters.base import GameLine
 
 
 def promoted_choice(
@@ -77,7 +79,7 @@ async def _available_characters(ctx: discord.AutocompleteContext):
 
         if user.guild_permissions.administrator:
             # Add SPCs
-            spcs = await core.cache.fetchnames(guild.id, bot_user.id)
+            spcs = await core.cache.fetchnames(guild.id, bot_user.id, GameLine(GAME_LINE))
             logger.info(
                 "%s: admin %s fetched %s SPCs",
                 guild.name,

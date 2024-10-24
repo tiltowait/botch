@@ -4,6 +4,7 @@
 import bisect
 
 import errors
+from config import GAME_LINE
 from core.characters import Character, GameLine, Splat
 from utils import normalize_text
 
@@ -34,6 +35,7 @@ class CharCache:
         key = self.key(guild, user)
         if key not in self._cache:
             chars = await Character.find(
+                Character.line == (line or GAME_LINE),
                 Character.guild == guild,
                 Character.user == user,
                 with_children=True,
@@ -50,7 +52,11 @@ class CharCache:
         return chars
 
     async def fetchnames(
-        self, guild: int, user: int, line: GameLine | None = None, splat: Splat | None = None
+        self,
+        guild: int,
+        user: int,
+        line: GameLine | None = None,
+        splat: Splat | None = None,
     ) -> list[str]:
         """Fetch just the characters' names."""
         chars = await self.fetchall(guild, user, line=line, splat=splat)
