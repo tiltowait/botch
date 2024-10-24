@@ -4,7 +4,6 @@
 import bisect
 
 import errors
-from config import GAME_LINE
 from core.characters import Character, GameLine, Splat
 from utils import normalize_text
 
@@ -35,7 +34,6 @@ class CharCache:
         key = self.key(guild, user)
         if key not in self._cache:
             chars = await Character.find(
-                Character.line == (line or GAME_LINE),
                 Character.guild == guild,
                 Character.user == user,
                 with_children=True,

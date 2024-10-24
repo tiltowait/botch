@@ -87,7 +87,7 @@ async def _available_characters(ctx: discord.AutocompleteContext):
                 len(spcs),
             )
 
-    chars = await core.cache.fetchnames(guild.id, int(owner))
+    chars = await core.cache.fetchnames(guild.id, int(owner), GameLine(GAME_LINE))
     chars.extend(spcs)
 
     name_search = ctx.value.casefold()
