@@ -10,7 +10,9 @@ import bot
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
 from botchcord.utils.text import i, m
+from config import GAME_LINE
 from core.characters import Character, Macro
+from core.characters.base import GameLine
 
 
 @haven(filter=lambda c: len(c.macros) > 0)
@@ -41,11 +43,16 @@ def paginate_macros(macros: list[Macro]) -> list[str]:
 
 def create_macro_entry(macro: Macro) -> str:
     """Create a macro display entry."""
+    is_cofd = GAME_LINE == GameLine.COFD
+    target = "Again" if is_cofd else "Difficulty"
+
     lines = [
         f"### {macro.name}",
         f"**Pool:** {m(macro.pool_str)}",
-        f"**Difficulty:** {macro.difficulty}",
+        f"**{target}:** {macro.difficulty}",
     ]
+    if is_cofd:
+        lines.append(f"**Rote:** {'Yes' if macro.rote else 'No'}")
     if macro.comment:
         lines.append(i(macro.comment))
 

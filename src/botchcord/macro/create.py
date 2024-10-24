@@ -3,6 +3,7 @@
 import bot
 import errors
 from botchcord.haven import Haven
+from botchcord.macro.display import create_macro_entry
 from botchcord.roll import RollParser
 from botchcord.utils import CEmbed
 from botchcord.utils.text import m
@@ -77,12 +78,13 @@ def create_macro(
 
 def build_embed(bot: bot.BotchBot, char: Character, macro: Macro) -> CEmbed:
     """Create an embed describing the newly created macro."""
+    description = create_macro_entry(macro)
     lines = [
         f"**Name:** {macro.name}",
         f"**Pool:** {m(macro.pool_str)}",
         f"**Difficulty:** {macro.difficulty}",
         f"**Comment:** {macro.comment}",
     ]
-    embed = CEmbed(bot, char, title="Macro created", description="\n".join(lines))
+    embed = CEmbed(bot, char, title="Macro created", description=description)
 
     return embed
