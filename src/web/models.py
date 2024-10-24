@@ -53,13 +53,6 @@ class Virtue(BaseModel):
     rating: int
 
 
-class SpecialTrait(BaseModel):
-    """Represents a splat-specific trait."""
-
-    name: str
-    value: str | int
-
-
 class CharacterData(BaseModel):
     """A model for creating a character."""
 
@@ -71,7 +64,7 @@ class CharacterData(BaseModel):
     willpower: int
     traits: dict[str, int]
     virtues: Optional[list[Virtue]] = None
-    special: list[SpecialTrait] = Field(default_factory=list)
+    special: dict[str, str | int] = Field(default_factory=dict)
 
     @property
     def virtues_dict(self) -> dict[str, int]:

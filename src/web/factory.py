@@ -27,8 +27,8 @@ def fill_wod(data: CharacterData, splat_args: dict[str, Any]):
 async def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
     """Create and return the character from the wizard and data."""
     splat_args: dict[str, Any] = dict(virtues=gen_virtues(data.virtues_dict))
-    for special in data.special:
-        splat_args[special.name] = special.value
+    for special, value in data.special.items():
+        splat_args[special.lower()] = value
 
     if wizard.traits.line == GameLine.WOD:
         fill_wod(data, splat_args)

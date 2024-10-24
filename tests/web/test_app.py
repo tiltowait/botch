@@ -98,12 +98,7 @@ async def test_create_character(
 ):
     character_data["splat"] = splat
     if splat == "Vampire":
-        character_data["special"] = [
-            {
-                "name": "generation",
-                "value": 13,
-            }
-        ]
+        character_data["special"] = {"generation": 13}
 
     response = client.post("/character/create", json=CharacterData(**character_data).model_dump())
     assert response.status_code == 200
