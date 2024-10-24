@@ -8,6 +8,7 @@ from discord import ButtonStyle
 from discord.ui import Button, Select
 
 from bot import AppCtx
+from config import GAME_LINE
 from core.cache import cache
 from core.characters import Character, GameLine, Splat
 from errors import (
@@ -22,7 +23,7 @@ P = ParamSpec("P")
 
 
 def haven(
-    line: GameLine | None = None,
+    line: GameLine | str | None = GAME_LINE,
     splat: Splat | None = None,
     filter: Callable[[Character], bool] = lambda _: True,
 ) -> Callable[
@@ -59,7 +60,7 @@ class Haven(discord.ui.View):
     def __init__(
         self,
         ctx: AppCtx,
-        line: GameLine | None,
+        line: GameLine | str | None,
         splat: Splat | None,
         character: str | Character | None,
         filter: Callable[[Character], bool] = lambda _: True,

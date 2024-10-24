@@ -125,6 +125,7 @@ class Trait(BaseModel):
     class Category(StrEnum):
         ATTRIBUTE = "attributes"
         ABILITY = "abilities"
+        SKILL = "skills"
         VIRTUE = "virtues"
         SPECIAL = "special"
         INNATE = "innate"

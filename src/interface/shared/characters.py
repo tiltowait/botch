@@ -10,6 +10,13 @@ import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
 from botchcord.premium import premium
+from config import GAME_LINE
+from core.characters.base import GameLine
+
+if GAME_LINE == GameLine.WOD:
+    ERAS = [OptionChoice("Modern", "vtm"), OptionChoice("Dark Ages", "dav20")]
+else:
+    ERAS = [OptionChoice("Modern", "vtr")]
 
 
 class CharactersCog(Cog, name="General character commands"):
@@ -45,7 +52,7 @@ class CharactersCog(Cog, name="General character commands"):
     @option(
         "era",
         description="Which era of sheet do you need?",
-        choices=[OptionChoice("Modern", "vtm"), OptionChoice("Dark Ages", "dav20")],
+        choices=ERAS,
     )
     async def wizard(self, ctx: AppCtx, era: str):
         """Create a character over the web."""

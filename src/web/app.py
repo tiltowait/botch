@@ -6,17 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import core
 import web.factory
 from config import BOTCH_URL, GAME_LINE, MAX_NAME_LEN
-from core.characters.wod import Ghoul, Mortal, Vampire
 from utils import normalize_text
 from web.cache import WizardCache
 from web.models import CharacterData, NameCheck, WizardSchema
-
-CharacterType = Ghoul | Mortal | Vampire
-SPLAT_MAPPING: dict[str, type[CharacterType]] = {
-    "Ghoul": Ghoul,
-    "Mortal": Mortal,
-    "Vampire": Vampire,
-}
 
 app = FastAPI()
 cache = WizardCache()
@@ -58,7 +50,7 @@ async def create_character(data: CharacterData):
             detail=f"You already have a character named {data.name} on {wizard.guild_name}!",
         )
 
-    char = await web.factory.create_character(wizard, data)
+    char = web.factory.create_character(wizard, data)
 
     await core.cache.register(char)
     cache.remove(data.token)

@@ -7,14 +7,23 @@ from beanie import init_beanie
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from core.characters import Character, wod
+from core.characters import Character, cofd, wod
 from core.rolls import Roll
 from interface.models import CommandRecord
 
 load_dotenv()
 
 logger = logging.getLogger("DB")
-DOCUMENT_MODELS = [Character, wod.Vampire, wod.Mortal, Roll, CommandRecord]
+DOCUMENT_MODELS = [
+    Character,
+    wod.Vampire,
+    wod.Ghoul,
+    wod.Mortal,
+    cofd.Vampire,
+    cofd.Mortal,
+    Roll,
+    CommandRecord,
+]
 
 
 async def init():

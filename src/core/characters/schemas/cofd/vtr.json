@@ -1,0 +1,105 @@
+{
+  "line": "cofd",
+  "splats": [
+    "vampire",
+    "mortal"
+  ],
+  "inherent": {
+    "category": "attributes",
+    "subcategories": [
+      {
+        "name": "mental",
+        "traits": [
+          "Intelligence",
+          "Wits",
+          "Resolve"
+        ]
+      },
+      {
+        "name": "physical",
+        "traits": [
+          "Strength",
+          "Dexterity",
+          "Stamina"
+        ]
+      },
+      {
+        "name": "social",
+        "traits": [
+          "Presence",
+          "Manipulation",
+          "Composure"
+        ]
+      }
+    ]
+  },
+  "learned": {
+    "category": "skills",
+    "subcategories": [
+      {
+        "name": "mental",
+        "traits": [
+          "Academics",
+          "Computer",
+          "Crafts",
+          "Investigation",
+          "Medicine",
+          "Occult",
+          "Politics",
+          "Science"
+        ]
+      },
+      {
+        "name": "physical",
+        "traits": [
+          "Athletics",
+          "Brawl",
+          "Drive",
+          "Firearms",
+          "Larceny",
+          "Stealth",
+          "Survival",
+          "Weaponry"
+        ]
+      },
+      {
+        "name": "social",
+        "traits": [
+          "AnimalKen",
+          "Empathy",
+          "Expression",
+          "Intimidation",
+          "Persuasion",
+          "Socialize",
+          "Streetwise",
+          "Subterfuge"
+        ]
+      }
+    ]
+  },
+  "special": [
+    {
+      "splat": "vampire",
+      "traits": [
+        {
+          "label": "Blood Potency",
+          "name": "blood_potency",
+          "type": "select",
+          "options": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "default": 1
+        }
+      ]
+    }
+  ]
+}

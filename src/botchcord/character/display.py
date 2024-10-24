@@ -20,9 +20,27 @@ class DisplayField(StrEnum):
     GENERATION = "Generation"
     BLOOD_POOL = "Blood Pool"
     EXPERIENCE = "Experience"
+    BLOOD_POTENCY = "Blood Potency"
+    VITAE = "Vitae"
 
 
 DEFAULT_FIELDS = {
+    GameLine.COFD: {
+        Splat.MORTAL: (
+            DisplayField.HEALTH,
+            DisplayField.WILLPOWER,
+            DisplayField.GROUNDING,
+            DisplayField.EXPERIENCE,
+        ),
+        Splat.VAMPIRE: (
+            DisplayField.HEALTH,
+            DisplayField.WILLPOWER,
+            DisplayField.GROUNDING,
+            DisplayField.EXPERIENCE,
+            DisplayField.BLOOD_POTENCY,
+            DisplayField.VITAE,
+        ),
+    },
     GameLine.WOD: {
         Splat.MORTAL: (
             # DisplayField.NAME,
@@ -47,7 +65,7 @@ DEFAULT_FIELDS = {
             DisplayField.BLOOD_POOL,
             DisplayField.EXPERIENCE,
         ),
-    }
+    },
 }
 
 
@@ -130,6 +148,10 @@ def get_field_value(
             return f"```{character.blood_pool} / {character.max_bp}```"
         case DisplayField.EXPERIENCE:
             return f"```{character.experience.unspent} / {character.experience.lifetime}```"
+        case DisplayField.BLOOD_POTENCY:
+            return f"```{character.blood_potency}```"
+        case DisplayField.VITAE:
+            return f"```{character.vitae} / {character.max_vitae}```"
 
 
 def emojify_track(bot: bot.BotchBot, track: str) -> str:
@@ -154,6 +176,7 @@ def get_track_string(track: str) -> str:
 
 def get_default_fields(character: Character) -> tuple[DisplayField, ...]:
     """Get the appropriate default fields for the character."""
+    print(character.line, character.splat)
     if character.line not in DEFAULT_FIELDS:
         raise errors.CharacterTemplateNotFound(f"Unknown game line `{character.line}`.")
 

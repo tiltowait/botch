@@ -215,6 +215,20 @@ def test_build_embed_author_no_char():
     assert isinstance(ctx.author, discord.User)
 
 
+def test_build_embed_rote_again():
+    rp = RollParser("6", None).parse()
+    roll = Roll.from_parser(rp, 0, 0, 8, GameLine.COFD, True)
+
+    ctx = Mock()
+    ctx.author = Mock(spec=discord.User)  # Make it a User to finish testing get_avatar()
+    ctx.author.display_name = "Jimmy Maxwell"
+    ctx.author.display_avatar = "https://example.com/icon.png"
+
+    embed = build_embed(ctx, roll, None, None, True)
+    assert embed.author is not None
+    assert embed.author.name == "Jimmy Maxwell • Rote • 8-again"
+
+
 @pytest.mark.parametrize(
     "title,pool,target,spec,comment",
     [

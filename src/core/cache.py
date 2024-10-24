@@ -50,7 +50,11 @@ class CharCache:
         return chars
 
     async def fetchnames(
-        self, guild: int, user: int, line: GameLine | None = None, splat: Splat | None = None
+        self,
+        guild: int,
+        user: int,
+        line: GameLine | None = None,
+        splat: Splat | None = None,
     ) -> list[str]:
         """Fetch just the characters' names."""
         chars = await self.fetchall(guild, user, line=line, splat=splat)

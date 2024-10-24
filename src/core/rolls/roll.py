@@ -189,6 +189,7 @@ class Roll(Document):
         user: int,
         target: int,
         line: GameLine | str | None = GAME_LINE,
+        rote=False,
     ):
         """Create a roll from a RollParser and a target number."""
         if not line:
@@ -198,11 +199,12 @@ class Roll(Document):
                 raise errors.MissingGameLine
 
         return cls(
-            line=line,
+            line=GameLine(line),
             guild=guild,
             user=user,
             num_dice=p.num_dice,
             target=target,
+            rote=rote,
             wp=p.using_wp,
             specialties=p.specialties,
             pool=p.pool,

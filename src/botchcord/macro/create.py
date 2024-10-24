@@ -3,9 +3,10 @@
 import bot
 import errors
 from botchcord.haven import Haven
+from botchcord.macro.display import create_macro_entry
 from botchcord.roll import RollParser
 from botchcord.utils import CEmbed
-from botchcord.utils.text import m
+from config import GAME_LINE
 from core.characters import Character, Macro
 
 
@@ -16,13 +17,14 @@ async def create(
     pool: str,
     diff: int,
     comment: str | None,
+    rote=False,
 ):
     """Create a macro and add it to the character."""
     # can_use_macro() is too complex for the @haven decorator
     try:
-        haven = Haven(ctx, None, None, character, filter=lambda c: can_use_macro(c, pool))
+        haven = Haven(ctx, GAME_LINE, None, character, filter=lambda c: can_use_macro(c, pool))
         char = await haven.get_match()
-        macro = create_macro(char, name, pool, diff, comment)
+        macro = create_macro(char, name, pool, diff, comment, rote)
         char.add_macro(macro)
 
         embed = build_embed(ctx.bot, char, macro)
@@ -51,7 +53,14 @@ def can_use_macro(char: Character, pool: str) -> bool:
         return False
 
 
-def create_macro(char: Character, name: str, pool: str, diff: int, comment: str | None) -> Macro:
+def create_macro(
+    char: Character,
+    name: str,
+    pool: str,
+    diff: int,
+    comment: str | None,
+    rote=False,
+) -> Macro:
     """Create a macro."""
     rpp = RollParser(pool, char).parse()
     rpk = RollParser(pool, char).parse(use_key=True)
@@ -60,7 +69,7 @@ def create_macro(char: Character, name: str, pool: str, diff: int, comment: str 
         pool=rpp.pool,
         keys=rpk.pool,
         difficulty=diff,
-        rote=False,
+        rote=rote,
         hunt=False,
         comment=comment,
     )
@@ -68,12 +77,7 @@ def create_macro(char: Character, name: str, pool: str, diff: int, comment: str 
 
 def build_embed(bot: bot.BotchBot, char: Character, macro: Macro) -> CEmbed:
     """Create an embed describing the newly created macro."""
-    lines = [
-        f"**Name:** {macro.name}",
-        f"**Pool:** {m(macro.pool_str)}",
-        f"**Difficulty:** {macro.difficulty}",
-        f"**Comment:** {macro.comment}",
-    ]
-    embed = CEmbed(bot, char, title="Macro created", description="\n".join(lines))
+    description = create_macro_entry(macro)
+    embed = CEmbed(bot, char, title="Macro created", description=description)
 
     return embed
