@@ -2,26 +2,40 @@
 
 from typing import Any
 
-from core.characters import Character, Damage
+from core.characters import Character, Damage, cofd, wod
 from core.characters.base import GameLine
-from core.characters.wod import Ghoul, Mortal, Vampire, gen_virtues
-from utils import max_vtm_bp
+from core.characters.wod import gen_virtues
+from utils import max_vtm_bp, max_vtr_vitae
 from web.models import CharacterData, WizardSchema
 
-CharacterType = Ghoul | Mortal | Vampire
-SPLAT_MAPPING: dict[str, type[CharacterType]] = {
-    "Ghoul": Ghoul,
-    "Mortal": Mortal,
-    "Vampire": Vampire,
+CharacterType = wod.Ghoul | wod.Mortal | wod.Vampire | cofd.Mortal | cofd.Vampire
+SPLAT_MAPPING: dict[GameLine, dict[str, type[CharacterType]]] = {
+    GameLine.WOD: {
+        "Ghoul": wod.Ghoul,
+        "Mortal": wod.Mortal,
+        "Vampire": wod.Vampire,
+    },
+    GameLine.COFD: {
+        "Mortal": cofd.Mortal,
+        "Vampire": cofd.Vampire,
+    },
 }
 
 
 def fill_wod(data: CharacterData, splat_args: dict[str, Any]):
-    """Start the character args with WoD data."""
+    """Fill in the character WoD-specific data."""
     if data.splat == "Vampire":
         gen = splat_args["generation"]
         splat_args["max_bp"] = max_vtm_bp(gen)
         splat_args["blood_pool"] = max_vtm_bp(gen)
+
+
+def fill_cofd(data: CharacterData, splat_args: dict[str, Any]):
+    """Fill in the CofD-specific data."""
+    if data.splat == "Vampire":
+        bp = splat_args["blood_potency"]
+        splat_args["vitae"] = max_vtr_vitae(bp)
+        splat_args["max_vitae"] = max_vtr_vitae(bp)
 
 
 async def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
@@ -33,9 +47,11 @@ async def create_character(wizard: WizardSchema, data: CharacterData) -> Charact
     if wizard.traits.line == GameLine.WOD:
         fill_wod(data, splat_args)
     else:
-        raise NotImplementedError("CofD isn't implemented yet!")
+        fill_cofd(data, splat_args)
 
-    cls = SPLAT_MAPPING[data.splat]
+    cls = SPLAT_MAPPING[wizard.traits.line][data.splat]
+    print(data.splat)
+    print(cls)
     char = cls(
         # Common traits
         name=data.name,

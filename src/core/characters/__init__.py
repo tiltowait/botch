@@ -1,6 +1,6 @@
 """The characters package defines various PC/NPC objects and functions."""
 
-from core.characters import wod
+from core.characters import cofd, wod
 from core.characters.base import (
     Character,
     Damage,
@@ -14,6 +14,7 @@ from core.characters.base import (
 )
 
 __all__ = (
+    "cofd",
     "wod",
     "Character",
     "Damage",
