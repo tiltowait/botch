@@ -38,7 +38,7 @@ def fill_cofd(data: CharacterData, splat_args: dict[str, Any]):
         splat_args["max_vitae"] = max_vtr_vitae(bp)
 
 
-async def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
+def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
     """Create and return the character from the wizard and data."""
     splat_args: dict[str, Any] = dict(virtues=gen_virtues(data.virtues_dict))
     for special, value in data.special.items():

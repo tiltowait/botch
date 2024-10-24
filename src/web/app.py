@@ -50,7 +50,7 @@ async def create_character(data: CharacterData):
             detail=f"You already have a character named {data.name} on {wizard.guild_name}!",
         )
 
-    char = await web.factory.create_character(wizard, data)
+    char = web.factory.create_character(wizard, data)
 
     await core.cache.register(char)
     cache.remove(data.token)
