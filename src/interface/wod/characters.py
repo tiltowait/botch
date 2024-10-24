@@ -13,7 +13,11 @@ from botchcord.premium import premium
 
 
 class CharactersCog(Cog, name="General character commands"):
-    character = SlashCommandGroup("character", "General character commands")
+    character = SlashCommandGroup(
+        "character",
+        "General character commands",
+        contexts={discord.InteractionContextType.guild},
+    )
     images = character.create_subgroup("image", "Character image commands")
 
     def __init__(self, bot: BotchBot):

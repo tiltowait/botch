@@ -1,5 +1,6 @@
 """Character traits command interface."""
 
+import discord
 from discord import option
 from discord.commands import SlashCommandGroup
 from discord.ext.commands import Cog
@@ -10,8 +11,16 @@ from botchcord import options
 
 
 class TraitsCog(Cog, name="Character trait/specialty commands"):
-    traits = SlashCommandGroup("traits", "Character trait commands")
-    specialties = SlashCommandGroup("specialties", "Character specialties commands")
+    traits = SlashCommandGroup(
+        "traits",
+        "Character trait commands",
+        contexts={discord.InteractionContextType.guild},
+    )
+    specialties = SlashCommandGroup(
+        "specialties",
+        "Character specialties commands",
+        contexts={discord.InteractionContextType.guild},
+    )
 
     def __init__(self, bot: BotchBot):
         self.bot = bot

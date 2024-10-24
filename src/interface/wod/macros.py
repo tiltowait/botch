@@ -1,5 +1,6 @@
 """Macro command cog."""
 
+import discord
 from discord import SlashCommandGroup, option, slash_command
 from discord.ext.commands import Cog
 
@@ -11,7 +12,11 @@ from botchcord import options
 class MacrosCog(Cog, name="Macro commands"):
     """Macro creation, review, updating, and deletion."""
 
-    macro = SlashCommandGroup("macro", "Macro commands")
+    macro = SlashCommandGroup(
+        "macro",
+        "Macro commands",
+        contexts={discord.InteractionContextType.guild},
+    )
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
