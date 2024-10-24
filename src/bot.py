@@ -47,6 +47,7 @@ class BotchBot(discord.Bot):
             *args,
             **kwargs,
         )
+        self.accept_commands = False
         self.welcomed = False
         if DEBUG_GUILDS:
             logger.info("Debugging on %s", DEBUG_GUILDS)
@@ -55,6 +56,7 @@ class BotchBot(discord.Bot):
         logger.info("Connected")
         await db.init()
         await self.sync_commands()
+        self.accept_commands = True
 
     async def on_ready(self):
         assert self.user is not None
@@ -106,6 +108,17 @@ class BotchBot(discord.Bot):
         """Make all contexts AppCtx instances."""
         ctx = await super().get_application_context(interaction, cls=cls)
         return cast(AppCtx, ctx)
+
+    async def on_interaction(self, interaction: discord.Interaction):
+        """Prevent commands if database hasn't been initialized."""
+        if self.accept_commands:
+            await self.process_application_commands(interaction)
+        else:
+            bot_name = self.user.name if self.user else "Botch"
+            await interaction.respond(
+                f"**Error:** {bot_name} is still initializing. Please try again.",
+                ephemeral=True,
+            )
 
     async def on_application_command_error(
         self,
