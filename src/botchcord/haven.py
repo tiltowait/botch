@@ -60,7 +60,7 @@ class Haven(discord.ui.View):
     def __init__(
         self,
         ctx: AppCtx,
-        line: GameLine | None,
+        line: GameLine | str | None,
         splat: Splat | None,
         character: str | Character | None,
         filter: Callable[[Character], bool] = lambda _: True,

@@ -4,6 +4,7 @@ import bot
 import botchcord
 import errors
 from botchcord.haven import Haven
+from config import GAME_LINE
 from core.characters import Character
 
 
@@ -19,7 +20,7 @@ async def mroll(
 
     The user can override the default difficulty with diff_override,
     and the default comment with comment_override."""
-    haven = Haven(ctx, None, None, character, filter=lambda c: has_macro(c, macro_name))
+    haven = Haven(ctx, GAME_LINE, None, character, filter=lambda c: has_macro(c, macro_name))
 
     char = await haven.get_match()
     macro = char.find_macro(macro_name)

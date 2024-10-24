@@ -52,7 +52,7 @@ async def roll(
 
     rp = RollParser(pool, None)
     if rp.needs_character or character:
-        haven = Haven(ctx, None, None, character, lambda c: RollParser.can_roll(c, pool))
+        haven = Haven(ctx, GAME_LINE, None, character, lambda c: RollParser.can_roll(c, pool))
         try:
             if character := await haven.get_match():
                 rp.character = character
