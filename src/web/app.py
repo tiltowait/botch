@@ -4,10 +4,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 import core
+import web.factory
 from config import BOTCH_URL, GAME_LINE, MAX_NAME_LEN
-from core.characters import Damage, Grounding
-from core.characters.wod import Ghoul, Mortal, Vampire, gen_virtues
-from utils import max_vtm_bp, normalize_text
+from core.characters.wod import Ghoul, Mortal, Vampire
+from utils import normalize_text
 from web.cache import WizardCache
 from web.models import CharacterData, NameCheck, WizardSchema
 
@@ -44,7 +44,6 @@ async def get_wizard_schema(token: str):
 @app.post("/character/create")
 async def create_character(data: CharacterData):
     """Create a character from provided data."""
-    # First, determine the splat. TODO: Make system-agnostic
     wizard = cache.get(data.token)
     assert wizard.traits.line == GAME_LINE
 
@@ -59,35 +58,7 @@ async def create_character(data: CharacterData):
             detail=f"You already have a character named {data.name} on {wizard.guild_name}!",
         )
 
-    cls = SPLAT_MAPPING[data.splat]
-    grounding = Grounding(**data.grounding.model_dump())
-
-    if data.splat == "Ghoul":
-        extra_args = dict(bond_strength=3)
-    elif data.splat == "Vampire":
-        gen = data.generation or 13
-        extra_args = dict(
-            generation=gen,
-            max_bp=max_vtm_bp(gen),
-            blood_pool=max_vtm_bp(gen),
-        )
-    else:
-        extra_args = dict()
-
-    char = cls(
-        name=data.name,
-        guild=wizard.guild_id,
-        user=wizard.user_id,
-        health=Damage.NONE * data.health,
-        willpower=Damage.NONE * data.willpower,
-        grounding=grounding,
-        virtues=gen_virtues(data.virtue_dict),
-        **extra_args,  # type: ignore
-    )
-    for trait, rating in data.traits.items():
-        category = wizard.traits.category(trait)
-        subcategory = wizard.traits.subcategory(trait)
-        char.add_trait(trait, rating, category, subcategory)
+    char = await web.factory.create_character(wizard, data)
 
     await core.cache.register(char)
     cache.remove(data.token)

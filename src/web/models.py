@@ -60,15 +60,17 @@ class CharacterData(BaseModel):
     splat: str
     name: str
     grounding: Grounding
-    generation: Optional[int]
     health: int
     willpower: int
     traits: dict[str, int]
-    virtues: list[Virtue]
+    virtues: Optional[list[Virtue]] = None
+    special: dict[str, str | int] = Field(default_factory=dict)
 
     @property
-    def virtue_dict(self) -> dict[str, int]:
+    def virtues_dict(self) -> dict[str, int]:
         """The Virtues as a dictionary."""
+        if self.virtues is None:
+            raise ValueError("No virtues set!")
         return {v.name: v.rating for v in self.virtues}
 
 

@@ -29,4 +29,4 @@ class Mortal(WoD):
 class Ghoul(Mortal):
     """A ghoul is just a fancy mortal."""
 
-    bond_strength: int
+    splat: Splat = Splat.GHOUL
