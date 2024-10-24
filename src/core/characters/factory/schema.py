@@ -38,6 +38,7 @@ class TraitGroup(BaseModel):
 class SpecialTrait(BaseModel):
     """An individual splat trait."""
 
+    label: str
     name: str
     type: str
     options: Optional[list[str] | list[int]]
