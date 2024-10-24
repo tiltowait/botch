@@ -28,4 +28,4 @@ def m(text: object) -> str:
 
 def c(text: object) -> str:
     """Code-fenced text."""
-    return f"```{text}```"
+    return f"```\n{text}\n```"

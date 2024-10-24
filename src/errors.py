@@ -74,7 +74,7 @@ class AmbiguousTraitError(TraitError):
         self.matches = matches
 
     def __str__(self) -> str:
-        match_block = "```" + "\n".join(self.matches) + "```"
+        match_block = "```\n" + "\n".join(self.matches) + "\n```"
         return f"`{self.needle}` is amgiguous. Did you mean: {match_block}"
 
 
