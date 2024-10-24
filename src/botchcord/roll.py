@@ -45,6 +45,7 @@ async def roll(
     comment: Optional[str],
     character: Optional[str | Character],
     wp=False,
+    rote=False,
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
     if wp:
@@ -62,7 +63,7 @@ async def roll(
             raise errors.RollError(f"No characters able to roll `{pool}`.")
 
     rp.parse()
-    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, difficulty, GAME_LINE).roll()
+    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, difficulty, GAME_LINE, rote).roll()
 
     extra_specs = []
     if specialties:
@@ -119,6 +120,10 @@ def build_embed(
         author_name = ctx.author.display_name
     if not icon:
         icon = botchcord.get_avatar(ctx.author)
+    if roll.rote:
+        author_name += " • Rote"
+    if roll.again < 10:
+        author_name += f" • {roll.again}-again"
 
     if emojis:
         try:

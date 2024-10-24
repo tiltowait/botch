@@ -25,6 +25,7 @@ class BasicCog(Cog, name="Basic CofD Commands"):
         description="A specialty to apply to the roll. You may also use trait.spec syntax in pool.",
         required=False,
     )
+    @option("rote", description="Whether to apply the Rote quality", default=False)
     @option(
         "comment",
         description="A comment to show alongside the roll",
@@ -42,13 +43,14 @@ class BasicCog(Cog, name="Basic CofD Commands"):
         ctx: AppCtx,
         pool: str,
         again: int,
+        rote: bool,
         specialty: str,
         comment: str,
         use_wp: bool,
         character: str,
     ):
         """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
-        await botchcord.roll.roll(ctx, pool, again, specialty, comment, character, use_wp)
+        await botchcord.roll.roll(ctx, pool, again, specialty, comment, character, use_wp, rote)
 
     @slash_command()
     async def chance(self, ctx: AppCtx):
