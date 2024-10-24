@@ -18,7 +18,7 @@ def test_init(wizard_cache: WizardCache):
     assert isinstance(wizard_cache._cache, TTLCache)
     assert wizard_cache._cache.maxsize == 100
     assert wizard_cache._cache.ttl == 1200
-    assert wizard_cache.token_size == 16
+    assert wizard_cache.token_size == 12
 
 
 def test_contains(wizard_cache: WizardCache):
@@ -31,7 +31,7 @@ def test_contains(wizard_cache: WizardCache):
 def test_generate_token(wizard_cache: WizardCache):
     token = wizard_cache._generate_token()
     assert len(token) == wizard_cache.token_size
-    assert all(c in ascii_letters + digits for c in token)
+    assert all(c in ascii_letters + digits + "_" for c in token)
 
 
 def test_register(wizard_cache: WizardCache):
