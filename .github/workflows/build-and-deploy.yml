@@ -67,3 +67,27 @@ jobs:
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           command: monitor
+
+  deploy-wod:
+    needs: build-attested-image
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      SERVICE_ID: ${{ secrets.WOD_SERVICE_ID }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+    steps:
+      - name: Deploy new image
+        run: railway redeploy -y --service ${{ env.SERVICE_ID }}
+
+  deploy-cofd:
+    needs: build-attested-image
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      SERVICE_ID: ${{ secrets.COFD_SERVICE_ID }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+    steps:
+      - name: Deploy new image
+        run: railway redeploy -y --service ${{ env.SERVICE_ID }}
