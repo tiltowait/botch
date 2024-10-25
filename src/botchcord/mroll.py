@@ -11,15 +11,15 @@ from core.characters import Character
 async def mroll(
     ctx: bot.AppCtx,
     macro_name: str,
-    diff_override: int | None,
+    target_override: int | None,
+    use_wp: bool,
+    rote_override: bool,
     comment_override: str | None,
     character: str | None,
-    use_wp=False,
-    rote_override=False,
 ):
     """Perform a macro roll.
 
-    The user can override the default difficulty with diff_override,
+    The user can override the default difficulty with target_override,
     and the default comment with comment_override."""
     haven = Haven(ctx, GAME_LINE, None, character, filter=lambda c: has_macro(c, macro_name))
 
@@ -27,12 +27,11 @@ async def mroll(
     macro = char.find_macro(macro_name)
     assert macro is not None  # Guaranteed
 
-    difficulty = diff_override or macro.target
+    difficulty = target_override or macro.target
     comment = comment_override or macro.comment
     rote = rote_override or macro.rote
 
     try:
-        print(difficulty)
         await botchcord.roll.roll(ctx, macro.key_str, difficulty, None, comment, char, use_wp, rote)
     except errors.RollError:
         await ctx.send_error(

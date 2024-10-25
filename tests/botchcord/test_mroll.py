@@ -23,7 +23,7 @@ def char(character: Character) -> Character:
 
 async def test_macro_not_found(ctx, char):
     with pytest.raises(errors.NoMatchingCharacter):
-        await mroll(ctx, "fake", None, None, char)
+        await mroll(ctx, "fake", None, False, False, None, char)
 
 
 @pytest.mark.parametrize(
@@ -44,7 +44,7 @@ async def test_mroll(
     macro = char.macros[0]
     diff = diff or macro.target
     comment = comment or macro.comment
-    await mroll(ctx, macro.name, diff, comment, char)  # type: ignore
+    await mroll(ctx, macro.name, diff, False, False, comment, char)  # type: ignore
 
     roll_mock.assert_awaited_once_with(ctx, macro.key_str, diff, None, comment, char, False, False)
 
@@ -53,7 +53,7 @@ async def test_mroll(
 async def test_mroll_no_mock(mock_roll_save: AsyncMock, ctx: AppCtx, char: Character):
     await char.save()
     macro = char.macros[0]
-    await mroll(ctx, macro.name, None, None, char)  # type: ignore
+    await mroll(ctx, macro.name, None, False, False, None, char)  # type: ignore
     ctx.respond.assert_awaited_once_with(embed=ANY)
     mock_roll_save.assert_awaited_once()
 
@@ -63,7 +63,7 @@ async def test_mroll_specs(mock_roll_save: AsyncMock, ctx: AppCtx, char: Charact
     char.add_subtraits("Brawl", ["Grappling"])
     macro = create_macro(char, "specs", "str+b.g", 6, None)
     char.add_macro(macro)
-    await mroll(ctx, macro.name, None, None, char)  # type: ignore
+    await mroll(ctx, macro.name, False, False, None, None, char)  # type: ignore
 
     ctx.respond.assert_awaited_once_with(embed=ANY)
     mock_roll_save.assert_awaited_once()  # This is our proof it rolled
@@ -71,5 +71,5 @@ async def test_mroll_specs(mock_roll_save: AsyncMock, ctx: AppCtx, char: Charact
 
 async def test_mroll_missing_trait(ctx: AppCtx, char: Character):
     char.remove_trait("Brawl")
-    await mroll(ctx, char.macros[0].name, None, None, char)  # type: ignore
+    await mroll(ctx, char.macros[0].name, None, False, False, None, char)  # type: ignore
     ctx.send_error.assert_awaited_once_with("Error", ANY)

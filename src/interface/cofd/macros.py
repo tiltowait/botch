@@ -63,12 +63,12 @@ class MacrosCog(Cog, name="CofD macro commands"):
         required=False,
     )
     @option("rote", description="Override the Rote quality", default=False)
-    @option("comment", description="Override the default comment", required=False)
     @option(
         "use_wp",
         description="Override the macro to use WP",
         default=False,
     )
+    @option("comment", description="Override the default comment", required=False)
     @options.character("The character performing the roll")
     async def mroll(
         self,
@@ -76,12 +76,12 @@ class MacrosCog(Cog, name="CofD macro commands"):
         name: str,
         again: int,
         rote: bool,
-        comment: str,
         use_wp: bool,
+        comment: str,
         character: str,
     ):
         """Roll using a macro."""
-        await botchcord.mroll(ctx, name, again, comment, character, use_wp, rote)
+        await botchcord.mroll(ctx, name, again, use_wp, rote, comment, character)
 
 
 def setup(bot: BotchBot):
