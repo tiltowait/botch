@@ -19,6 +19,11 @@ class BasicCog(Cog, name="Basic CofD Commands"):
 
     @slash_command()
     @option("pool", description="The dice pool. May be a number or trait + attribute equation")
+    @option(
+        "use_wp",
+        description="Use WP on the roll. Can also add + WP to your pool",
+        default=False,
+    )
     @option("again", description="The number at which dice explode", choices=[10, 9, 8], default=10)
     @option(
         "specialty",
@@ -32,25 +37,20 @@ class BasicCog(Cog, name="Basic CofD Commands"):
         required=False,
         max_length=300,
     )
-    @option(
-        "use_wp",
-        description="Use WP on the roll. Can also add + WP to your pool",
-        default=False,
-    )
     @options.character("[Optional] The character performing the roll")
     async def roll(
         self,
         ctx: AppCtx,
         pool: str,
+        use_wp: bool,
         again: int,
         rote: bool,
         specialty: str,
         comment: str,
-        use_wp: bool,
         character: str,
     ):
         """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
-        await botchcord.roll.roll(ctx, pool, again, specialty, comment, character, use_wp, rote)
+        await botchcord.roll.roll(ctx, pool, again, specialty, use_wp, rote, comment, character)
 
     @slash_command()
     async def chance(self, ctx: AppCtx):

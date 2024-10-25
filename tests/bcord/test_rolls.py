@@ -242,7 +242,7 @@ def test_build_embed_rote_again():
 )
 def test_wod_text_embed_with_character(
     title: str,
-    pool: list[str],
+    pool: list[str | int],
     target: int,
     spec: list[str],
     comment: str,
@@ -288,6 +288,7 @@ def test_wod_text_embed_with_character(
         i += 1
     if roll.uses_traits:
         assert embed.fields[i].name == "Pool"
+        assert roll.pool
         assert embed.fields[i].value == " ".join(map(str, roll.pool))
 
     if comment:
@@ -399,13 +400,13 @@ async def test_roll_command(
     if raises:
         if char is None or char == wod_vampire.name:
             with pytest.raises(errors.RollError):
-                await roll_cmd(ctx, pool, 6, specs, None, char)
+                await roll_cmd(ctx, pool, 6, specs, False, False, None, char)
         else:
             with pytest.raises(errors.CharacterNotFound):
-                await roll_cmd(ctx, pool, 6, specs, None, char)
+                await roll_cmd(ctx, pool, 6, specs, False, False, None, char)
 
     else:
-        await roll_cmd(ctx, pool, 6, specs, None, char)
+        await roll_cmd(ctx, pool, 6, specs, False, False, None, char)
         ctx.respond.assert_called_once_with(embed=ANY)
 
 

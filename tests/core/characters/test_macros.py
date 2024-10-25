@@ -11,7 +11,7 @@ mc = partial(
     Macro,
     pool=["Strength", "+", "Brawl", "-", 1],
     keys=["Strength", "+", "Brawl", "-", 1],
-    difficulty=6,
+    target=6,
     rote=False,
     hunt=False,
     comment=None,

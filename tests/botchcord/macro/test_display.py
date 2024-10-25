@@ -19,7 +19,7 @@ def macro() -> Macro:
         name="punch",
         pool=["Strength", "+", "Brawl"],
         keys=["Strength", "+", "Brawl"],
-        difficulty=6,
+        target=6,
         rote=False,
         hunt=False,
         comment="Punch a guy",
@@ -40,7 +40,7 @@ def test_create_macro_entry(macro: Macro):
     lines = [
         f"### {macro.name}",
         f"**Pool:** {m(macro.pool_str)}",
-        f"**Difficulty:** {macro.difficulty}",
+        f"**Difficulty:** {macro.target}",
         i(macro.comment),
     ]
     assert entry == "\n".join(lines)

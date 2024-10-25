@@ -49,7 +49,7 @@ def create_macro_entry(macro: Macro) -> str:
     lines = [
         f"### {macro.name}",
         f"**Pool:** {m(macro.pool_str)}",
-        f"**{target}:** {macro.difficulty}",
+        f"**{target}:** {macro.target}",
     ]
     if is_cofd:
         lines.append(f"**Rote:** {'Yes' if macro.rote else 'No'}")
