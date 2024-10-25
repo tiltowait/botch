@@ -46,7 +46,7 @@ async def test_mroll(
     comment = comment or macro.comment
     await mroll(ctx, macro.name, diff, False, False, comment, char)  # type: ignore
 
-    roll_mock.assert_awaited_once_with(ctx, macro.key_str, diff, None, comment, char, False, False)
+    roll_mock.assert_awaited_once_with(ctx, macro.key_str, diff, None, False, False, comment, char)
 
 
 @patch("botchcord.roll.Roll.save", new_callable=AsyncMock)

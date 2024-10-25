@@ -21,6 +21,11 @@ class BasicCog(Cog, name="Basic WoD Commands"):
     @option("pool", description="The dice pool. May be a number or trait + attribute equation")
     @options.promoted_choice("difficulty", "The roll's difficulty", start=2, end=10, first=6)
     @option(
+        "use_wp",
+        description="Use WP on the roll. Can also add + WP to your pool",
+        default=False,
+    )
+    @option(
         "specialty",
         description="A specialty to apply to the roll. You may also use trait.spec syntax in pool.",
         required=False,
@@ -31,24 +36,21 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         required=False,
         max_length=300,
     )
-    @option(
-        "use_wp",
-        description="Use WP on the roll. Can also add + WP to your pool",
-        default=False,
-    )
     @options.character("[Optional] The character performing the roll")
     async def roll(
         self,
         ctx: AppCtx,
         pool: str,
         difficulty: int,
+        use_wp: bool,
         specialty: str,
         comment: str,
-        use_wp: bool,
         character: str,
     ):
         """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
-        await botchcord.roll.roll(ctx, pool, difficulty, specialty, comment, character, use_wp)
+        await botchcord.roll.roll(
+            ctx, pool, difficulty, specialty, use_wp, False, comment, character
+        )
 
 
 def setup(bot: BotchBot):

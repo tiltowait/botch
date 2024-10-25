@@ -40,12 +40,12 @@ def add_wp(pool: str) -> str:
 async def roll(
     ctx: bot.AppCtx,
     pool: str,
-    difficulty: int,
+    target: int,
     specialties: Optional[str],
+    wp: bool,
+    rote: bool,
     comment: Optional[str],
     character: Optional[str | Character],
-    wp=False,
-    rote=False,
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
     if wp:
@@ -63,7 +63,7 @@ async def roll(
             raise errors.RollError(f"No characters able to roll `{pool}`.")
 
     rp.parse()
-    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, difficulty, GAME_LINE, rote).roll()
+    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, target, GAME_LINE, rote).roll()
 
     extra_specs = []
     if specialties:

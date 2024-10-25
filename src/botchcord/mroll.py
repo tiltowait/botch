@@ -32,7 +32,7 @@ async def mroll(
     rote = rote_override or macro.rote
 
     try:
-        await botchcord.roll.roll(ctx, macro.key_str, difficulty, None, comment, char, use_wp, rote)
+        await botchcord.roll.roll(ctx, macro.key_str, difficulty, None, use_wp, rote, comment, char)
     except errors.RollError:
         await ctx.send_error(
             "Error",
