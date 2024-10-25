@@ -100,7 +100,7 @@ class Macro(BaseModel):
     name: str = Field(max_length=20)
     pool: list[str | int]
     keys: list[str | int]
-    difficulty: int = Field(ge=2, le=10)
+    target: int = Field(ge=2, le=10)
     rote: bool
     hunt: bool
     comment: Optional[str]

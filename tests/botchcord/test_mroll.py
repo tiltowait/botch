@@ -42,7 +42,7 @@ async def test_mroll(
     comment: str | None,
 ):
     macro = char.macros[0]
-    diff = diff or macro.difficulty
+    diff = diff or macro.target
     comment = comment or macro.comment
     await mroll(ctx, macro.name, diff, comment, char)  # type: ignore
 

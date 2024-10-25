@@ -68,7 +68,7 @@ def create_macro(
         name=name,
         pool=rpp.pool,
         keys=rpk.pool,
-        difficulty=diff,
+        target=diff,
         rote=rote,
         hunt=False,
         comment=comment,

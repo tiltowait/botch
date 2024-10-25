@@ -27,7 +27,7 @@ async def mroll(
     macro = char.find_macro(macro_name)
     assert macro is not None  # Guaranteed
 
-    difficulty = diff_override or macro.difficulty
+    difficulty = diff_override or macro.target
     comment = comment_override or macro.comment
     rote = rote_override or macro.rote
 

@@ -41,7 +41,7 @@ def test_create_macro(char):
     macro = create_macro(char, "punch", "str+b", 6, "punch a guy")
     assert macro.name == "punch"
     assert macro.pool == ["Strength", "+", "Brawl"]
-    assert macro.difficulty == 6
+    assert macro.target == 6
     assert macro.comment == "punch a guy"
 
 
@@ -90,5 +90,5 @@ async def test_create_cmd(
         assert macro is not None
         assert macro.name == "test"
         assert macro.pool_str == pool
-        assert macro.difficulty == 7
+        assert macro.target == 7
         assert macro.comment is None
