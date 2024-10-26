@@ -52,7 +52,7 @@ class HelpCog(Cog, name="Help"):
 
     @slash_command(name="help")
     async def help_command(self, ctx: AppCtx):
-        """View command help. It's ... what you're looking at right now."""
+        """See descriptions of the different available commands."""
         page_groups = [PageGroup(pages=[self.quickref], label="Quick reference")]
         for cog_name, cog in sorted(self.bot.cogs.items()):
             embeds = self._generate_cog_embeds(cog)
