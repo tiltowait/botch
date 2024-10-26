@@ -25,24 +25,24 @@ class Vampire(Mortal):
         """Reduce blood, to a minimum of 0."""
         self.blood_pool = max(0, self.blood_pool - count)
 
-    def increment_max_bp(self):
+    def increment_max_blood(self):
         """Increase max BP by 1."""
         if self.max_bp < 50:
             self.max_bp += 1
 
-    def decrement_max_bp(self):
+    def decrement_max_blood(self):
         """Decrease max BP by 1."""
         if self.max_bp > 1:
             self.max_bp -= 1
             self.blood_pool = min(self.blood_pool, self.max_bp)
 
-    def lower_generation(self):
+    def lower_potency(self):
         """Lower generation by 1, adjusting max BP to fit."""
         if self.generation > 3:
             self.generation -= 1
             self.max_bp = max_vtm_bp(self.generation)
 
-    def raise_generation(self):
+    def raise_potency(self):
         """Increase generation by 1, adjusting max BP to fit."""
         if self.generation < 15:
             self.generation += 1

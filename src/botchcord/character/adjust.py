@@ -11,8 +11,7 @@ import bot
 import botchcord.settings
 from botchcord.character.display import DisplayField, build_embed
 from botchcord.haven import haven
-from core.characters import Character, Damage, Tracker
-from core.characters.wod import Vampire
+from core.characters import Character, Damage, GameLine, Tracker, cofd, wod
 
 __all__ = (
     "Adjuster",
@@ -20,8 +19,10 @@ __all__ = (
     "HealthAdjuster",
     "Toggler",
     "WillpowerAdjuster",
-    "WoDVampAdjuster",
+    "VampAdjuster",
 )
+
+VampireType = wod.Vampire | cofd.Vampire
 
 
 @haven()
@@ -48,8 +49,8 @@ class Toggler(View):
         self.add_adjuster("Adjust: Willpower", WillpowerAdjuster)
         self.add_adjuster(f"Adjust: {char.grounding.path}", GroundingAdjuster)
 
-        if self.character.has_blood_pool:
-            self.add_adjuster("Adjust: Vampirism", WoDVampAdjuster)
+        if isinstance(char, VampireType):
+            self.add_adjuster("Adjust: Vampirism", VampAdjuster)
 
     def _populate_menu(self, adjuster: "Adjuster"):
         """Populate the menu."""
@@ -103,9 +104,12 @@ class Toggler(View):
             DisplayField.WILLPOWER,
             DisplayField.GROUNDING,
         ]
-        if self.character.has_blood_pool:
+        if isinstance(self.character, wod.Vampire):
             fields.append(DisplayField.BLOOD_POOL)
             fields.append(DisplayField.GENERATION)
+        elif isinstance(self.character, cofd.Vampire):
+            fields.append(DisplayField.VITAE)
+            fields.append(DisplayField.BLOOD_POTENCY)
         return build_embed(self.ctx.bot, self.character, use_emojis, fields=tuple(fields))
 
     async def on_timeout(self):
@@ -283,19 +287,46 @@ class GroundingAdjuster(Adjuster):
         await super().callback(interaction)
 
 
-class WoDVampAdjuster(Adjuster):
+class VampAdjuster(Adjuster):
     """Adjust character blood pool. This might be expandable to adjusting
     special attributes--BP, Rage, Pillars, etc."""
 
-    character: Vampire
+    character: VampireType
+
+    @property
+    def is_cofd(self) -> bool:
+        return self.character.line == GameLine.COFD
 
     def _populate(self):
         colors = dict(dec_color=ButtonStyle.danger, inc_color=ButtonStyle.success)
-        self.add_stepper(1, "Blood Pool", **colors)
-        self.add_stepper(2, "Max Blood Pool", **colors)
-        self.add_stepper(3, "Generation")
+        if self.is_cofd:
+            current_blood = "Vitae"
+            max_blood = "Max Vitae"
+            potency = "Blood Potency"
+        else:
+            current_blood = "Blood Pool"
+            max_blood = "Max Blood Pool"
+            potency = "Generation"
+
+        self.add_stepper(1, current_blood, **colors)
+        self.add_stepper(2, max_blood, **colors)
+        self.add_stepper(3, potency)
 
     def _update_buttons(self):
+        if self.is_cofd:
+            self._update_buttons_cofd()
+        else:
+            self._update_buttons_wod()
+
+    def _update_buttons_cofd(self):
+        self.buttons[0].disabled = self.character.vitae == 0
+        self.buttons[2].disabled = self.character.vitae == self.character.max_vitae
+        self.buttons[3].disabled = self.character.max_vitae == 1
+        self.buttons[5].disabled = self.character.max_vitae == 75
+        self.buttons[6].disabled = self.character.blood_potency == 0
+        self.buttons[8].disabled = self.character.blood_potency == 10
+
+    def _update_buttons_wod(self):
         self.buttons[0].disabled = self.character.blood_pool == 0
         self.buttons[2].disabled = self.character.blood_pool == self.character.max_bp
         self.buttons[3].disabled = self.character.max_bp == 1
@@ -314,13 +345,13 @@ class WoDVampAdjuster(Adjuster):
                 self.character.add_blood(1)
             # Max BP
             case 3:
-                self.character.decrement_max_bp()
+                self.character.decrement_max_blood()
             case 5:
-                self.character.increment_max_bp()
+                self.character.increment_max_blood()
             # Generation
             case 6:
-                self.character.lower_generation()
+                self.character.lower_potency()
             case 8:
-                self.character.raise_generation()
+                self.character.raise_potency()
 
         await super().callback(interaction)
