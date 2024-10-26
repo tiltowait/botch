@@ -21,7 +21,7 @@ class MiscCog(Cog, name="Miscellaneous"):
     @slash_command()
     async def info(self, ctx: AppCtx):
         """View bot information."""
-        embed = discord.Embed(title="Botch", description=f"**Version:** {m(VERSION)}")
+        embed = discord.Embed(title=ctx.bot.user.name, description=f"**Version:** {m(VERSION)}")
         await ctx.respond(embed=embed)
 
     @slash_command(name="coin")
