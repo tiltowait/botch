@@ -9,10 +9,9 @@ from bot import AppCtx, BotchBot
 from botchcord import options
 
 
-class BasicCog(Cog, name="Basic CofD Commands"):
-    """The "Basic" cog contains non-help commands usable by anyone without a
-    character in the bot (though some commands have enhanced functionality if
-    the user has a character)."""
+class BasicCog(Cog, name="Basic"):
+    """These commands are available to any user, whether you have a character\
+    or not."""
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
@@ -49,7 +48,7 @@ class BasicCog(Cog, name="Basic CofD Commands"):
         comment: str,
         character: str,
     ):
-        """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
+        """Roll the dice! If you have a character, `pool` can be traits (e.g. `Strength + Brawl`)."""
         await botchcord.roll.roll(ctx, pool, again, specialty, use_wp, rote, comment, character)
 
     @slash_command()

@@ -9,8 +9,17 @@ from bot import AppCtx, BotchBot
 from botchcord import options
 
 
-class MacrosCog(Cog, name="CofD macro commands"):
-    """Macro creation, review, updating, and deletion for CofD characters."""
+class MacrosCog(Cog, name="Macros"):
+    """Macros are shortcuts for your most commonly used rolls. For instance,\
+    if you often roll `Wits + Composure`, you can create a macro called\
+    `perception` that rolls those traits. You can also specify a comment to\
+    apply to all invocations, set the `rote` quality, and give it 9-again or\
+    8-again.
+
+    Macros are per-character, so you can have multiple macros by the same\
+    name if they're all under different characters. However, if you use unique\
+    names, then `BOT`'s automatic filtering system won't prompt you to ask\
+    which character is rolling."""
 
     macro = SlashCommandGroup(
         "macro",
