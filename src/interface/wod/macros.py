@@ -1,4 +1,4 @@
-"""Macro command cog."""
+"""Macro command interface."""
 
 import discord
 from discord import SlashCommandGroup, option, slash_command
@@ -9,8 +9,16 @@ from bot import AppCtx, BotchBot
 from botchcord import options
 
 
-class MacrosCog(Cog, name="Macro commands"):
-    """Macro creation, review, updating, and deletion."""
+class MacrosCog(Cog, name="Macros"):
+    """Macros are shortcuts for your most commonly used rolls. For instance,\
+    if you often roll `Perception + Alertness`, you can create a macro called\
+    `spot` that rolls those traits, at a difficulty you specify, and even\
+    with a predefined comment!
+
+    Macros are per-character, so you can have multiple macros by the same\
+    name if they're all under different characters. However, if you use unique\
+    names, then `BOT`'s automatic filtering system won't prompt you to ask\
+    which character is rolling."""
 
     macro = SlashCommandGroup(
         "macro",
@@ -38,20 +46,20 @@ class MacrosCog(Cog, name="Macro commands"):
         comment: str,
         character: str,
     ):
-        """Create a macro."""
+        """Create a macro. Avoid using Willpower in the pool; you can always add it when rolling."""
         await botchcord.macro.create(ctx, character, name, pool, difficulty, comment)
 
     @macro.command(name="list")
     @options.character("The character whose macros to display")
     async def display_macros(self, ctx: AppCtx, character: str):
-        """Display a character's macros."""
+        """List your macros."""
         await botchcord.macro.display(ctx, character)
 
     @macro.command(name="delete")
     @option("macro_name", description="The name of the macro to delete")
     @options.character("The character with the macro to delete")
     async def delete_macro(self, ctx: AppCtx, macro_name: str, character: str):
-        """Delete a macro from a character."""
+        """Remove a macro."""
         await botchcord.macro.delete(ctx, character, macro_name)
 
     @slash_command()
@@ -80,7 +88,8 @@ class MacrosCog(Cog, name="Macro commands"):
         comment: str,
         character: str,
     ):
-        """Roll using a macro."""
+        """Roll using a macro. Allows for overriding the difficulty, comment,\
+        and using Willpower."""
         await botchcord.mroll(ctx, name, difficulty, use_wp, False, comment, character)
 
 
