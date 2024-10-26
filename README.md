@@ -9,13 +9,13 @@
 
 # Botch
 
-Botch is a WIP Discord bot for playing Vampire: The Masquerade (V20) games. It features a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
+Botch is a pair of Discord bots (called Botch and Beat) for playing *Vampire: The Masquerade* and *Vampire: The Requiem* games over Discord. They feature a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
 
-Botch is being designed from the ground up to be modular and extensible, meaning it can eventually expand to other World of Darkness—and Chronicles of Darkness!—game lines, depending on community interest.
+Botch is being designed from the ground up to be modular and extensible, meaning it can eventually expand to other World/Chronicles of Darkness game lines, depending on community and personal interest.
 
 ## Current status
 
-Botch is currently in private beta available to supporters. After a short testing period, it will open to all users on The Second City (link above). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
+Botch is currently in beta on the [official server](https://discord.gg/QHnCdSPeEE). After a short testing period, it will open to all users on The Second City (link above). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
 
 **Need a bot now?** Check out [[Tzimisce]](https://tzimisce.app) for a basic X20 Wod/CofD dice bot without character tracking features. Or add [Inconnu](https://inconnu.app) for a fully-featured V5 dice bot and character manager.
 
@@ -37,6 +37,6 @@ Inconnu's a far more advanced bot than [Tzimisce], and it has many of the featur
 
 Why Botch? Botches are bad! Yes, they are. Over the years, many users have contacted me to complain that botch too often. In reality, it's just confirmation bias at work: you remember the bad rolls more strongly than you remember the good rolls. It's human nature. In actuality, a good PRNG (programmable random number generator), like these bots use, is more random than any set of dice you'll buy at your FLGS.
 
-### Will it support <insert game here>?
+### Will it support `X`?
 
 If your hypothetical game is a WoD20 or CofD 2E game, then: Maybe!
