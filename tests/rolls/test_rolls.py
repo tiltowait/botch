@@ -42,6 +42,39 @@ def test_cofd_explosions():
 
 
 @pytest.mark.parametrize(
+    "line,dice,specs,wp,expected",
+    [
+        # None of the options should change WoD readout
+        (GameLine.WOD, [5] * 5, None, False, "5"),
+        (GameLine.WOD, [5] * 5, ["a"], False, "5"),
+        (GameLine.WOD, [5] * 5, None, True, "5"),
+        (GameLine.COFD, [5] * 5, None, False, "5"),
+        (GameLine.COFD, [5] * 6, None, False, "5 *+ [1]*"),
+        (GameLine.COFD, [5] * 9, None, True, "5 *+ [1]* *+ WP*"),
+        (GameLine.COFD, [5] * 8, None, True, "5 *+ WP*"),
+        (GameLine.COFD, [5] * 6, ["a"], False, "6"),
+        (GameLine.COFD, [5] * 7, ["a"], False, "6 *+ [1]*"),
+        (GameLine.COFD, [5] * 9, ["a"], True, "6 *+ WP*"),
+        (GameLine.COFD, [5] * 10, ["a"], True, "6 *+ [1]* *+ WP*"),
+    ],
+)
+def test_dice_readout(
+    line: GameLine, dice: list[int], specs: list[str] | None, wp: bool, expected: str
+):
+    roll = Roll(
+        line=line,
+        guild=0,
+        user=0,
+        num_dice=5,
+        target=10,
+        specialties=specs,
+        dice=dice,
+        wp=wp,
+    )
+    assert roll.dice_readout == expected
+
+
+@pytest.mark.parametrize(
     "difficulty,expected,wp,specialties",
     [
         (2, 14, False, None),

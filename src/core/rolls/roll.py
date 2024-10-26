@@ -169,13 +169,16 @@ class Roll(Document):
     @property
     def dice_readout(self) -> str:
         """Just the number of dice if WoD, or dice + WP if CofD and WP in use."""
-        readout = str(self.num_dice)
-        if self.line == GameLine.COFD:
-            explosions = len(self.dice) - self.num_dice
+        if self.line == GameLine.WOD:
+            readout = str(self.num_dice)
+        elif self.line == GameLine.COFD:
+            base_dice = self.num_dice + 1 if self.specialties else self.num_dice
+            readout = str(base_dice)
+            explosions = len(self.dice) - base_dice
             if self.wp:
                 explosions -= 3
             if explosions > 0:
-                readout += f" *+ {explosions}*"
+                readout += f" *+ [{explosions}]*"
             if self.wp:
                 readout += " *+ WP*"
 
