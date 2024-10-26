@@ -46,7 +46,11 @@ class HelpCog(Cog, name="Help"):
         commands.sort(key=lambda c: c.qualified_name)
 
         entries = map(self._generate_command_entry, commands)
-        embed = discord.Embed(title=cog.qualified_name, description=cog.description)
+        if self.bot.user:
+            description = cog.description.replace("`BOT`", self.bot.user.name)
+        else:
+            description = cog.description
+        embed = discord.Embed(title=cog.qualified_name, description=description)
         embed.add_field(name="Commands", value="\n".join(entries))
 
         return [embed]
