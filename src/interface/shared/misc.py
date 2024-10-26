@@ -10,7 +10,6 @@ from discord.ext.commands import Cog
 from bot import AppCtx, BotchBot
 from botchcord.utils.text import m
 from config import VERSION
-from core.rolls import Roll
 
 
 class MiscCog(Cog, name="Miscellaneous"):
