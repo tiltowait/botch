@@ -1,5 +1,7 @@
 """Help interface."""
 
+from typing import cast
+
 import discord
 from discord import slash_command
 from discord.cog import Cog
@@ -17,10 +19,41 @@ class HelpCog(Cog, name="Help"):
     def __init__(self, bot: BotchBot):
         self.bot = bot
 
+    @property
+    def quickref(self):
+        """A "quick start" help page with the most common commands."""
+        embed = discord.Embed(
+            title="Quick reference",
+            description="The following commands are the most commonly used. Use the menu at the bottom to see information on all commands.",
+        )
+
+        entries = []
+        cmds = [
+            "roll",
+            "",
+            "character wizard",
+            "character display",
+            "character adjust",
+            "",
+            "traits list",
+            "traits assign",
+        ]
+        for cmd in cmds:
+            if cmd:
+                command = cast(SlashCommand, self.bot.get_command(cmd))
+                entries.append(self._generate_command_entry(command))
+            else:
+                entries.append("")  # Separator
+
+        embed.add_field(name="Commands", value="\n".join(entries))
+        embed.set_footer(text="You can click a command to paste it in your chat box.")
+
+        return Page(embeds=[embed])
+
     @slash_command(name="help")
     async def help_command(self, ctx: AppCtx):
         """View command help. It's ... what you're looking at right now."""
-        page_groups = []
+        page_groups = [PageGroup(pages=[self.quickref], label="Quick reference")]
         for cog_name, cog in sorted(self.bot.cogs.items()):
             embeds = self._generate_cog_embeds(cog)
             if embeds is None:
@@ -32,6 +65,7 @@ class HelpCog(Cog, name="Help"):
             pages=page_groups,
             disable_on_timeout=True,
             show_menu=True,
+            menu_placeholder="Select help section",
             use_default_buttons=False,
         )
         await paginator.respond(ctx.interaction, ephemeral=True)
@@ -52,6 +86,7 @@ class HelpCog(Cog, name="Help"):
             description = cog.description
         embed = discord.Embed(title=cog.qualified_name, description=description)
         embed.add_field(name="Commands", value="\n".join(entries))
+        embed.set_footer(text="You can click a command to paste it in your chat box.")
 
         return [embed]
 
