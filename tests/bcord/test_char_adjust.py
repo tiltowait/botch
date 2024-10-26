@@ -13,14 +13,15 @@ from botchcord.character.adjust import (
     GroundingAdjuster,
     HealthAdjuster,
     Toggler,
+    VampAdjuster,
     WillpowerAdjuster,
-    WoDVampAdjuster,
     adjust,
 )
-from core.characters import Character, GameLine, Splat
-from core.characters.wod import Vampire
+from core.characters import Character, GameLine, Splat, cofd, wod
 from tests.characters import gen_char
-from utils import max_vtm_bp
+from utils import max_vtm_bp, max_vtr_vitae
+
+VampireType = wod.Vampire | cofd.Vampire
 
 
 @pytest.fixture(autouse=True)
@@ -30,8 +31,9 @@ def mock_char_save():
 
 
 @pytest.fixture(autouse=True)
-def mock_toggler_embed():
-    with patch("botchcord.character.adjust.build_embed") as mocked:
+def mock_use_emojis():
+    with patch("botchcord.settings.use_emojis", new_callable=AsyncMock) as mocked:
+        mocked.return_value = False
         yield mocked
 
 
@@ -41,16 +43,33 @@ def char(request) -> Character:
 
 
 @pytest.fixture
-def vamp() -> Vampire:
+def vamp() -> wod.Vampire:
     return gen_char(
         GameLine.WOD,
         Splat.VAMPIRE,
-        Vampire,
+        wod.Vampire,
         generation=13,
         max_bp=10,
         blood_pool=5,
         virtues=[],
     )
+
+
+@pytest.fixture
+def cvamp() -> cofd.Vampire:
+    return gen_char(
+        GameLine.COFD,
+        Splat.VAMPIRE,
+        cofd.Vampire,
+        blood_potency=2,
+        max_vitae=10,
+        vitae=5,
+    )
+
+
+@pytest.fixture(params=["vamp", "cvamp"])
+def avamp(request: pytest.FixtureRequest) -> VampireType:
+    return request.getfixturevalue(request.param)
 
 
 @pytest.fixture
@@ -61,7 +80,7 @@ def ctx() -> AppCtx:
 
 
 @pytest.fixture
-async def toggler(ctx: AppCtx, vamp: Vampire) -> Toggler:
+async def toggler(ctx: AppCtx, vamp: wod.Vampire) -> Toggler:
     with patch("bot.AppCtx.edit", new_callable=AsyncMock):
         toggler = Toggler(ctx, vamp)
         return toggler
@@ -214,13 +233,16 @@ async def test_grounding_adjuster(idx: int, count: int, expected: int, toggler: 
         (8, 10, (15, max_vtm_bp(15))),
     ],
 )
-# @patch("botchcord.character.adjust.Toggler._embed")
 async def test_wod_vamp_adjuster(
-    idx: int, count: int, expected: int | tuple[int, ...], ctx: AppCtx, vamp: Vampire
+    idx: int,
+    count: int,
+    expected: int | tuple[int, ...],
+    ctx: AppCtx,
+    vamp: wod.Vampire,
 ):
     toggler = Toggler(ctx, vamp)
     adjuster = toggler.adjusters[3]
-    assert isinstance(adjuster, WoDVampAdjuster)
+    assert isinstance(adjuster, VampAdjuster)
 
     inter = AsyncMock()
     inter.custom_id = adjuster.buttons[idx].custom_id
@@ -249,6 +271,69 @@ async def test_wod_vamp_adjuster(
 
 
 @pytest.mark.parametrize(
+    "idx,count,expected",
+    [
+        (0, 1, 4),
+        (0, 2, 3),
+        (0, 3, 2),
+        (0, 4, 1),
+        (0, 5, 0),
+        (0, 6, 0),
+        (2, 1, 6),
+        (2, 2, 7),
+        (2, 3, 8),
+        (2, 4, 9),
+        (2, 5, 10),
+        (2, 6, 10),
+        (3, 1, (9, 5)),
+        (3, 6, (4, 4)),
+        (3, 10, (1, 1)),
+        (5, 1, (11, 5)),
+        (5, 100, (50, 5)),
+        (6, 1, (1, max_vtr_vitae(1))),
+        (6, 6, (0, max_vtr_vitae(0))),
+        (8, 1, (3, max_vtr_vitae(3))),
+        (8, 10, (10, max_vtr_vitae(10))),
+    ],
+)
+async def test_cofd_vamp_adjuster(
+    ctx: AppCtx,
+    cvamp: cofd.Vampire,
+    idx: int,
+    count: int,
+    expected: int | tuple[int, ...],
+):
+    toggler = Toggler(ctx, cvamp)
+    adjuster = toggler.adjusters[3]
+    assert isinstance(adjuster, VampAdjuster)
+
+    inter = AsyncMock()
+    inter.custom_id = adjuster.buttons[idx].custom_id
+
+    for _ in range(count):
+        await adjuster.callback(inter)
+
+    match idx:
+        case 0 | 2:
+            assert cvamp.vitae == expected
+        case 3 | 5:
+            assert isinstance(expected, tuple)
+            mbp, bp = expected
+            assert cvamp.max_vitae == mbp
+            assert cvamp.vitae == bp
+        case 6 | 8:
+            assert isinstance(expected, tuple)
+            gen, mbp = expected
+            assert cvamp.blood_potency == gen
+            assert cvamp.max_vitae == mbp
+
+    assert toggler.ctx.edit.await_count == count
+    assert inter.response.edit_message.await_count == count
+    inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
+    assert toggler.character.save.await_count == count
+
+
+@pytest.mark.parametrize(
     "cls,track,expected",
     [
         (HealthAdjuster, "....", {0: True, 2: False, 3: True, 5: False, 6: True, 8: False}),
@@ -265,17 +350,17 @@ async def test_wod_vamp_adjuster(
         (GroundingAdjuster, 0, {0: True, 2: False}),
         (GroundingAdjuster, 10, {0: False, 2: True}),
         (
-            WoDVampAdjuster,
+            VampAdjuster,
             (5, 10, 10),
             {0: False, 2: False, 3: False, 5: False, 6: False, 8: False},
         ),
-        (WoDVampAdjuster, (0, 1, 3), {0: True, 2: False, 3: True, 5: False, 6: True, 8: False}),
-        (WoDVampAdjuster, (10, 10, 15), {0: False, 2: True, 3: False, 5: False, 6: False, 8: True}),
-        (WoDVampAdjuster, (10, 50, 3), {0: False, 2: False, 3: False, 5: True, 6: True, 8: False}),
+        (VampAdjuster, (0, 1, 3), {0: True, 2: False, 3: True, 5: False, 6: True, 8: False}),
+        (VampAdjuster, (10, 10, 15), {0: False, 2: True, 3: False, 5: False, 6: False, 8: True}),
+        (VampAdjuster, (10, 50, 3), {0: False, 2: False, 3: False, 5: True, 6: True, 8: False}),
     ],
 )
 def test_adjuster_button_states(
-    vamp: Vampire,
+    vamp: wod.Vampire,
     cls: type[Adjuster],
     track: str | int | tuple[int, ...],
     expected: dict[int, bool],
@@ -287,7 +372,7 @@ def test_adjuster_button_states(
         vamp.willpower = cast(str, track)
     elif cls is GroundingAdjuster:
         vamp.grounding.rating = cast(int, track)
-    elif cls is WoDVampAdjuster:
+    elif cls is VampAdjuster:
         assert isinstance(track, tuple)
         bp, mbp, gen = track
         vamp.blood_pool = bp
@@ -301,9 +386,35 @@ def test_adjuster_button_states(
         assert adjuster.buttons[idx].disabled == state
 
 
+@pytest.mark.parametrize(
+    "vitae,max_vitae,potency,expected",
+    [
+        (0, 1, 0, {0: True, 2: False, 3: True, 5: False, 6: True, 8: False}),
+        (5, 10, 5, {0: False, 2: False, 3: False, 5: False, 6: False, 8: False}),
+        (75, 75, 10, {0: False, 2: True, 3: False, 5: True, 6: False, 8: True}),
+    ],
+)
+def test_vtr_button_states(
+    cvamp: cofd.Vampire,
+    vitae: int,
+    max_vitae: int,
+    potency: int,
+    expected: dict[int, bool],
+):
+    cvamp.vitae = vitae
+    cvamp.max_vitae = max_vitae
+    cvamp.blood_potency = potency
+
+    adjuster = VampAdjuster(AsyncMock(), cvamp)
+    for idx, state in expected.items():
+        assert adjuster.buttons[idx].disabled == state
+
+    pass
+
+
 @patch("bot.AppCtx.respond", new_callable=AsyncMock)
-async def test_adjust_command(mock_respond: AsyncMock, ctx: AppCtx, vamp: Vampire):
-    await adjust(ctx, vamp)
+async def test_adjust_command(mock_respond: AsyncMock, ctx: AppCtx, avamp: VampireType):
+    await adjust(ctx, avamp)
 
     assert mock_respond.await_count == 2
     mock_respond.assert_has_awaits([call(embed=ANY), call(view=ANY, ephemeral=True)])

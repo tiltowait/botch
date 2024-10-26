@@ -3,6 +3,7 @@
 from pydantic import Field
 
 from core.characters.base import Character, GameLine, Splat, Trait
+from utils import max_vtr_vitae
 
 
 class CofD(Character):
@@ -59,3 +60,43 @@ class Vampire(Mortal):
     blood_potency: int = Field(ge=1, le=10)
     vitae: int = Field(ge=0)
     max_vitae: int = Field(ge=1, le=75)
+
+    @property
+    def blood_pool(self) -> int:
+        return self.vitae
+
+    @property
+    def max_bp(self) -> int:
+        return self.max_vitae
+
+    def add_blood(self, count: int):
+        """Add blood, to a maximum of max_vitae."""
+        self.vitae = min(self.max_vitae, self.vitae + count)
+
+    def reduce_blood(self, count: int):
+        """Reduce blood, to a minimum of 0."""
+        self.vitae = max(0, self.vitae - count)
+
+    def increment_max_blood(self):
+        """Increase max BP by 1."""
+        if self.max_vitae < 50:
+            self.max_vitae += 1
+
+    def decrement_max_blood(self):
+        """Decrease max BP by 1."""
+        if self.max_vitae > 1:
+            self.max_vitae -= 1
+            self.vitae = min(self.vitae, self.max_vitae)
+
+    def lower_potency(self):
+        """Lower generation by 1, adjusting max BP to fit."""
+        if self.blood_potency > 0:
+            self.blood_potency -= 1
+            self.max_vitae = max_vtr_vitae(self.blood_potency)
+
+    def raise_potency(self):
+        """Increase generation by 1, adjusting max BP to fit."""
+        if self.blood_potency < 10:
+            self.blood_potency += 1
+            self.max_vitae = max_vtr_vitae(self.blood_potency)
+            self.vitae = min(self.vitae, self.max_vitae)
