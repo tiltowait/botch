@@ -7,12 +7,12 @@ from discord.ext.commands import Cog
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
+from core.rolls import Roll
 
 
-class BasicCog(Cog, name="Basic WoD Commands"):
-    """The "Basic" cog contains non-help commands usable by anyone without a
-    character in the bot (though some commands have enhanced functionality if
-    the user has a character)."""
+class BasicCog(Cog, name="Basic"):
+    """These commands are available to any user, whether you have a character\
+    or not."""
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
@@ -47,10 +47,30 @@ class BasicCog(Cog, name="Basic WoD Commands"):
         comment: str,
         character: str,
     ):
-        """Roll the dice! If you have a character, you can supply traits ("Strength + Brawl")."""
+        """Roll the dice! If you have a character, `pool` can be traits (e.g. `Strength + Brawl`)."""
         await botchcord.roll.roll(
-            ctx, pool, difficulty, specialty, use_wp, False, comment, character
+            ctx,
+            pool,
+            difficulty,
+            specialty,
+            use_wp,
+            False,
+            comment,
+            character,
         )
+
+    @slash_command()
+    async def botches(self, ctx: AppCtx):
+        """How many botches have you rolled?"""
+        rolls = await Roll.find(dict(guild=ctx.guild.id, user=ctx.user.id, botched=True)).to_list()
+        count = len(rolls)
+
+        if count == 1:
+            await ctx.respond(f"You've got **{count}** botch on this server 😆")
+        elif count > 1:
+            await ctx.respond(f"You've got **{count}** botches on this server 🤣🤣🤣")
+        else:
+            await ctx.respond("You haven't botched here yet. Good job, I guess 😔")
 
 
 def setup(bot: BotchBot):

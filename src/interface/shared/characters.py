@@ -19,7 +19,10 @@ else:
     ERAS = [OptionChoice("Modern", "vtr")]
 
 
-class CharactersCog(Cog, name="General character commands"):
+class CharactersCog(Cog, name="Character info and adjustment"):
+    """Commands for displaying and updating character status as well as images\
+    (premium users only)."""
+
     character = SlashCommandGroup(
         "character",
         "General character commands",
@@ -33,19 +36,19 @@ class CharactersCog(Cog, name="General character commands"):
     @character.command()
     @options.character("The character to display")
     async def display(self, ctx: AppCtx, character: str):
-        """Display a character."""
+        """Display one of your character's stats."""
         await botchcord.character.display(ctx, character)
 
     @character.command()
     @options.character("The character to delete", required=True)
     async def delete(self, ctx: AppCtx, character: str):
-        """Delete a character."""
+        """Delete one of your characters."""
         await botchcord.character.delete(ctx, character)
 
     @character.command()
     @options.character("The character to adjust")
     async def adjust(self, ctx: AppCtx, character: str):
-        """Adjust character stats."""
+        """Adjust one of your character's stats."""
         await botchcord.character.adjust(ctx, character)
 
     @character.command()
@@ -55,7 +58,7 @@ class CharactersCog(Cog, name="General character commands"):
         choices=ERAS,
     )
     async def wizard(self, ctx: AppCtx, era: str):
-        """Create a character over the web."""
+        """Create a character. This command opens a web browser."""
         await botchcord.character.web.wizard(ctx, era)
 
     @character.command(name="images")
@@ -75,7 +78,7 @@ class CharactersCog(Cog, name="General character commands"):
     @options.character("The character to upload the image to")
     @premium()
     async def upload_image(self, ctx: AppCtx, image: discord.Attachment, character: str):
-        """[PREMIUM] Upload an image."""
+        """[PREMIUM] Upload a character image."""
         await botchcord.character.images.upload(ctx, character, image)
 
 

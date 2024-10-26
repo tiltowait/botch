@@ -17,7 +17,7 @@ class MacrosCog(Cog, name="Macros"):
 
     Macros are per-character, so you can have multiple macros by the same\
     name if they're all under different characters. However, if you use unique\
-    names, then the bot's automatic filtering system won't prompt you to ask\
+    names, then `BOT`'s automatic filtering system won't prompt you to ask\
     which character is rolling."""
 
     macro = SlashCommandGroup(
