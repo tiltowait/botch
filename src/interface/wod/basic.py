@@ -1,6 +1,6 @@
 """Command interface for basic WoD commands."""
 
-from discord import option
+from discord import InteractionContextType, option
 from discord.commands import slash_command
 from discord.ext.commands import Cog
 
@@ -59,7 +59,7 @@ class BasicCog(Cog, name="Basic"):
             character,
         )
 
-    @slash_command()
+    @slash_command(contexts={InteractionContextType.guild})
     async def botches(self, ctx: AppCtx):
         """How many botches have you rolled?"""
         rolls = await Roll.find(dict(guild=ctx.guild.id, user=ctx.user.id, botched=True)).to_list()
