@@ -48,7 +48,7 @@ class SpecialTrait(BaseModel):
 class Special(BaseModel):
     """Special, splat-specific traits."""
 
-    splat: str
+    splats: list[str]
     traits: list[SpecialTrait]
 
 

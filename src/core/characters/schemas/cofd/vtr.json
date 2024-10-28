@@ -83,7 +83,7 @@
   },
   "special": [
     {
-      "splat": "vampire",
+      "splats": ["vampire"],
       "traits": [
         {
           "label": "Blood Potency",
