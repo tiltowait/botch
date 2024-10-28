@@ -5,6 +5,11 @@
     "mortal",
     "ghoul"
   ],
+  "grounding": {
+    "vampire": "Humanity",
+    "mortal": "Humanity",
+    "ghoul": "Humanity"
+  },
   "inherent": {
     "category": "attributes",
     "subcategories": [

@@ -4,6 +4,10 @@
     "vampire",
     "mortal"
   ],
+  "grounding": {
+    "vampire": "Humanity",
+    "mortal": "Integrity"
+  },
   "inherent": {
     "category": "attributes",
     "subcategories": [

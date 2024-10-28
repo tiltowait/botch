@@ -60,6 +60,7 @@ class Schema(BaseModel):
 
     line: GameLine
     splats: list[Splat]
+    grounding: dict[Splat, str]
     inherent: TraitGroup
     learned: TraitGroup
     virtues: Optional[list[list[str]]] = None
