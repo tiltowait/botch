@@ -1,5 +1,5 @@
 """World of Darkness characters submodule."""
 
-from core.characters.cofd.base import Mortal, Vampire
+from core.characters.cofd.base import Mortal, Mummy, Vampire
 
-__all__ = ("Mortal", "Vampire")
+__all__ = ("Mortal", "Mummy", "Vampire")

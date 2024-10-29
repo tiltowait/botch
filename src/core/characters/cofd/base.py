@@ -100,3 +100,9 @@ class Vampire(Mortal):
             self.blood_potency += 1
             self.max_vitae = max_vtr_vitae(self.blood_potency)
             self.vitae = min(self.vitae, self.max_vitae)
+
+
+class Mummy(Mortal):
+    splat: Splat = Splat.MUMMY
+
+    sekhem: int = Field(ge=0, le=10)

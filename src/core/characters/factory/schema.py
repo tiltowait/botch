@@ -2,6 +2,7 @@
 
 
 import json
+from enum import StrEnum
 from typing import Optional
 
 from pydantic import BaseModel
@@ -35,20 +36,38 @@ class TraitGroup(BaseModel):
         return None
 
 
+class SpecialTraitType(StrEnum):
+    SELECT = "select"
+    TRAIT_GROUP = "trait-group"
+
+
 class SpecialTrait(BaseModel):
-    """An individual splat trait."""
+    """An individual splat trait.
+
+    For SELECT type:
+        - Use options to define valid choices
+        - Default should be one of the options
+
+    For TRAIT_GROUP type:
+        - Use items to define trait names
+        - Use min/max to define value range
+        - Default is the starting value
+    """
 
     label: str
     name: str
-    type: str
-    options: Optional[list[str] | list[int]]
-    default: Optional[str | int]
+    type: SpecialTraitType
+    options: Optional[list[str] | list[int]] = None
+    default: Optional[str | int] = None
+    items: Optional[list[str]] = None
+    min: Optional[int] = None
+    max: Optional[int] = None
 
 
 class Special(BaseModel):
     """Special, splat-specific traits."""
 
-    splats: list[str]
+    splats: list[Splat]
     traits: list[SpecialTrait]
 
 

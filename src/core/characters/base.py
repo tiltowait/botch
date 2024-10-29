@@ -44,6 +44,7 @@ class Splat(StrEnum):
     MORTAL = "mortal"
     VAMPIRE = "vampire"
     GHOUL = "ghoul"
+    MUMMY = "mummy"
 
 
 class Experience(BaseModel):
@@ -138,6 +139,7 @@ class Trait(BaseModel):
         TALENTS = "talents"
         SKILLS = "skills"
         KNOWLEDGES = "knowledges"
+        PILLARS = "pillars"
         BLANK = "\u200b"  # Discord doesn't allow empty field names
         CUSTOM = "custom"
 
