@@ -40,18 +40,13 @@ def fill_cofd(data: CharacterData, splat_args: dict[str, Any]) -> list[Trait]:
         splat_args["vitae"] = max_vtr_vitae(bp)
         splat_args["max_vitae"] = max_vtr_vitae(bp)
     elif data.splat == "Mummy":
+        # Pillars aren't normal traits, so we add them specially
         pillars = splat_args.pop("pillars", {})
-        pillar_traits = []
-        for pillar, rating in pillars.items():
-            pillar_traits.append(
-                Trait(
-                    name=pillar,
-                    rating=rating,
-                    category=Trait.Category.SPECIAL,
-                    subcategory=Trait.Subcategory.PILLARS,
-                )
-            )
-        return pillar_traits
+        splat_args["pillars"] = []
+
+        for p, r in pillars.items():
+            pillar = dict(name=p, rating=r, temporary=r)
+            splat_args["pillars"].append(pillar)
 
     return []
 
