@@ -50,8 +50,13 @@ def wod_vamp() -> Character:
 
 def test_default_fields(character):
     print(character.line, character.splat)
-    fields = get_default_fields(character)
-    assert isinstance(fields, tuple)
+    if character.line == GameLine.WOD and character.splat == Splat.MUMMY:
+        # TODO: Just never return a WoD mummy
+        with pytest.raises(errors.CharacterTemplateNotFound):
+            _ = get_default_fields(character)
+    else:
+        fields = get_default_fields(character)
+        assert isinstance(fields, tuple)
 
     character.line = "fake"
     with pytest.raises(errors.CharacterTemplateNotFound):

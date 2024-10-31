@@ -7,6 +7,7 @@ import botchcord
 import errors
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
+from botchcord.utils.text import c
 from core.characters import Character, Damage, GameLine, Splat
 
 
@@ -17,6 +18,7 @@ class DisplayField(StrEnum):
     HEALTH = "Health"
     WILLPOWER = "Willpower"
     GROUNDING = "Grounding"
+    SEKHEM = "Sekhem"
     GENERATION = "Generation"
     BLOOD_POOL = "Blood Pool"
     EXPERIENCE = "Experience"
@@ -39,6 +41,13 @@ DEFAULT_FIELDS = {
             DisplayField.EXPERIENCE,
             DisplayField.BLOOD_POTENCY,
             DisplayField.VITAE,
+        ),
+        Splat.MUMMY: (
+            DisplayField.HEALTH,
+            DisplayField.WILLPOWER,
+            DisplayField.GROUNDING,
+            DisplayField.SEKHEM,
+            DisplayField.EXPERIENCE,
         ),
     },
     GameLine.WOD: {
@@ -142,6 +151,8 @@ def get_field_value(
             return get_track_string(character.willpower)
         case DisplayField.GROUNDING:
             return str(character.grounding.rating)
+        case DisplayField.SEKHEM:
+            return c(character.sekhem)
         case DisplayField.GENERATION:
             return str(character.generation)
         case DisplayField.BLOOD_POOL:

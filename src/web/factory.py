@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from core.characters import Character, Damage, cofd, wod
+from core.characters import Character, Damage, Trait, cofd, wod
 from core.characters.base import GameLine
 from core.characters.wod import gen_virtues
 from utils import max_vtm_bp, max_vtr_vitae
@@ -18,24 +18,37 @@ SPLAT_MAPPING: dict[GameLine, dict[str, type[CharacterType]]] = {
     GameLine.COFD: {
         "Mortal": cofd.Mortal,
         "Vampire": cofd.Vampire,
+        "Mummy": cofd.Mummy,
     },
 }
 
 
-def fill_wod(data: CharacterData, splat_args: dict[str, Any]):
+def fill_wod(data: CharacterData, splat_args: dict[str, Any]) -> list[Trait]:
     """Fill in the character WoD-specific data."""
     if data.splat == "Vampire":
         gen = splat_args["generation"]
         splat_args["max_bp"] = max_vtm_bp(gen)
         splat_args["blood_pool"] = max_vtm_bp(gen)
 
+    return []
 
-def fill_cofd(data: CharacterData, splat_args: dict[str, Any]):
+
+def fill_cofd(data: CharacterData, splat_args: dict[str, Any]) -> list[Trait]:
     """Fill in the CofD-specific data."""
     if data.splat == "Vampire":
         bp = splat_args["blood_potency"]
         splat_args["vitae"] = max_vtr_vitae(bp)
         splat_args["max_vitae"] = max_vtr_vitae(bp)
+    elif data.splat == "Mummy":
+        # Pillars aren't normal traits, so we add them specially
+        pillars = splat_args.pop("pillars", {})
+        splat_args["pillars"] = []
+
+        for p, r in pillars.items():
+            pillar = dict(name=p, rating=r, temporary=r)
+            splat_args["pillars"].append(pillar)
+
+    return []
 
 
 def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
@@ -45,9 +58,9 @@ def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
         splat_args[special.lower()] = value
 
     if wizard.traits.line == GameLine.WOD:
-        fill_wod(data, splat_args)
+        extra_traits = fill_wod(data, splat_args)
     else:
-        fill_cofd(data, splat_args)
+        extra_traits = fill_cofd(data, splat_args)
 
     cls = SPLAT_MAPPING[wizard.traits.line][data.splat]
     print(data.splat)
@@ -66,5 +79,14 @@ def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
         category = wizard.traits.category(trait)
         subcategory = wizard.traits.subcategory(trait)
         char.add_trait(trait, rating, category, subcategory)
+    for extra_trait in extra_traits:
+        # We double-create the traits, but it's such a small number, we can
+        # accept the inefficiency.
+        char.add_trait(
+            extra_trait.name,
+            extra_trait.rating,
+            extra_trait.category,
+            extra_trait.subcategory,
+        )
 
     return char

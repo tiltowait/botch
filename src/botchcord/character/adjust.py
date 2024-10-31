@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from collections import Counter
+from typing import Any
 
 import discord
 from discord import ButtonStyle
@@ -17,6 +18,8 @@ __all__ = (
     "Adjuster",
     "GroundingAdjuster",
     "HealthAdjuster",
+    "MummyPillarAdjuster",
+    "MummySekhemAdjuster",
     "Toggler",
     "WillpowerAdjuster",
     "VampAdjuster",
@@ -51,6 +54,12 @@ class Toggler(View):
 
         if isinstance(char, VampireType):
             self.add_adjuster("Adjust: Vampirism", VampAdjuster)
+        elif isinstance(char, cofd.Mummy):
+            self.add_adjuster("Adjust: Sekhem", MummySekhemAdjuster)
+            p = cofd.Mummy.Pillars
+            self.add_adjuster("Adjust: Ab, Ba", MummyPillarAdjuster, p.AB, p.BA)
+            self.add_adjuster("Adjust: Ka, Ren", MummyPillarAdjuster, p.KA, p.REN)
+            self.add_adjuster("Adjust: Sheut", MummyPillarAdjuster, p.SHEUT)
 
     def _populate_menu(self, adjuster: "Adjuster"):
         """Populate the menu."""
@@ -72,9 +81,9 @@ class Toggler(View):
 
         await interaction.response.edit_message(view=self)
 
-    def add_adjuster(self, label: str, adjuster_cls: type["Adjuster"]):
+    def add_adjuster(self, label: str, adjuster_cls: type["Adjuster"], *args: Any, **kwargs: Any):
         """Add a subview behind a select menu option."""
-        adjuster = adjuster_cls(self, self.character)
+        adjuster = adjuster_cls(self, self.character, *args, **kwargs)
         if not self.adjusters:
             self._populate_menu(adjuster)
             default = True
@@ -353,5 +362,81 @@ class VampAdjuster(Adjuster):
                 self.character.lower_potency()
             case 8:
                 self.character.raise_potency()
+
+        await super().callback(interaction)
+
+
+class MummySekhemAdjuster(Adjuster):
+    """Adjust Mummy-exclusive traits (Sekhem)."""
+
+    character: cofd.Mummy
+
+    def _populate(self):
+        self.add_stepper(1, "Sekhem", dec_color=ButtonStyle.danger, inc_color=ButtonStyle.success)
+
+    def _update_buttons(self):
+        self.buttons[0].disabled = self.character.sekhem == 0
+        self.buttons[2].disabled = self.character.sekhem == 10
+
+    async def callback(self, interaction: discord.Interaction):
+        i, _ = self.get_button(interaction.custom_id)
+
+        match i:
+            case 0:
+                self.character.sekhem = max(0, self.character.sekhem - 1)
+            case 2:
+                self.character.sekhem = min(10, self.character.sekhem + 1)
+
+        await super().callback(interaction)
+
+
+class MummyPillarAdjuster(Adjuster):
+    """Adjust Mummy pillar ratings."""
+
+    character: cofd.Mummy
+
+    def __init__(self, container: Toggler, char: cofd.Mummy, *pillars: cofd.Mummy.Pillars):
+        assert 0 < len(pillars) <= 2
+        self.pillars = pillars
+        super().__init__(container, char)
+
+    def _populate(self):
+        bad = ButtonStyle.danger
+        good = ButtonStyle.success
+
+        for i, pillar in enumerate(self.pillars):
+            self.add_stepper(i + 1, f"{pillar.value} (Permanent)", dec_color=bad, inc_color=good)
+            self.add_stepper(i + 2, f"{pillar.value} (Current)", dec_color=bad, inc_color=good)
+
+    def _update_buttons(self):
+        pillar = self.character.get_pillar(self.pillars[0])
+        self.buttons[0].disabled = pillar.rating == 0
+        self.buttons[3].disabled = pillar.temporary == 0
+        self.buttons[2].disabled = pillar.rating == 5
+        self.buttons[5].disabled = pillar.temporary >= pillar.rating
+
+        if len(self.pillars) == 2:
+            pillar = self.character.get_pillar(self.pillars[1])
+            self.buttons[6].disabled = pillar.rating == 0
+            self.buttons[9].disabled = pillar.temporary == 0
+            self.buttons[8].disabled = pillar.rating == 5
+            self.buttons[11].disabled = pillar.temporary >= pillar.rating
+
+    async def callback(self, interaction: discord.Interaction):
+        i, _ = self.get_button(interaction.custom_id)
+        pillar = self.character.get_pillar(self.pillars[0 if i < 6 else 1])
+
+        match i:
+            # Permanent
+            case 0 | 6:  # Decrement
+                pillar.pdec()
+                pillar.temporary = min(pillar.temporary, pillar.rating)
+            case 2 | 8:  # Increment
+                pillar.pinc()
+            # Temporary
+            case 3 | 9:
+                pillar.tdec()
+            case 5 | 11:
+                pillar.tinc()
 
         await super().callback(interaction)

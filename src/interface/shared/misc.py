@@ -21,6 +21,7 @@ class MiscCog(Cog, name="Miscellaneous"):
     @slash_command()
     async def info(self, ctx: AppCtx):
         """View bot information."""
+        assert ctx.bot.user is not None
         embed = discord.Embed(title=ctx.bot.user.name, description=f"**Version:** {m(VERSION)}")
         await ctx.respond(embed=embed)
 

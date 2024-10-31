@@ -2,8 +2,14 @@
   "line": "cofd",
   "splats": [
     "vampire",
-    "mortal"
+    "mortal",
+    "mummy"
   ],
+  "grounding": {
+    "vampire": "Humanity",
+    "mortal": "Integrity",
+    "mummy": "Memory"
+  },
   "inherent": {
     "category": "attributes",
     "subcategories": [
@@ -79,7 +85,7 @@
   },
   "special": [
     {
-      "splat": "vampire",
+      "splats": ["vampire"],
       "traits": [
         {
           "label": "Blood Potency",
@@ -98,6 +104,38 @@
             10
           ],
           "default": 1
+        }
+      ]
+    },
+    {
+      "splats": ["mummy"],
+      "traits": [
+        {
+          "label": "Sekhem",
+          "name": "sekhem",
+          "type": "select",
+          "options": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "default": 10
+        },
+        {
+          "label": "Pillars",
+          "name": "pillars",
+          "type": "trait-group",
+          "items": ["Ab", "Ba", "Ka", "Ren", "Sheut"],
+          "default": 0,
+          "min": 0,
+          "max": 5
         }
       ]
     }

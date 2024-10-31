@@ -5,6 +5,11 @@
     "mortal",
     "ghoul"
   ],
+  "grounding": {
+    "vampire": "Humanity",
+    "mortal": "Humanity",
+    "ghoul": "Humanity"
+  },
   "inherent": {
     "category": "attributes",
     "subcategories": [
@@ -99,7 +104,7 @@
   ],
   "special": [
     {
-      "splat": "vampire",
+      "splats": ["vampire"],
       "traits": [
         {
           "label": "Generation",

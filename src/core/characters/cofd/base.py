@@ -1,6 +1,9 @@
 """Base WoD character attributes."""
 
-from pydantic import Field
+from enum import StrEnum
+from typing import ClassVar
+
+from pydantic import BaseModel, Field, model_validator
 
 from core.characters.base import Character, GameLine, Splat, Trait
 from utils import max_vtr_vitae
@@ -100,3 +103,74 @@ class Vampire(Mortal):
             self.blood_potency += 1
             self.max_vitae = max_vtr_vitae(self.blood_potency)
             self.vitae = min(self.vitae, self.max_vitae)
+
+
+class Pillar(BaseModel):
+    """A Pillar is a special trait that has a permanent and a temporary rating,
+    like HP/WP. Unlike those, however, they do not have multiple damage types,
+    and we don't care about a graphical representation of them, so we don't use
+    a string to represent them."""
+
+    name: str
+    rating: int = Field(ge=0, le=5)
+    temporary: int = Field(default=-1, ge=-1, le=5)
+    category: ClassVar[Trait.Category] = Trait.Category.SPECIAL
+    subcategory: ClassVar[Trait.Subcategory] = Trait.Subcategory.PILLARS
+
+    @model_validator(mode="after")
+    def set_temporary_on_init(self) -> "Pillar":
+        if self.temporary == -1:
+            self.temporary = self.rating
+        return self
+
+    def pinc(self) -> int:
+        """Increment the temporary rating, then return it."""
+        self.rating = min(5, self.rating + 1)
+        return self.rating
+
+    def pdec(self) -> int:
+        """Decrement the temporary rating, then return it."""
+        self.rating = max(0, self.rating - 1)
+        return self.rating
+
+    def tinc(self) -> int:
+        """Increment the temporary rating, then return it."""
+        self.temporary = min(self.rating, self.temporary + 1)
+        return self.temporary
+
+    def tdec(self) -> int:
+        """Decrement the temporary rating, then return it."""
+        self.temporary = max(0, self.temporary - 1)
+        return self.temporary
+
+
+class Mummy(Mortal):
+    splat: Splat = Splat.MUMMY
+
+    class Pillars(StrEnum):
+        AB = "Ab"
+        BA = "Ba"
+        KA = "Ka"
+        REN = "Ren"
+        SHEUT = "Sheut"
+
+    sekhem: int = Field(ge=0, le=10)
+    pillars: list[Pillar] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def initialize_pillars(self) -> "Mummy":
+        if not self.pillars:
+            self.pillars = [Pillar(name=name.value, rating=0) for name in Mummy.Pillars]
+        return self
+
+    @property
+    def display_traits(self) -> list[Trait]:
+        """The Mummy's traits, plus Pillars."""
+        return self.traits + self.pillars  # type: ignore
+
+    def get_pillar(self, name: "Mummy.Pillars | str") -> Pillar:
+        """Returns the indicated Pillar. Unlike Traits, this is NOT a copy."""
+        for pillar in self.pillars:
+            if pillar.name.lower() == name.lower():
+                return pillar
+        raise ValueError("Unknown Pillar")

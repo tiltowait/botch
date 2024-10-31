@@ -3,6 +3,7 @@
 import json
 import random
 from collections import OrderedDict
+from glob import glob
 
 import pytest
 
@@ -35,9 +36,14 @@ def factory() -> Factory:
     return Factory(GameLine.WOD, Splat.VAMPIRE, Vampire, args, schema_filter="vtm.json")
 
 
-def test_load_schema():
-    loc = "src/core/characters/schemas/wod/vtm.json"
-    schema = Schema.load(loc)
+@pytest.fixture(params=glob("src/core/characters/schemas/*/*.json"))
+def schema_file(request: pytest.FixtureRequest) -> str:
+    return request.param
+
+
+# @pytest.mark.parametrize("schema_file", schema_files())
+def test_all_schemas_valid(schema_file: str):
+    schema = Schema.load(schema_file)
     assert isinstance(schema, Schema)
 
 

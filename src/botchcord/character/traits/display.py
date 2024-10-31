@@ -33,7 +33,7 @@ def add_trait_category(
     char: Character,
     category: Trait.Category,
 ):
-    traits = categorize_traits(category, char.traits)
+    traits = categorize_traits(category, char.display_traits)
     if traits:
         if category == Trait.Category.CUSTOM:
             category = " "  # type: ignore

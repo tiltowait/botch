@@ -19,6 +19,7 @@ DOCUMENT_MODELS = [
     wod.Vampire,
     wod.Ghoul,
     wod.Mortal,
+    cofd.Mummy,
     cofd.Vampire,
     cofd.Mortal,
     Roll,

@@ -64,7 +64,7 @@ class CharacterData(BaseModel):
     willpower: int
     traits: dict[str, int]
     virtues: Optional[list[Virtue]] = None
-    special: dict[str, str | int] = Field(default_factory=dict)
+    special: dict[str, str | int | dict[str, int]] = Field(default_factory=dict)
 
     @property
     def virtues_dict(self) -> dict[str, int]:

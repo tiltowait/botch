@@ -12,6 +12,8 @@ from botchcord.character.adjust import (
     Adjuster,
     GroundingAdjuster,
     HealthAdjuster,
+    MummyPillarAdjuster,
+    MummySekhemAdjuster,
     Toggler,
     VampAdjuster,
     WillpowerAdjuster,
@@ -67,6 +69,22 @@ def cvamp() -> cofd.Vampire:
     )
 
 
+@pytest.fixture
+def mummy() -> cofd.Mummy:
+    mummy = gen_char(
+        GameLine.COFD,
+        Splat.MUMMY,
+        cofd.Mummy,
+        sekhem=8,
+    )
+
+    for pillar in mummy.pillars:
+        pillar.rating = 3
+        pillar.temporary = 3
+
+    return mummy
+
+
 @pytest.fixture(params=["vamp", "cvamp"])
 def avamp(request: pytest.FixtureRequest) -> VampireType:
     return request.getfixturevalue(request.param)
@@ -83,6 +101,13 @@ def ctx() -> AppCtx:
 async def toggler(ctx: AppCtx, vamp: wod.Vampire) -> Toggler:
     with patch("bot.AppCtx.edit", new_callable=AsyncMock):
         toggler = Toggler(ctx, vamp)
+        return toggler
+
+
+@pytest.fixture
+async def mummy_toggler(ctx: AppCtx, mummy: cofd.Mummy) -> Toggler:
+    with patch("bot.AppCtx.edit", new_callable=AsyncMock):
+        toggler = Toggler(ctx, mummy)
         return toggler
 
 
@@ -331,6 +356,180 @@ async def test_cofd_vamp_adjuster(
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
     assert toggler.character.save.await_count == count
+
+
+@pytest.mark.parametrize(
+    "idx,count,expected",
+    [
+        (0, 1, 7),
+        (0, 100, 0),
+        (2, 1, 9),
+        (2, 100, 10),
+    ],
+)
+async def test_mummy_sekhem_adjuster(mummy_toggler: Toggler, idx: int, count: int, expected: int):
+    adjuster = mummy_toggler.adjusters[3]
+    assert isinstance(adjuster, MummySekhemAdjuster)
+
+    inter = AsyncMock()
+    inter.custom_id = adjuster.buttons[idx].custom_id
+
+    for _ in range(count):
+        await adjuster.callback(inter)
+
+    assert mummy_toggler.character.sekhem == expected
+    assert mummy_toggler.ctx.edit.await_count == count
+    assert inter.response.edit_message.await_count == count
+    assert mummy_toggler.character.save.await_count == count
+
+
+@pytest.mark.parametrize(
+    "rating,dec,inc",
+    [
+        (5, True, True),
+        (10, True, False),
+        (0, False, True),
+    ],
+)
+def test_mummy_sekhem_button_states(mummy: cofd.Mummy, rating: int, dec: bool, inc: bool):
+    mummy.sekhem = rating
+    adj = MummySekhemAdjuster(AsyncMock(), mummy)
+    assert adj.buttons[0].disabled == (not dec)
+    assert adj.buttons[2].disabled == (not inc)
+
+
+@pytest.mark.parametrize(
+    "perm,temp,can_pdec,can_pinc,can_tdec,can_tinc",
+    [
+        (3, 2, True, True, True, True),
+        (3, 3, True, True, True, False),
+        (5, 5, True, False, True, False),
+        (0, 0, False, True, False, False),
+        (1, 0, True, True, False, True),
+        (5, 1, True, False, True, True),
+    ],
+)
+async def test_mummy_pillar_button_states(
+    mummy: cofd.Mummy,
+    perm: int,
+    temp: int,
+    can_pdec: bool,
+    can_pinc: bool,
+    can_tdec: bool,
+    can_tinc: bool,
+):
+    # We don't need to test all of them, since they're the same class
+    mummy.pillars[0].rating = perm
+    mummy.pillars[0].temporary = temp
+    mummy.pillars[1].rating = perm
+    mummy.pillars[1].temporary = temp
+    p = cofd.Mummy.Pillars
+    adj = MummyPillarAdjuster(AsyncMock(), mummy, p.AB, p.BA)
+
+    # We have two pillars, so we test the full range of buttons
+    pdecs = (0, 6)
+    for pdec in pdecs:
+        assert adj.buttons[pdec].disabled == (not can_pdec)
+
+    pincs = (2, 8)
+    for pinc in pincs:
+        assert adj.buttons[pinc].disabled == (not can_pinc)
+
+    tdecs = (3, 9)
+    for tdec in tdecs:
+        assert adj.buttons[tdec].disabled == (not can_tdec)
+
+    tincs = (5, 11)
+    for tinc in tincs:
+        assert adj.buttons[tinc].disabled == (not can_tinc)
+
+
+@pytest.mark.parametrize(
+    "pillar_name,ida,idx,count,expected",
+    [
+        # Permanent
+        ("Ab", 4, 0, 1, 2),
+        ("Ab", 4, 0, 10, 0),
+        ("Ab", 4, 2, 1, 4),
+        ("Ab", 4, 2, 10, 5),
+        # Temporary
+        ("Ab", 4, 3, 1, 2),
+        ("Ab", 4, 3, 10, 0),
+        ("Ab", 4, 5, 1, 3),
+        ("Ab", 4, 5, 10, 3),  # Shouldn't exceed!
+        # Permanent
+        ("Ba", 4, 6, 1, 2),
+        ("Ba", 4, 6, 10, 0),
+        ("Ba", 4, 8, 1, 4),
+        ("Ba", 4, 8, 10, 5),
+        # Temporary
+        ("Ba", 4, 9, 1, 2),
+        ("Ba", 4, 9, 10, 0),
+        ("Ba", 4, 11, 1, 3),
+        ("Ba", 4, 11, 10, 3),  # Shouldn't exceed!
+        # Permanent
+        ("Ka", 5, 0, 1, 2),
+        ("Ka", 5, 0, 10, 0),
+        ("Ka", 5, 2, 1, 4),
+        ("Ka", 5, 2, 10, 5),
+        # Temporary
+        ("Ka", 5, 3, 1, 2),
+        ("Ka", 5, 3, 10, 0),
+        ("Ka", 5, 5, 1, 3),
+        ("Ka", 5, 5, 10, 3),  # Shouldn't exceed!
+        # Permanent
+        ("Ren", 5, 6, 1, 2),
+        ("Ren", 5, 6, 10, 0),
+        ("Ren", 5, 8, 1, 4),
+        ("Ren", 5, 8, 10, 5),
+        # Temporary
+        ("Ren", 5, 9, 1, 2),
+        ("Ren", 5, 9, 10, 0),
+        ("Ren", 5, 11, 1, 3),
+        ("Ren", 5, 11, 10, 3),  # Shouldn't exceed!
+        # Permanent
+        ("Sheut", 6, 0, 1, 2),
+        ("Sheut", 6, 0, 10, 0),
+        ("Sheut", 6, 2, 1, 4),
+        ("Sheut", 6, 2, 10, 5),
+        # Temporary
+        ("Sheut", 6, 3, 1, 2),
+        ("Sheut", 6, 3, 10, 0),
+        ("Sheut", 6, 5, 1, 3),
+        ("Sheut", 6, 5, 10, 3),  # Shouldn't exceed!
+    ],
+)
+async def test_mummy_pillar_adjuster(
+    mummy_toggler: Toggler,
+    pillar_name: str,
+    ida: int,
+    idx: int,
+    count: int,
+    expected: tuple[int, int],
+):
+    adj = cast(MummyPillarAdjuster, mummy_toggler.adjusters[ida])
+    if ida == 6:
+        assert len(adj.pillars) == 1
+    else:
+        assert len(adj.pillars) == 2
+
+    inter = AsyncMock()
+    inter.custom_id = adj.buttons[idx].custom_id
+
+    pillar = adj.character.get_pillar(pillar_name)
+    temp = pillar.temporary
+
+    for _ in range(count):
+        await adj.callback(inter)
+
+    if idx in (0, 2, 6, 8):  # Permanent rating
+        assert pillar.rating == expected
+        if idx in (0, 6):  # Decremented
+            assert pillar.temporary == expected, "Temporary should have been reduced as well"
+        else:  # Incremented
+            assert pillar.temporary == temp
+    else:
+        assert pillar.temporary == expected
 
 
 @pytest.mark.parametrize(
