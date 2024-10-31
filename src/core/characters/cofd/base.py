@@ -160,7 +160,7 @@ class Mummy(Mortal):
     @model_validator(mode="after")
     def initialize_pillars(self) -> "Mummy":
         if not self.pillars:
-            self.pillars = [Pillar(name=name.value, rating=0) for name in list(Mummy.Pillars)]
+            self.pillars = [Pillar(name=name.value, rating=0) for name in Mummy.Pillars]
         return self
 
     @property

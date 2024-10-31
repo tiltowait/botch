@@ -79,9 +79,14 @@ def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
         category = wizard.traits.category(trait)
         subcategory = wizard.traits.subcategory(trait)
         char.add_trait(trait, rating, category, subcategory)
-    for trait in extra_traits:
+    for extra_trait in extra_traits:
         # We double-create the traits, but it's such a small number, we can
         # accept the inefficiency.
-        char.add_trait(trait.name, trait.rating, trait.category, trait.subcategory)
+        char.add_trait(
+            extra_trait.name,
+            extra_trait.rating,
+            extra_trait.category,
+            extra_trait.subcategory,
+        )
 
     return char
