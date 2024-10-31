@@ -1,6 +1,7 @@
 """Base WoD character attributes."""
 
 from enum import StrEnum
+from typing import ClassVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -113,6 +114,8 @@ class Pillar(BaseModel):
     name: str
     rating: int = Field(ge=0, le=5)
     temporary: int = Field(default=-1, ge=-1, le=5)
+    category: ClassVar[Trait.Category] = Trait.Category.SPECIAL
+    subcategory: ClassVar[Trait.Subcategory] = Trait.Subcategory.PILLARS
 
     @model_validator(mode="after")
     def set_temporary_on_init(self) -> "Pillar":
@@ -159,6 +162,11 @@ class Mummy(Mortal):
         if not self.pillars:
             self.pillars = [Pillar(name=name.value, rating=0) for name in list(Mummy.Pillars)]
         return self
+
+    @property
+    def display_traits(self) -> list[Trait]:
+        """The Mummy's traits, plus Pillars."""
+        return self.traits + self.pillars  # type: ignore
 
     def get_pillar(self, name: "Mummy.Pillars | str") -> Pillar:
         """Returns the indicated Pillar. Unlike Traits, this is NOT a copy."""

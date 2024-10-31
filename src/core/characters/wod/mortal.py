@@ -10,8 +10,8 @@ def gen_virtues(virtues: dict[str, int]):
         Trait(
             name=k,
             rating=v,
-            category=Trait.Category.VIRTUE,
-            subcategory=Trait.Subcategory.BLANK,
+            category=Trait.Category.SPECIAL,
+            subcategory=Trait.Subcategory.VIRTUES,
         )
         for k, v in virtues.items()
     ]
@@ -24,6 +24,11 @@ class Mortal(WoD):
     splat: Splat = Splat.MORTAL
 
     virtues: list[Trait]
+
+    @property
+    def display_traits(self) -> list[Trait]:
+        """The character's traits, plus Virtues."""
+        return self.traits + self.virtues
 
 
 class Ghoul(Mortal):

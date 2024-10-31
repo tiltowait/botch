@@ -127,7 +127,6 @@ class Trait(BaseModel):
         ATTRIBUTE = "attributes"
         ABILITY = "abilities"
         SKILL = "skills"
-        VIRTUE = "virtues"
         SPECIAL = "special"
         INNATE = "innate"
         CUSTOM = "custom"
@@ -140,6 +139,7 @@ class Trait(BaseModel):
         SKILLS = "skills"
         KNOWLEDGES = "knowledges"
         PILLARS = "pillars"
+        VIRTUES = "virtues"
         BLANK = "\u200b"  # Discord doesn't allow empty field names
         CUSTOM = "custom"
 
@@ -309,6 +309,11 @@ class Character(Document):
 
     traits: list[Trait] = Field(default_factory=list)
     macros: list[Macro] = Field(default_factory=list)
+
+    @property
+    def display_traits(self) -> list[Trait]:
+        """All the character's traits."""
+        return self.traits
 
     @property
     def has_blood_pool(self) -> bool:
