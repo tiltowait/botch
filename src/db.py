@@ -7,6 +7,7 @@ from beanie import init_beanie
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from botchcord.models import User
 from core.characters import Character, cofd, wod
 from core.rolls import Roll
 from interface.models import CommandRecord
@@ -23,6 +24,7 @@ DOCUMENT_MODELS = [
     cofd.Vampire,
     cofd.Mortal,
     Roll,
+    User,
     CommandRecord,
 ]
 
