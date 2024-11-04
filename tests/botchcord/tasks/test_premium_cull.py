@@ -1,11 +1,39 @@
 """Premium culler tests."""
 
 from datetime import UTC, datetime, timedelta
+from functools import partial
+from typing import AsyncGenerator
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from botchcord.models import User
 from botchcord.tasks import premium
+from core import cache
+from core.characters import Character, GameLine, Splat
+from tests.characters import gen_char
+
+# We don't care about the save and delete operations in the database, so we
+# mock therm here to save time. The relevant actions are handled by the cache
+# and not the database, but we can still check whether we're properly saving.
+
+
+@pytest.fixture(autouse=True)
+async def mock_save() -> AsyncGenerator[AsyncMock, None]:
+    with patch("core.characters.Character.save", new_callable=AsyncMock) as mocked:
+        yield mocked
+
+
+@pytest.fixture(autouse=True)
+async def mock_delete() -> AsyncGenerator[AsyncMock, None]:
+    with patch("core.characters.Character.delete", new_callable=AsyncMock) as mocked:
+        yield mocked
+
+
+@pytest.fixture(autouse=True)
+async def mock_api() -> AsyncGenerator[AsyncMock, None]:
+    with patch("api.delete_character_faceclaims", new_callable=AsyncMock) as mocked:
+        yield mocked
 
 
 @pytest.fixture
@@ -14,7 +42,7 @@ def user():
 
 
 @pytest.fixture(autouse=True)
-async def mock_users():
+async def mock_users() -> list[User]:
     users = [
         User(user=1, left_premium=datetime.now(UTC) - timedelta(days=31)),  # Should purge
         User(user=2, left_premium=datetime.now(UTC) - timedelta(days=15)),  # Should not purge
@@ -27,18 +55,87 @@ async def mock_users():
     return users
 
 
-def test_should_purge(user):
+@pytest.fixture(autouse=True)
+async def mock_characters() -> AsyncGenerator[list[Character], None]:
+    gc = partial(gen_char, line=GameLine.WOD, splat=Splat.VAMPIRE)
+    chars = [
+        gc(guild=1, user=1, name="A"),  # Should purge
+        gc(guild=2, user=2, name="B"),
+        gc(guild=3, user=3, name="C"),
+        gc(guild=1, user=1, name="D"),  # Should NOT purge - no images
+        gc(guild=2, user=4, name="E"),  # Should purge
+        gc(guild=3, user=4, name="F"),  # Should purge
+        gc(guild=1, user=2, name="G"),
+        gc(guild=2, user=1, name="H"),  # Should purge
+    ]
+    # The correct method is just Character.add_image(), but we don't need the
+    # API call for these tests
+    chars[0].profile.add_image("https://example.com/image.png")
+    chars[0].profile.add_image("https://example.com/image.png")
+    chars[0].profile.add_image("https://example.com/image.png")
+    chars[4].profile.add_image("https://example.com/image.png")
+    chars[5].profile.add_image("https://example.com/image.png")
+    chars[7].profile.add_image("https://example.com/image.png")
+    chars[7].profile.add_image("https://example.com/image.png")
+
+    for char in chars:
+        await cache.register(char)
+
+    yield chars
+
+    for char in chars:
+        await cache.remove(char)
+
+
+def test_should_purge(user: User):
     assert not user.should_purge
     user.left_premium = datetime.now(UTC) - timedelta(days=User.PURGE_INTERVAL + 1)
     assert user.should_purge
 
 
-def test_drop_premium(user):
+def test_drop_premium(user: User):
     user.drop_premium()
     assert user.left_premium is not None
 
 
-async def test_fetch_purgable_users():
-    purgable = await premium.fetch_purgable_users()
-    assert len(purgable) == 2
-    assert [u.user for u in purgable] == [1, 4]
+async def test_fetch_purgeable_users():
+    purgeable = await premium.fetch_purgeable_users()
+    assert len(purgeable) == 2
+    assert [u.user for u in purgeable] == [1, 4]
+
+
+async def test_fetch_purgeable_characters():
+    users = await premium.fetch_purgeable_users()
+    chars = []
+    for user in users:
+        purgeable = await premium.fetch_purgeable_characters(user)
+        assert all(c.user == user.user for c in purgeable)
+        chars.extend(purgeable)
+
+    assert len(chars) == 4
+    assert all(len(c.profile.images) > 0 for c in chars)
+
+    # We have to use a set here, because the order from the database isn't
+    # guaranteed
+    assert {c.name for c in chars} == {"A", "E", "F", "H"}
+
+
+async def test_fetch_purge_images(mock_api: AsyncMock, mock_save: AsyncMock):
+    users = await premium.fetch_purgeable_users()
+    for user in users:
+        count = await premium.purge_images(user)
+        assert user.left_premium is None
+        assert not user.should_purge
+
+        if user.user == 1:
+            assert count == 5
+        elif user.user == 4:
+            assert count == 2
+
+    assert mock_api.await_count == 4
+    assert mock_save.await_count == 4
+
+
+async def test_purge_expired():
+    purge_info = await premium.purge_expired_images()
+    assert purge_info == "Purged 7 image(s) across 2 user(s)."
