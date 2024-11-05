@@ -5,7 +5,15 @@ import discord
 from botchcord import character, haven, macro, roll, settings
 from botchcord.mroll import mroll
 
-__all__ = ("character", "haven", "macro", "mroll", "roll", "settings", "get_avatar")
+__all__ = (
+    "character",
+    "haven",
+    "macro",
+    "mroll",
+    "roll",
+    "settings",
+    "get_avatar",
+)
 
 
 def get_avatar(user: discord.User | discord.Member):

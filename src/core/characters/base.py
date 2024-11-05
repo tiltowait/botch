@@ -582,7 +582,7 @@ class Character(Document):
         await api.delete_character_faceclaims(self)
         del self.profile.images[:]
         if save_changes:
-            await self.save_changes()
+            await self.save()
 
     class Settings:
         name = "characters"

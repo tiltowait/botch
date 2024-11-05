@@ -10,8 +10,10 @@ import discord
 import config
 import db
 import errors
-from config import DEBUG_GUILDS, EMOJI_GUILD
+import tasks
+from config import DEBUG_GUILDS, EMOJI_GUILD, SUPPORTER_GUILD, SUPPORTER_ROLE
 from errors import BotchError, NotPremium
+from models import User
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -63,6 +65,9 @@ class BotchBot(discord.Bot):
         self.welcomed = True
         config.set_bot_id(self.user.id)
         logger.info("Ready!")
+
+        tasks.premium.purge.start()
+        logger.info("Tasks scheduled")
 
     def load_cogs(self, directories: list[str]) -> None:
         """Load cogs from specified directories relative to this script."""
@@ -149,6 +154,37 @@ class BotchBot(discord.Bot):
             case _:
                 # TODO: Error reporter
                 raise err
+
+    async def on_guild_join(self, guild: discord.Guild):
+        """Notify guild joining."""
+        logger.info("Joined %s :)", guild.name)
+
+    async def on_guild_remove(self, guild: discord.Guild):
+        """Notify guild removal."""
+        logger.info("Left %s :(", guild.name)
+
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        """Check for supporter status changes."""
+        if before.guild.id != SUPPORTER_GUILD:
+            return
+
+        def is_supporter(member: discord.Member) -> bool:
+            """Check if the member is a supporter."""
+            return member.get_role(SUPPORTER_ROLE) is not None
+
+        user = await User.find_one(User.user == after.id)
+        if user is None:
+            user = User(user=after.id)
+
+        if is_supporter(before) and not is_supporter(after):
+            logger.info("%s is no longer a supporter :(", after.name)
+            user.drop_premium()
+
+        elif is_supporter(after) and not is_supporter(before):
+            logger.info("%s is now a supporter!", after.name)
+            user.gain_premium()
+
+        await user.save()
 
     def cmd_mention(
         self,
