@@ -8,11 +8,11 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from bot import BotchBot
-from botchcord.models import User
-from botchcord.tasks import premium
-from config import SUPPORTER_GUILD, SUPPORTER_ROLE
+from config import SUPPORTER_GUILD
 from core import cache
 from core.characters import Character, GameLine, Splat
+from models import User
+from tasks import premium
 from tests.characters import gen_char
 
 # We don't care about the save and delete operations in the database, so we
@@ -148,7 +148,7 @@ async def test_purge_expired():
     assert purge_info == "Purged 7 image(s) across 2 user(s)."
 
 
-@patch("botchcord.models.User.save", new_callable=AsyncMock)
+@patch("models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_wrong_guild(mock_save: AsyncMock, bot: BotchBot):
     member = Mock()
     member.guild.id = SUPPORTER_GUILD + 1
@@ -157,9 +157,9 @@ async def test_on_member_update_wrong_guild(mock_save: AsyncMock, bot: BotchBot)
     mock_save.assert_not_awaited()
 
 
-@patch("botchcord.models.User.drop_premium")
-@patch("botchcord.models.User.gain_premium")
-@patch("botchcord.models.User.save", new_callable=AsyncMock)
+@patch("models.User.drop_premium")
+@patch("models.User.gain_premium")
+@patch("models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_wrong_role(
     mock_save: AsyncMock,
     mock_gain: Mock,
@@ -177,9 +177,9 @@ async def test_on_member_update_wrong_role(
     mock_save.assert_awaited_once()
 
 
-@patch("botchcord.models.User.drop_premium")
-@patch("botchcord.models.User.gain_premium")
-@patch("botchcord.models.User.save", new_callable=AsyncMock)
+@patch("models.User.drop_premium")
+@patch("models.User.gain_premium")
+@patch("models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_drop_premium(
     mock_save: AsyncMock,
     mock_gain: Mock,
@@ -202,9 +202,9 @@ async def test_on_member_update_drop_premium(
     mock_save.assert_awaited_once()
 
 
-@patch("botchcord.models.User.drop_premium")
-@patch("botchcord.models.User.gain_premium")
-@patch("botchcord.models.User.save", new_callable=AsyncMock)
+@patch("models.User.drop_premium")
+@patch("models.User.gain_premium")
+@patch("models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_gainpremium(
     mock_save: AsyncMock,
     mock_gain: Mock,

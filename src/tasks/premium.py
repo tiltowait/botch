@@ -1,8 +1,20 @@
 """Premium data culling tasks."""
 
-from botchcord.models import User
+import logging
+from datetime import UTC, time
+
+from discord.ext import tasks
+
 from core import cache
 from core.characters import Character
+from models import User
+
+
+@tasks.loop(time=time(12, 0, tzinfo=UTC))
+async def purge():
+    """Cull inactive characters and guilds."""
+    result = await purge_expired_images()
+    logging.getLogger("TASK").info(result)
 
 
 async def purge_expired_images() -> str:

@@ -7,10 +7,10 @@ from beanie import init_beanie
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from botchcord.models import User
 from core.characters import Character, cofd, wod
 from core.rolls import Roll
 from interface.models import CommandRecord
+from models import User
 
 load_dotenv()
 

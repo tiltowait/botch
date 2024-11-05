@@ -10,9 +10,10 @@ import discord
 import config
 import db
 import errors
-from botchcord.models import User
+import tasks
 from config import DEBUG_GUILDS, EMOJI_GUILD, SUPPORTER_GUILD, SUPPORTER_ROLE
 from errors import BotchError, NotPremium
+from models import User
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -64,6 +65,9 @@ class BotchBot(discord.Bot):
         self.welcomed = True
         config.set_bot_id(self.user.id)
         logger.info("Ready!")
+
+        tasks.premium.purge.start()
+        logger.info("Tasks scheduled")
 
     def load_cogs(self, directories: list[str]) -> None:
         """Load cogs from specified directories relative to this script."""
@@ -173,11 +177,11 @@ class BotchBot(discord.Bot):
             user = User(user=after.id)
 
         if is_supporter(before) and not is_supporter(after):
-            logger.info("PREMIUM: %s is no longer a supporter", after.name)
+            logger.info("%s is no longer a supporter :(", after.name)
             user.drop_premium()
 
         elif is_supporter(after) and not is_supporter(before):
-            logger.info("PREMIUM: %s is now a supporter!", after.name)
+            logger.info("%s is now a supporter!", after.name)
             user.gain_premium()
 
         await user.save()
