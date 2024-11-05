@@ -3,12 +3,14 @@
 from datetime import UTC, datetime, timedelta
 from functools import partial
 from typing import AsyncGenerator
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from bot import BotchBot
 from botchcord.models import User
 from botchcord.tasks import premium
+from config import SUPPORTER_GUILD, SUPPORTER_ROLE
 from core import cache
 from core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
@@ -37,7 +39,12 @@ async def mock_api() -> AsyncGenerator[AsyncMock, None]:
 
 
 @pytest.fixture
-def user():
+def bot() -> BotchBot:
+    return BotchBot()
+
+
+@pytest.fixture
+def user() -> User:
     return User(user=123)
 
 
@@ -139,3 +146,82 @@ async def test_fetch_purge_images(mock_api: AsyncMock, mock_save: AsyncMock):
 async def test_purge_expired():
     purge_info = await premium.purge_expired_images()
     assert purge_info == "Purged 7 image(s) across 2 user(s)."
+
+
+@patch("botchcord.models.User.save", new_callable=AsyncMock)
+async def test_on_member_update_wrong_guild(mock_save: AsyncMock, bot: BotchBot):
+    member = Mock()
+    member.guild.id = SUPPORTER_GUILD + 1
+
+    await bot.on_member_update(member, member)
+    mock_save.assert_not_awaited()
+
+
+@patch("botchcord.models.User.drop_premium")
+@patch("botchcord.models.User.gain_premium")
+@patch("botchcord.models.User.save", new_callable=AsyncMock)
+async def test_on_member_update_wrong_role(
+    mock_save: AsyncMock,
+    mock_gain: Mock,
+    mock_drop: Mock,
+    bot: BotchBot,
+):
+    member = Mock()
+    member.id = 1
+    member.guild.id = SUPPORTER_GUILD
+    member.get_role.return_value = None
+
+    await bot.on_member_update(member, member)
+    mock_gain.assert_not_called()
+    mock_drop.assert_not_called()
+    mock_save.assert_awaited_once()
+
+
+@patch("botchcord.models.User.drop_premium")
+@patch("botchcord.models.User.gain_premium")
+@patch("botchcord.models.User.save", new_callable=AsyncMock)
+async def test_on_member_update_drop_premium(
+    mock_save: AsyncMock,
+    mock_gain: Mock,
+    mock_drop: Mock,
+    bot: BotchBot,
+):
+    before = Mock()
+    before.id = 1
+    before.guild.id = SUPPORTER_GUILD
+    before.get_role.return_value = True
+
+    after = Mock()
+    after.id = 1
+    after.guild.id = SUPPORTER_GUILD
+    after.get_role.return_value = None
+
+    await bot.on_member_update(before, after)
+    mock_gain.assert_not_called()
+    mock_drop.assert_called_once()
+    mock_save.assert_awaited_once()
+
+
+@patch("botchcord.models.User.drop_premium")
+@patch("botchcord.models.User.gain_premium")
+@patch("botchcord.models.User.save", new_callable=AsyncMock)
+async def test_on_member_update_gainpremium(
+    mock_save: AsyncMock,
+    mock_gain: Mock,
+    mock_drop: Mock,
+    bot: BotchBot,
+):
+    before = Mock()
+    before.id = 1
+    before.guild.id = SUPPORTER_GUILD
+    before.get_role.return_value = None
+
+    after = Mock()
+    after.id = 1
+    after.guild.id = SUPPORTER_GUILD
+    after.get_role.return_value = True
+
+    await bot.on_member_update(before, after)
+    mock_gain.assert_called_once()
+    mock_drop.assert_not_called()
+    mock_save.assert_awaited_once()

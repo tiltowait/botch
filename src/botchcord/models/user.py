@@ -34,6 +34,10 @@ class User(Document):
         # requires us to force BOTH datetimes to be naive.
         return datetime.now(UTC).replace(tzinfo=None) > purge_date.replace(tzinfo=None)
 
+    def gain_premium(self):
+        """Mark the user as having premium."""
+        self.left_premium = None  # TODO: Maybe actually track it here?
+
     def drop_premium(self):
         """Mark the user as having left premium."""
         self.left_premium = datetime.now(UTC)
