@@ -53,20 +53,16 @@ class RollParser:
             alphascore = alphas + "_"
             trait = Combine(Opt(Word(alphascore)) + ZeroOrMore("." + Opt(Word(alphascore))))
             operand = Word(nums) | trait
-            eq = operand + ZeroOrMore(one_of("+ -") + operand)
-            parsed = eq.parse_string(self.raw_syntax, parse_all=True).as_list()
 
-            # Convert to list[str | int]
-            for i, elem in enumerate(parsed):
-                try:
-                    parsed[i] = int(elem)
-                except ValueError:
-                    pass
+            expr = operand + ZeroOrMore(one_of("+ -") + operand)
 
-            return parsed
+            return [
+                int(token) if token.isdigit() else token
+                for token in expr.parseString(self.raw_syntax, parseAll=True)
+            ]
 
         except ParseException as err:
-            raise errors.InvalidSyntax(err) from err
+            raise errors.InvalidSyntax(f"Invalid syntax at column {err.loc}") from err
 
     def parse(self, use_key=False):
         """Parse the roll, populating pool, equation, and dice."""
