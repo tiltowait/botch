@@ -8,6 +8,7 @@ from pyparsing import (
     Combine,
     Opt,
     ParseException,
+    White,
     Word,
     ZeroOrMore,
     alphas,
@@ -51,7 +52,11 @@ class RollParser:
         """Validate the syntax and return the tokenized list."""
         try:
             alphascore = alphas + "_"
-            trait = Combine(Opt(Word(alphascore)) + ZeroOrMore("." + Opt(Word(alphascore))))
+            # Allow words with spaces, but combine them
+            word_part = Word(alphascore) + ZeroOrMore(
+                White().set_parse_action(lambda: " ") + Word(alphascore)
+            )
+            trait = Combine(Opt(word_part) + ZeroOrMore("." + Opt(word_part)))
             operand = Word(nums) | trait
 
             expr = operand + ZeroOrMore(one_of("+ -") + operand)

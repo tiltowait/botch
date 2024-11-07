@@ -34,7 +34,7 @@ def test_can_create_macro(char: Character, pool: str, valid: bool):
 
 def test_macro_raises_bad_syntax(char: Character):
     with pytest.raises(errors.InvalidSyntax):
-        can_use_macro(char, "this is not valid")
+        can_use_macro(char, "strength * brawl")
 
 
 def test_create_macro(char):
