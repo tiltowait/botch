@@ -4,20 +4,11 @@ import ast
 import operator as op
 import re
 
-from pyparsing import (
-    Combine,
-    Opt,
-    ParseException,
-    White,
-    Word,
-    ZeroOrMore,
-    alphas,
-    nums,
-    one_of,
-)
+from pyparsing import Combine, Opt, ParseException, Word, ZeroOrMore, nums, one_of
 
 import errors
 from core.characters import Character
+from core.utils.parsing import TRAIT
 
 
 class RollParser:
@@ -51,12 +42,8 @@ class RollParser:
     def tokenize(self) -> list[str | int]:
         """Validate the syntax and return the tokenized list."""
         try:
-            alphascore = alphas + "_"
-            # Allow words with spaces, but combine them
-            word_part = Word(alphascore) + ZeroOrMore(
-                White().set_parse_action(lambda: " ") + Word(alphascore)
-            )
-            trait = Combine(Opt(word_part) + ZeroOrMore("." + Opt(word_part)))
+            # Allow
+            trait = Combine(Opt(TRAIT) + ZeroOrMore("." + Opt(TRAIT)))
             operand = Word(nums) | trait
 
             expr = operand + ZeroOrMore(one_of("+ -") + operand)
