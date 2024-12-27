@@ -8,6 +8,7 @@ import os
 import re
 from datetime import datetime
 from functools import partial
+from typing import Any
 from urllib.parse import urlparse
 
 import aiohttp
@@ -109,7 +110,7 @@ async def upload_logs():
 
 
 @measure
-async def _post(*, path: str, data: dict) -> str:
+async def _post(*, path: str, data: dict[str, Any] | str) -> str:
     """Send an API POST request."""
     logger.debug("POST to %s with %s", path, str(data))
     url = BASE_API + path.lstrip("/")
