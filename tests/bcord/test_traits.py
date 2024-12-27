@@ -301,8 +301,10 @@ def test_parse_duplicates():
     [
         ("foo", ["foo"]),
         ("  foo   ", ["foo"]),
-        ("foo bar", ["foo", "bar"]),
-        ("foo1 bar1 ba2z", ["foo1", "bar1", "ba2z"]),
+        ("foo bar", ["foo bar"]),
+        ("foo   bar", ["foo bar"]),
+        ("foo; bar; baz", ["foo", "bar", "baz"]),
+        ("foo bar; baz", ["foo bar", "baz"]),
     ],
 )
 def test_parse_deletion_input(user_input: str, expected: list[str]):

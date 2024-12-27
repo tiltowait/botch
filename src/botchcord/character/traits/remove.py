@@ -1,13 +1,14 @@
 """Trait removal command and methods."""
 
 import discord
-from pyparsing import OneOrMore, ParseException, Word, alphas, nums
+from pyparsing import DelimitedList, ParseException
 
 import bot
 import errors
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
 from core.characters import Character
+from core.utils.parsing import TRAIT
 
 
 @haven()
@@ -59,12 +60,11 @@ def remove_traits(
 
 def parse_input(user_input: str) -> list[str]:
     """Parse the input into the list of traits to delete."""
-    alphascore = alphas + "_"
-    trait = OneOrMore(Word(alphas, alphascore + nums))
+    trait = DelimitedList(TRAIT, delim=";")
 
     try:
         parsed = trait.parse_string(user_input, parse_all=True)
     except ParseException:
-        raise SyntaxError("Invalid syntax! **Example:** `foo bar`")
+        raise SyntaxError("Invalid syntax! **Example:** `foo; bar`")
 
     return list(parsed)
