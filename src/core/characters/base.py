@@ -17,24 +17,6 @@ import errors
 from config import MAX_NAME_LEN
 
 
-class Damage(StrEnum):
-    NONE = "."
-    BASHING = "/"
-    LETHAL = "X"
-    AGGRAVATED = "*"
-
-    @classmethod
-    def emoji_name(cls, e: str) -> str:
-        """The box's emoji name."""
-        emoji = {
-            Damage.NONE.value: "no_dmg",
-            Damage.BASHING.value: "bash",
-            Damage.LETHAL.value: "leth",
-            Damage.AGGRAVATED.value: "agg",
-        }
-        return emoji[e]
-
-
 class GameLine(StrEnum):
     WOD = "wod"
     COFD = "cofd"
@@ -70,8 +52,30 @@ class Grounding(BaseModel):
 
 
 class Tracker(StrEnum):
+    """Identifies a damage tracker."""
+
     HEALTH = "health"
     WILLPOWER = "willpower"
+
+
+class Damage(StrEnum):
+    """Represents damage in a track."""
+
+    NONE = "."
+    BASHING = "/"
+    LETHAL = "X"
+    AGGRAVATED = "*"
+
+    @classmethod
+    def emoji_name(cls, e: str) -> str:
+        """The box's emoji name."""
+        emoji = {
+            Damage.NONE.value: "no_dmg",
+            Damage.BASHING.value: "bash",
+            Damage.LETHAL.value: "leth",
+            Damage.AGGRAVATED.value: "agg",
+        }
+        return emoji[e]
 
 
 class Profile(BaseModel):
@@ -209,16 +213,13 @@ class Trait(BaseModel):
         ]
 
     @overload
-    def expanding(self, identifier: str, exact: bool) -> list[str]:
-        ...
+    def expanding(self, identifier: str, exact: bool) -> list[str]: ...
 
     @overload
-    def expanding(self, identifier: str, exact: bool, join: Literal[True]) -> list[str]:
-        ...
+    def expanding(self, identifier: str, exact: bool, join: Literal[True]) -> list[str]: ...
 
     @overload
-    def expanding(self, identifier: str, exact: bool, join: Literal[False]) -> list[list[str]]:
-        ...
+    def expanding(self, identifier: str, exact: bool, join: Literal[False]) -> list[list[str]]: ...
 
     def expanding(self, identifier: str, exact: bool, join=True) -> list[str] | list[list[str]]:
         """Expand the user's input to full skill:spec names."""
