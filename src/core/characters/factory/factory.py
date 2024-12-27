@@ -19,7 +19,7 @@ class Factory:
         line: GameLine,
         splat: Splat,
         char_class: type[Character],
-        args: dict,
+        args: dict[str, Any],
         schema_filter="*.json",
     ):
         self.line = line
