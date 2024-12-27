@@ -44,9 +44,12 @@ def specced(character: Character) -> Character:
     [
         ("brawl=kindred", [("brawl", ["kindred"])]),
         ("brawl=kindred,kine", [("brawl", ["kindred", "kine"])]),
-        ("brawl=kindred occult=bahari", [("brawl", ["kindred"]), ("occult", ["bahari"])]),
         (
-            "brawl=kindred,kine occult=bahari",
+            "brawl=kindred ; occult=bahari",
+            [("brawl", ["kindred"]), ("occult", ["bahari"])],
+        ),
+        (
+            "brawl=kindred,kine; occult=bahari",
             [("brawl", ["kindred", "kine"]), ("occult", ["bahari"])],
         ),
         ("brawl = kindred,", [("brawl", ["kindred"])]),
@@ -86,7 +89,7 @@ def test_invalid_syntax(syntax: str):
         ("brawl=Kindred", [("Brawl", ["Kindred"], ["Kindred"])]),
         ("brawl=Kindred,Kine", [("Brawl", ["Kindred", "Kine"], ["Kindred", "Kine"])]),
         (
-            "brawl=Kindred craft=Knives",
+            "brawl=Kindred ;craft=Knives",
             [("Brawl", ["Kindred"], ["Kindred"]), ("Craft", ["Knives"], ["Knives"])],
         ),
     ],
@@ -110,7 +113,9 @@ def test_add_specialties(syntax: str, expected: list, character: Character):
         ("brawl=Kindred,Werewolves,Kine", ["Kine", "Werewolves"]),
     ],
 )
-def test_add_specialties_intersection(syntax: str, expected: list[str], character: Character):
+def test_add_specialties_intersection(
+    syntax: str, expected: list[str], character: Character
+):
     """Ensure that the delta filters out duplicates."""
     character.add_subtraits("Brawl", "Kindred")
 
@@ -122,7 +127,7 @@ def test_add_specialties_intersection(syntax: str, expected: list[str], characte
     "syntax",
     [
         "Performance=Piano",  # Only invalid
-        "Brawl=Kindred Performance=Piano",  # One valid, one invalid
+        "Brawl=Kindred; Performance=Piano",  # One valid, one invalid
     ],
 )
 def test_fail_add_specialties(syntax: str, character: Character):
@@ -136,7 +141,7 @@ def test_fail_add_specialties(syntax: str, character: Character):
         ("Brawl=Kindred", [("Brawl", ["Kine"], ["Kindred"])]),
         ("Brawl=Kindred,Kine", [("Brawl", [], ["Kindred", "Kine"])]),
         (
-            "Brawl=Kindred Craft=Knives",
+            "Brawl=Kindred; Craft=Knives",
             [("Brawl", ["Kine"], ["Kindred"]), ("Craft", [], ["Knives"])],
         ),
     ],
@@ -162,7 +167,11 @@ def test_remove_specialties(syntax: str, expected: list, specced: Character):
         (pytest.raises(errors.TraitError), "Brawl", ["Brawl"]),
         (pytest.raises(errors.TraitError), "Brawl", ["Kindred", "Brawl"]),
         (pytest.raises(errors.TraitError), "NotASkill", ["ShouldFail"]),
-        (pytest.raises(errors.TraitError), "BRAWL", ["brawl"]),  # Test case-insensitivity
+        (
+            pytest.raises(errors.TraitError),
+            "BRAWL",
+            ["brawl"],
+        ),  # Test case-insensitivity
     ],
 )
 def test_validate_tokens(exception, skill: str, specs: list[str], character: Character):
@@ -173,11 +182,13 @@ def test_validate_tokens(exception, skill: str, specs: list[str], character: Cha
 @pytest.mark.parametrize(
     "assignments,fails",
     [
-        ("brawl=Grappling,Biting craft=Sailboats", False),
+        ("brawl=Grappling,Biting; craft=Sailboats", False),
         ("b", True),
     ],
 )
-async def test_assign_cmd(ctx: AppCtx, character: Character, assignments: str, fails: bool):
+async def test_assign_cmd(
+    ctx: AppCtx, character: Character, assignments: str, fails: bool
+):
     with patch.object(Character, "save", new_callable=AsyncMock) as mock_save:
         if fails:
             with pytest.raises(errors.InvalidSyntax):
@@ -191,11 +202,13 @@ async def test_assign_cmd(ctx: AppCtx, character: Character, assignments: str, f
 @pytest.mark.parametrize(
     "assignments,fails",
     [
-        ("brawl=Grappling,Biting craft=Sailboats", False),
+        ("brawl=Grappling,Biting; craft=Sailboats", False),
         ("b", True),
     ],
 )
-async def test_remove_cmd(ctx: AppCtx, character: Character, assignments: str, fails: bool):
+async def test_remove_cmd(
+    ctx: AppCtx, character: Character, assignments: str, fails: bool
+):
     with patch.object(Character, "save", new_callable=AsyncMock) as mock_save:
         if fails:
             with pytest.raises(errors.InvalidSyntax):
@@ -223,4 +236,6 @@ def test_adding_subtraits_to_subtraited(ctx: AppCtx, specced: Character):
     embed = _make_embed(ctx, specced, additions, "Specialties added")
 
     assert embed.description is not None
-    assert "***All:*** *Knives*, *Painting*" in embed.description, "Should show all specs"
+    assert (
+        "***All:*** *Knives*, *Painting*" in embed.description
+    ), "Should show all specs"
