@@ -3,4 +3,8 @@
 from pyparsing import White, Word, ZeroOrMore, alphas
 
 __alphascore = alphas + "_"
-TRAIT = Word(__alphascore) + ZeroOrMore(White().set_parse_action(lambda: " ") + Word(__alphascore))
+
+TRAIT = (
+    Word(__alphascore)
+    + ZeroOrMore(White().set_parse_action(lambda: " ") + Word(__alphascore))
+).set_parse_action(lambda t: "".join(t))

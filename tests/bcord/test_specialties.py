@@ -55,11 +55,16 @@ def specced(character: Character) -> Character:
         ("brawl = kindred,", [("brawl", ["kindred"])]),
         ("brawl = kindred, kine", [("brawl", ["kindred", "kine"])]),
         ("animal_ken=squirrels", [("animal_ken", ["squirrels"])]),
+        (
+            "animal ken=badgers; subterfuge=impeccable lies,glib;",
+            [("animal ken", ["badgers"]), ("subterfuge", ["impeccable lies", "glib"])],
+        ),
     ],
 )
 def test_valid_syntax(syntax: str, _expected: list[tuple[str, list[str]]]):
     tokens = tokenize(syntax)
     assert len(tokens) == len(_expected)
+    print(tokens)
 
     for received, expected in zip(tokens, _expected):
         r_trait, r_specs = received
