@@ -24,18 +24,15 @@ _rng = default_rng()  # numpy's default RNG is PCG64 (superior to builtin)
 
 
 @overload
-def d10() -> int:
-    ...
+def d10() -> int: ...
 
 
 @overload
-def d10(count: None) -> int:
-    ...
+def d10(count: None) -> int: ...
 
 
 @overload
-def d10(count: int) -> list[int]:
-    ...
+def d10(count: int) -> list[int]: ...
 
 
 def d10(count: int | None = None) -> int | list[int]:
@@ -169,18 +166,19 @@ class Roll(Document):
     @property
     def dice_readout(self) -> str:
         """Just the number of dice if WoD, or dice + WP if CofD and WP in use."""
-        if self.line == GameLine.WOD:
-            readout = str(self.num_dice)
-        elif self.line == GameLine.COFD:
-            base_dice = self.num_dice + 1 if self.specialties else self.num_dice
-            readout = str(base_dice)
-            explosions = len(self.dice) - base_dice
-            if self.wp:
-                explosions -= 3
-            if explosions > 0:
-                readout += f" *+ [{explosions}]*"
-            if self.wp:
-                readout += " *+ WP*"
+        match self.line:
+            case GameLine.WOD:
+                readout = str(self.num_dice)
+            case GameLine.COFD:
+                base_dice = self.num_dice + 1 if self.specialties else self.num_dice
+                readout = str(base_dice)
+                explosions = len(self.dice) - base_dice
+                if self.wp:
+                    explosions -= 3
+                if explosions > 0:
+                    readout += f" *+ [{explosions}]*"
+                if self.wp:
+                    readout += " *+ WP*"
 
         return readout
 
