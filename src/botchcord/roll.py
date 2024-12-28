@@ -81,7 +81,6 @@ async def roll(
 async def chance(ctx: bot.AppCtx):
     """Roll a chance die."""
     die = d10()
-    print(die)
     if await botchcord.settings.use_emojis(ctx):
         diemoji = ctx.bot.find_emoji(emoji_name(die, 10, 10, True))
     else:
