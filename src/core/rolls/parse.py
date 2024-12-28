@@ -1,8 +1,8 @@
 """Roll-parsing utilities."""
 
 import ast
-import operator as op
 import re
+from typing import cast
 
 from pyparsing import Combine, Opt, ParseException, Word, ZeroOrMore, nums, one_of
 
@@ -87,7 +87,7 @@ class RollParser:
                 if match.subtraits:
                     self.specialties.extend(match.subtraits)
 
-        self.num_dice = eval_expr("".join(map(str, self.equation)))
+        self.num_dice = evaluate("".join(map(str, self.equation)))
 
         return self
 
@@ -110,23 +110,34 @@ class RollParser:
 # We could use pandas for this, but this is built-in and considerably faster,
 # which makes a difference when calculating probabilities.
 
-OPERATORS = {ast.Add: op.add, ast.Sub: op.sub, ast.UAdd: op.pos, ast.USub: op.neg}
 
+def evaluate(expr: str) -> int:
+    """Evaluate a mathematical expression with +/-."""
 
-def eval_expr(expr):
-    """Evaluate a mathematical string expression. Safer than using eval."""
-    return eval_(ast.parse(expr, mode="eval").body)
+    def _eval(node: ast.AST) -> int:
+        """Recursively evaluate the operands and operations."""
+        match node:
+            case ast.Constant():
+                # Technically, this could also be a float or complex, but we
+                # know that it will only ever be an int.
+                return cast(int, node.n)
+            case ast.BinOp(left=left, op=op, right=right):
+                match op:
+                    case ast.Add():
+                        return _eval(left) + _eval(right)
+                    case ast.Sub():
+                        return _eval(left) - _eval(right)
+                    case _:
+                        raise TypeError(f"Unsupported operator: {op}")
+            case ast.UnaryOp(op=op, operand=operand):
+                match op:
+                    case ast.UAdd():
+                        return _eval(operand)
+                    case ast.USub():
+                        return -_eval(operand)
+                    case _:
+                        raise TypeError(f"Unsupported operator: {op}")
+            case _:
+                raise TypeError(f"Unsupported node type: {node}")
 
-
-def eval_(node):
-    """Recursively evaluate a mathematical expression. Only handles +/-."""
-    if isinstance(node, ast.Num):
-        return node.n
-
-    if isinstance(node, ast.BinOp):
-        return OPERATORS[type(node.op)](eval_(node.left), eval_(node.right))
-
-    if isinstance(node, ast.UnaryOp):
-        return OPERATORS[type(node.op)](eval_(node.operand))
-
-    raise TypeError(node)
+    return _eval(ast.parse(expr, mode="eval").body)

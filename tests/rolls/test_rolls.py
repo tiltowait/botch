@@ -6,7 +6,7 @@ import pytest
 
 import errors
 from core.characters import Character, GameLine
-from core.rolls.parse import RollParser, eval_expr
+from core.rolls.parse import RollParser, evaluate
 from core.rolls.roll import Roll
 
 TRIALS = 1000
@@ -15,6 +15,18 @@ TRIALS = 1000
 @pytest.fixture
 def dice() -> list[int]:
     return [1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10]
+
+
+@pytest.mark.parametrize(
+    "expr,expected",
+    [
+        ("1+2", 3),
+        ("1+2-3", 0),
+        ("4-6", -2),
+    ],
+)
+def test_evaluate(expr: str, expected: int):
+    assert evaluate(expr) == expected
 
 
 def test_cofd_explosions():
@@ -301,6 +313,6 @@ async def test_roll_spec_coalescence(spec: list[str] | None, expected: list[str]
 
 
 def test_remaining_eval():
-    assert eval_expr("-1") == -1, "unary op didn't run"
+    assert evaluate("-1") == -1, "unary op didn't run"
     with pytest.raises(TypeError):
-        eval_expr("noop")
+        evaluate("noop")
