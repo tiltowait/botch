@@ -30,11 +30,11 @@ def haven(
     [Callable[Concatenate[AppCtx, Character, P], Coroutine[Any, Any, T]]],
     Callable[Concatenate[AppCtx, str | Character, P], Coroutine[Any, Any, T]],
 ]:
-    def inner(
-        func: Callable[Concatenate[AppCtx, Character, P], Coroutine[Any, Any, T]]
-    ) -> Callable[Concatenate[AppCtx, str | Character, P], Coroutine[Any, Any, T]]:
-        """A decorator that automatically selects a character."""
+    """A decorator that automatically selects a character."""
 
+    def inner(
+        func: Callable[Concatenate[AppCtx, Character, P], Coroutine[Any, Any, T]],
+    ) -> Callable[Concatenate[AppCtx, str | Character, P], Coroutine[Any, Any, T]]:
         @functools.wraps(func)
         async def wrapper(
             ctx: AppCtx,
@@ -66,7 +66,7 @@ class Haven(discord.ui.View):
         filter: Callable[[Character], bool] = lambda _: True,
     ):
         self.ctx = ctx
-        self.line = line
+        self.line = GameLine(line) if line is not None else None
         self.splat = splat
         self.character = character
         self.chars: list[Character] = []
