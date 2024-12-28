@@ -17,7 +17,7 @@ class RollParser:
         self.character = character
         self.pool: list[str | int] = []
         self.equation: list[str | int] = []
-        self.num_dice: int = 0
+        self.num_dice = 0
         self.specialties: list[str] = []
 
     @property
@@ -57,9 +57,6 @@ class RollParser:
 
     def parse(self, use_key=False):
         """Parse the roll, populating pool, equation, and dice."""
-        if self.needs_character and self.character is None:
-            raise errors.RollError(f"You need a character to roll `{self.raw_syntax}`.")
-
         for elem in self.tokenize():
             if elem in {"+", "-"} or isinstance(elem, int):
                 self.pool.append(elem)
@@ -68,27 +65,47 @@ class RollParser:
                 self.pool.append("WP")
                 self.equation.append(0)
             else:
-                assert self.character is not None
-                traits = self.character.match_traits(elem)
-                if not traits:
-                    raise errors.TraitNotFound(self.character, elem)
-                elif len(traits) > 1:
-                    raise errors.AmbiguousTraitError(elem, [t.key for t in traits])
-
-                # Single trait found!
-                match = traits[0]
-                if use_key:
-                    self.pool.append(match.key)
-                else:
-                    self.pool.append(match.name)
-                self.equation.append(match.rating)
-
-                if match.subtraits:
-                    self.specialties.extend(match.subtraits)
+                self._process_trait_token(elem, use_key)
 
         self.num_dice = evaluate("".join(map(str, self.equation)))
 
         return self
+
+    def _process_trait_token(self, trait_name: str, use_key: bool):
+        """Process a trait token and update roll components.
+
+        The matched trait name (or key) is added to the pool, the rating is
+        added to the equation, and any specialties are added to the specialties
+        list.
+
+        Args:
+            trait_name: The name of the trait to find. May be truncated.
+            use_key: Whether to use "Trait.Subtrait" or "Trait (Subtrait)".
+
+        Raises:
+            RollError if no character is set.
+            TraitNotFound if no matches are found.
+            AmbiguousTraitError if multiple matches are found.
+        """
+        if self.character is None:
+            raise errors.RollError(f"You need a character to roll `{self.raw_syntax}`.")
+
+        traits = self.character.match_traits(trait_name)
+        match len(traits):
+            case 1:
+                trait = traits[0]
+                if use_key:
+                    self.pool.append(trait.key)
+                else:
+                    self.pool.append(trait.name)
+                self.equation.append(trait.rating)
+
+                if trait.subtraits:
+                    self.specialties.extend(trait.subtraits)
+            case 0:
+                raise errors.TraitNotFound(self.character, trait_name)
+            case _:
+                raise errors.AmbiguousTraitError(trait_name, [t.key for t in traits])
 
     @classmethod
     def can_roll(cls, char: Character, syntax: str) -> bool:
@@ -104,14 +121,8 @@ class RollParser:
             return True
 
 
-# Math Helpers
-
-# We could use pandas for this, but this is built-in and considerably faster,
-# which makes a difference when calculating probabilities.
-
-
 def evaluate(expr: str) -> int:
-    """Evaluate a mathematical expression with +/-."""
+    """Safely evaluate a mathematical expression (+/- only)."""
 
     def _eval(node: ast.AST) -> int:
         """Recursively evaluate the operands and operations."""
