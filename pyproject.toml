@@ -6,7 +6,7 @@ profile = "black"
 
 [tool.poetry]
 name = "botch"
-version = "0.9.6-BETA"
+version = "0.9.7-BETA"
 packages = [{ include = "*", from = "src" }]
 description = ""
 authors = ["tiltowait <208040+tiltowait@users.noreply.github.com>"]
