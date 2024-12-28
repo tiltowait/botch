@@ -1,21 +1,13 @@
 """Functions for adding/updating character traits. Not inclusive of subtraits."""
 
-from pyparsing import (
-    Dict,
-    Group,
-    OneOrMore,
-    ParseException,
-    Suppress,
-    Word,
-    alphas,
-    nums,
-)
+from pyparsing import DelimitedList, Dict, Group, ParseException, Suppress, Word, nums
 
 import bot
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
 from botchcord.utils.text import m
 from core.characters import Character, Trait
+from core.utils.parsing import TRAIT
 
 
 @haven()
@@ -70,15 +62,14 @@ def assign_traits(
 
 def parse_input(user_input: str) -> dict[str, int]:
     """Parse the user's input and find all the traits and ratings."""
-    alphascore = alphas + "_"
     equals = Suppress("=")
-    trait = Group(Word(alphas, alphascore + nums) + equals + Word(nums))
-    traits = Dict(OneOrMore(trait))  # type: ignore
+    trait = Group(TRAIT + equals + Word(nums))
+    traits = Dict(DelimitedList(trait, delim=";"))  # type: ignore
 
     try:
         parsed = traits.parse_string(user_input, parse_all=True)
     except ParseException:
-        raise SyntaxError("Invalid syntax! **Example:** `Brawl=3 Strength=2`")
+        raise SyntaxError("Invalid syntax! **Example:** `Brawl=3; Strength=2`")
 
     # Create dictionary, converting ratings to ints
     traits_dict: dict[str, int] = {}

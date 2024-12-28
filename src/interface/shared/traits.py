@@ -42,7 +42,7 @@ class TraitsCog(Cog, name="Character traits and specialties"):
         await botchcord.character.traits.display(ctx, character)
 
     @traits.command()
-    @option("traits", description="The traits to assign. Ex: Foo=1 Bar=2", required=True)
+    @option("traits", description="The traits to assign. Ex: Foo=1; Bar=2", required=True)
     @options.character("The character to modify")
     async def assign(
         self,
@@ -54,7 +54,7 @@ class TraitsCog(Cog, name="Character traits and specialties"):
         await botchcord.character.traits.assign(ctx, character, traits)
 
     @traits.command()
-    @option("traits", description="The traits to remove (separate with spaces)", required=True)
+    @option("traits", description="The traits to remove (separate with semicolons)", required=True)
     @options.character("The character to modify")
     async def remove(self, ctx: AppCtx, traits: str, character: str):
         """Remove traits from one of your characters."""

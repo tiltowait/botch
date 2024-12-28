@@ -4,19 +4,11 @@ import ast
 import operator as op
 import re
 
-from pyparsing import (
-    Combine,
-    Opt,
-    ParseException,
-    Word,
-    ZeroOrMore,
-    alphas,
-    nums,
-    one_of,
-)
+from pyparsing import Combine, Opt, ParseException, Word, ZeroOrMore, nums, one_of
 
 import errors
 from core.characters import Character
+from core.utils.parsing import TRAIT
 
 
 class RollParser:
@@ -50,23 +42,19 @@ class RollParser:
     def tokenize(self) -> list[str | int]:
         """Validate the syntax and return the tokenized list."""
         try:
-            alphascore = alphas + "_"
-            trait = Combine(Opt(Word(alphascore)) + ZeroOrMore("." + Opt(Word(alphascore))))
+            # Allow
+            trait = Combine(Opt(TRAIT) + ZeroOrMore("." + Opt(TRAIT)))
             operand = Word(nums) | trait
-            eq = operand + ZeroOrMore(one_of("+ -") + operand)
-            parsed = eq.parse_string(self.raw_syntax, parse_all=True).as_list()
 
-            # Convert to list[str | int]
-            for i, elem in enumerate(parsed):
-                try:
-                    parsed[i] = int(elem)
-                except ValueError:
-                    pass
+            expr = operand + ZeroOrMore(one_of("+ -") + operand)
 
-            return parsed
+            return [
+                int(token) if token.isdigit() else token
+                for token in expr.parseString(self.raw_syntax, parseAll=True)
+            ]
 
         except ParseException as err:
-            raise errors.InvalidSyntax(err) from err
+            raise errors.InvalidSyntax(f"Invalid syntax at column {err.loc}") from err
 
     def parse(self, use_key=False):
         """Parse the roll, populating pool, equation, and dice."""

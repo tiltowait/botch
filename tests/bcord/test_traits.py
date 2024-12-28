@@ -209,15 +209,16 @@ async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
 @pytest.mark.parametrize(
     "text,expected",
     [
-        ("t1=2", {"t1": 2}),
-        (" t1=2", {"t1": 2}),
-        ("t1 =2", {"t1": 2}),
-        ("t1= 2", {"t1": 2}),
-        ("t1=2", {"t1": 2}),
-        ("t1 = 2", {"t1": 2}),
-        ("t1 =   2 ", {"t1": 2}),
-        ("t1=2 t2=3", {"t1": 2, "t2": 3}),
-        ("Brawl=4 Academics=3", {"Brawl": 4, "Academics": 3}),
+        ("t=2", {"t": 2}),
+        (" t=2", {"t": 2}),
+        ("t =2", {"t": 2}),
+        ("t= 2", {"t": 2}),
+        ("t=2", {"t": 2}),
+        ("t = 2", {"t": 2}),
+        ("t =   2 ", {"t": 2}),
+        ("t=2; u=3", {"t": 2, "u": 3}),
+        ("Brawl=4; Academics=3", {"Brawl": 4, "Academics": 3}),
+        ("Animal Ken=3; Brawl=2 ", {"Animal Ken": 3, "Brawl": 2}),
     ],
 )
 def test_parse_input(text: str, expected: dict[str, int]):
@@ -225,7 +226,7 @@ def test_parse_input(text: str, expected: dict[str, int]):
     assert parsed == expected
 
 
-@pytest.mark.parametrize("text", ["t", "t=", "t==1", "1=1", "1t=1", "=1", "1=t", "t=t"])
+@pytest.mark.parametrize("text", ["t", "t=", "t==1", "1=1", "1t=1", "=1", "1=t", "t=t", "a=1 b=2"])
 def test_parse_errors(text: str):
     with pytest.raises(SyntaxError):
         _ = assign.parse_input(text)
@@ -234,8 +235,9 @@ def test_parse_errors(text: str):
 @pytest.mark.parametrize(
     "assignments,custom",
     [
-        ("strength=1 brawl=5", False),
-        ("Apples=3 Barp=2", True),
+        ("strength=1; brawl=5", False),
+        ("Apples=3; Barp=2", True),
+        ("Animal Ken=3", True),
     ],
 )
 def test_assign_traits(assignments: str, custom: bool, skilled: Character):
@@ -267,7 +269,7 @@ def test_describe_assignments():
 
 
 def test_build_assignment_embed(bot_mock, skilled: Character):
-    parsed = assign.parse_input("strength=2 brawl=3")
+    parsed = assign.parse_input("strength=2 ; brawl=3")
     traits = assign.assign_traits(skilled, parsed)
     embed = assign.build_embed(bot_mock, skilled, traits)
 
@@ -283,7 +285,7 @@ async def test_assign(ctx, skilled: Character):
         await assign.assign(ctx, skilled, "brawl=2")
 
         ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
-        skilled.save.assert_called_once()
+        skilled.save.assert_called_once()  # pyright: ignore
 
 
 def test_parse_duplicates():
@@ -299,8 +301,10 @@ def test_parse_duplicates():
     [
         ("foo", ["foo"]),
         ("  foo   ", ["foo"]),
-        ("foo bar", ["foo", "bar"]),
-        ("foo1 bar1 ba2z", ["foo1", "bar1", "ba2z"]),
+        ("foo bar", ["foo bar"]),
+        ("foo   bar", ["foo bar"]),
+        ("foo; bar; baz", ["foo", "bar", "baz"]),
+        ("foo bar; baz", ["foo bar", "baz"]),
     ],
 )
 def test_parse_deletion_input(user_input: str, expected: list[str]):

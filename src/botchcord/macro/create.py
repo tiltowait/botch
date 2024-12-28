@@ -45,6 +45,8 @@ def can_use_macro(char: Character, pool: str) -> bool:
     Returns:
         True if the character can roll the pool
         False if it cannot
+    Raises: InvalidSyntax if the pool syntax is invalid. This differentiates
+        characters who can't do the roll vs a roll that is ALWAYS invalid.
     """
     try:
         RollParser(pool, char).parse()

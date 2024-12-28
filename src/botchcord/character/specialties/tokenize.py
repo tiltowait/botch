@@ -1,10 +1,9 @@
 """Specialties input tokenizer."""
 
-from pyparsing import DelimitedList, Group, OneOrMore, ParseException, Word, alphas
+from pyparsing import DelimitedList, Group, ParseException
 
 import errors
-
-VALID_CHARS = alphas + "_"
+from core.utils.parsing import TRAIT
 
 
 def tokenize(syntax: str) -> list[tuple[str, list[str]]]:
@@ -20,22 +19,21 @@ def tokenize(syntax: str) -> list[tuple[str, list[str]]]:
     Raises:
         errors.InvalidSyntax: If the input syntax is invalid.
     """
-    trait_group = OneOrMore(
+    trait_group = DelimitedList(
         Group(
-            Word(VALID_CHARS).set_results_name("trait")
+            TRAIT.set_results_name("trait")
             + "="
-            + DelimitedList(Word(VALID_CHARS), allow_trailing_delim=True).set_results_name(
+            + DelimitedList(TRAIT, allow_trailing_delim=True).set_results_name(
                 "subtraits"
             )
-        )
+        ),
+        delim=";",
+        allow_trailing_delim=True,
     )
 
     try:
-        matches = []
-        for match in trait_group.parse_string(syntax, parse_all=True):
-            match = match.as_dict()
-            matches.append((match["trait"], match["subtraits"]))
-        return matches
+        matches = trait_group.parse_string(syntax, parse_all=True)
+        return [(match.trait, match.subtraits.as_list()) for match in matches]
 
     except ParseException as err:
         raise errors.InvalidSyntax(err) from err
