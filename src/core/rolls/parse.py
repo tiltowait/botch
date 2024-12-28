@@ -50,7 +50,7 @@ class RollParser:
 
             return [
                 int(token) if token.isdigit() else token
-                for token in expr.parseString(self.raw_syntax, parseAll=True)
+                for token in expr.parse_string(self.raw_syntax, parse_all=True)
             ]
 
         except ParseException as err:
