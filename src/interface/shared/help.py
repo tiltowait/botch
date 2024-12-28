@@ -1,6 +1,6 @@
 """Help interface."""
 
-from typing import cast
+from functools import cached_property
 
 import discord
 from discord import slash_command
@@ -19,8 +19,8 @@ class HelpCog(Cog, name="Help"):
     def __init__(self, bot: BotchBot):
         self.bot = bot
 
-    @property
-    def quickref(self):
+    @cached_property
+    def quickref(self) -> Page:
         """A "quick start" help page with the most common commands."""
         embed = discord.Embed(
             title="Quick reference",
@@ -40,8 +40,9 @@ class HelpCog(Cog, name="Help"):
         ]
         for cmd in cmds:
             if cmd:
-                command = cast(SlashCommand, self.bot.get_command(cmd))
-                entries.append(self._generate_command_entry(command))
+                command = self.bot.get_command(cmd)
+                if isinstance(command, SlashCommand):
+                    entries.append(self._generate_command_entry(command))
             else:
                 entries.append("")  # Separator
 
@@ -75,6 +76,7 @@ class HelpCog(Cog, name="Help"):
         embeds because Page expects a list."""
         commands = [cmd for cmd in cog.walk_commands() if isinstance(cmd, SlashCommand)]
         if not commands:
+            # Some cogs have no commands
             return None
 
         commands.sort(key=lambda c: c.qualified_name)
