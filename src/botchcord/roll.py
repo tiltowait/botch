@@ -21,6 +21,16 @@ DICE_CAP_MESSAGE = "***Too many to show.***"
 
 
 class Color(IntEnum):
+    """Roll result colors from worst to best outcome.
+
+    BOTCH: Bright red
+    FAILURE: Gray
+    MARGINAL_SUCCESS: Light green
+    MODERATE_SUCCESS: Medium green
+    COMPLETE_SUCCESS: Bright green
+    EXCEPTIONAL_SUCCESS: Pure green
+    PHENOMENAL_SUCCESS: Discord blurple"""
+
     BOTCH = 0xFF0000
     FAILURE = 0x777777
     MARGINAL_SUCCESS = 0xB2FCB2
