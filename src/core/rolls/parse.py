@@ -42,7 +42,6 @@ class RollParser:
     def tokenize(self) -> list[str | int]:
         """Validate the syntax and return the tokenized list."""
         try:
-            # Allow
             trait = Combine(Opt(TRAIT) + ZeroOrMore("." + Opt(TRAIT)))
             operand = Word(nums) | trait
 
