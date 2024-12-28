@@ -89,12 +89,10 @@ class BotchBot(discord.Bot):
                         logger.error(f"Failed to load cog {cog_path}: {str(e)}")
 
     @overload
-    def find_emoji(self, emoji_name: str) -> str:
-        ...
+    def find_emoji(self, emoji_name: str) -> str: ...
 
     @overload
-    def find_emoji(self, emoji_name: str, count: int) -> str | list[str]:
-        ...
+    def find_emoji(self, emoji_name: str, count: int) -> str | list[str]: ...
 
     def find_emoji(self, emoji_name: str, count=1) -> str | list[str]:
         """Get an emoji from the emoji guild."""
@@ -127,11 +125,11 @@ class BotchBot(discord.Bot):
 
     async def on_application_command_error(
         self,
-        ctx: discord.ApplicationContext,
+        context: discord.ApplicationContext,
         exception: discord.DiscordException,
     ):
         # Fix some mypy complaints
-        ctx = cast(AppCtx, ctx)
+        context = cast(AppCtx, context)
         exception = cast(discord.ApplicationCommandInvokeError, exception)
 
         err = exception.original
@@ -140,10 +138,10 @@ class BotchBot(discord.Bot):
                 # This might be dangerous during development
                 pass
             case BotchError():
-                await ctx.send_error("Error", str(err), ephemeral=True)
+                await context.send_error("Error", str(err), ephemeral=True)
             case NotPremium():
-                cmd_mention = ctx.bot.cmd_mention(ctx.command.qualified_name)
-                await ctx.send_error(
+                cmd_mention = context.bot.cmd_mention(context.command.qualified_name)
+                await context.send_error(
                     "This is a premium feature",
                     (
                         f"Only patrons can use {cmd_mention}. Click "
