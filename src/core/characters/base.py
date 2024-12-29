@@ -6,7 +6,7 @@ import copy
 from collections import Counter
 from enum import StrEnum
 from itertools import product
-from typing import Literal, Optional, overload
+from typing import Collection, Literal, Optional, overload
 
 import pymongo
 from beanie import Delete, Document, before_event
@@ -166,7 +166,7 @@ class Trait(BaseModel):
     subcategory: Subcategory
     subtraits: list[str] = Field(default_factory=list)
 
-    def add_subtraits(self, subtraits: str | list[str] | set[str]):
+    def add_subtraits(self, subtraits: str | Collection[str]):
         """Add subtraits to the trait."""
         if isinstance(subtraits, str):
             subtraits = {subtraits}
