@@ -2,8 +2,6 @@
 
 import discord
 
-from models import Guild
-
 
 async def accessibility(ctx: discord.ApplicationContext) -> bool:
     """Whether to use accessibility mode for the current operation."""
