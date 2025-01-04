@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from bot import BotchBot
+from botchcord.settings import GuildCache
 from models import Guild
 
 
@@ -19,6 +20,11 @@ def guild() -> Mock:
 @pytest.fixture
 def bot() -> BotchBot:
     return BotchBot()
+
+
+@pytest.fixture
+def cache() -> GuildCache:
+    return GuildCache()
 
 
 async def test_guild_join(bot: BotchBot, guild: Mock):
@@ -69,3 +75,16 @@ async def test_guild_rename(bot: BotchBot, guild: Mock):
     found = await Guild.find_one(Guild.guild == guild.id)
     assert found is not None
     assert found.name == new_named.name
+
+
+async def test_get_or_fetch_no_guild(cache: GuildCache, guild: Mock):
+    found = await cache.get_or_fetch(guild.id)
+    assert found is None
+    assert not cache._cache
+
+
+async def test_get_or_fetch_found(bot: BotchBot, cache: GuildCache, guild: Mock):
+    await bot.on_guild_join(guild)
+    found = await cache.get_or_fetch(guild.id)
+    assert found is not None
+    assert cache._cache[guild.id] == found
