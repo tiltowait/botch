@@ -10,7 +10,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from core.characters import Character, cofd, wod
 from core.rolls import Roll
 from interface.models import CommandRecord
-from models import User
+from models import Guild, User
 
 load_dotenv()
 
@@ -24,6 +24,7 @@ DOCUMENT_MODELS = [
     cofd.Vampire,
     cofd.Mortal,
     Roll,
+    Guild,
     User,
     CommandRecord,
 ]
