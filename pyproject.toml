@@ -28,7 +28,7 @@ uvicorn = "^0.32.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.1"
-mongomock-motor = "^0.0.20"
+mongomock-motor = "^0.0.34"
 pytest-cov = "^4.1.0"
 requests = "^2.31.0"
 debugpy = "^1.6.7"
