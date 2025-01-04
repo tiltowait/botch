@@ -63,7 +63,7 @@ async def test_guild_rejoin(bot: BotchBot, guild: Mock, mock_save: AsyncMock):
     mock_save.assert_awaited()
     assert mock_save.await_count == 3
 
-    found = await bot.guild_cache.get_or_fetch(guild.id)
+    found = await bot.guild_cache.fetch(guild.id)
     assert found is not None
     assert found.left is None
 
@@ -78,20 +78,20 @@ async def test_guild_rename(bot: BotchBot, guild: Mock, mock_save: AsyncMock):
     mock_save.assert_awaited()
     assert mock_save.await_count == 2
 
-    found = await bot.guild_cache.get_or_fetch(guild.id)
+    found = await bot.guild_cache.fetch(guild.id)
     assert found is not None
     assert found.name == renamed.name
 
 
 async def test_get_or_fetch_no_guild(bot: BotchBot, guild: Mock):
-    found = await bot.guild_cache.get_or_fetch(guild.id)
+    found = await bot.guild_cache.fetch(guild.id)
     assert found is None
     assert not bot.guild_cache._cache
 
 
 async def test_get_or_fetch_found(bot: BotchBot, guild: Mock):
     await bot.on_guild_join(guild)
-    found = await bot.guild_cache.get_or_fetch(guild.id)
+    found = await bot.guild_cache.fetch(guild.id)
     assert found is not None
     assert bot.guild_cache._cache[guild.id] == found
 
@@ -99,13 +99,13 @@ async def test_get_or_fetch_found(bot: BotchBot, guild: Mock):
 async def test_cache_invalidation(bot: BotchBot, guild: Mock):
     await bot.on_guild_join(guild)
     # Get it into cache
-    _ = await bot.guild_cache.get_or_fetch(guild.id)
+    _ = await bot.guild_cache.fetch(guild.id)
     # Modify directly in DB
     g = await Guild.find_one(Guild.guild == guild.id)
     assert g is not None
     g.name = "Changed Outside Cache"
     await g.save()
     # Should still get cached version
-    cached = await bot.guild_cache.get_or_fetch(guild.id)
+    cached = await bot.guild_cache.fetch(guild.id)
     assert cached is not None
     assert cached.name == guild.name

@@ -47,7 +47,7 @@ class GuildCache:
     def __init__(self):
         self._cache: dict[int, Guild] = {}
 
-    async def get_or_fetch(self, guild_id: int) -> Guild | None:
+    async def fetch(self, guild_id: int) -> Guild | None:
         """Gets the Guild from the cache. If it misses, fetch from the
         database. If that fails, return None."""
         if guild := self._cache.get(guild_id):
@@ -69,12 +69,12 @@ class GuildCache:
 
     async def guild_left(self, guild_id: int):
         """Mark the guild as having left."""
-        if guild := await self.get_or_fetch(guild_id):
+        if guild := await self.fetch(guild_id):
             await guild.leave()
 
     async def rename(self, guild_id: int, new_name: str):
         """The guild was renamed."""
-        if guild := await self.get_or_fetch(guild_id):
+        if guild := await self.fetch(guild_id):
             await guild.rename(new_name)
         else:
             guild = Guild(guild=guild_id, name=new_name)
