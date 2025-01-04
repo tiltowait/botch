@@ -14,6 +14,7 @@ import tasks
 from config import DEBUG_GUILDS, EMOJI_GUILD, SUPPORTER_GUILD, SUPPORTER_ROLE
 from errors import BotchError, NotPremium
 from models import Guild, User
+from models.guild import GuildCache
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -49,6 +50,7 @@ class BotchBot(discord.Bot):
             *args,
             **kwargs,
         )
+        self.guild_cache = GuildCache()
         self.accept_commands = False
         self.welcomed = False
         if DEBUG_GUILDS:
@@ -156,18 +158,18 @@ class BotchBot(discord.Bot):
     async def on_guild_join(self, guild: discord.Guild):
         """Notify guild joining."""
         logger.info("Joined %s :)", guild.name)
-        await Guild.join(guild.id, guild.name)
+        await self.guild_cache.guild_joined(guild.id, guild.name)
 
     async def on_guild_remove(self, guild: discord.Guild):
         """Notify guild removal."""
         logger.info("Left %s :(", guild.name)
-        await Guild.leave(guild.id)
+        await self.guild_cache.guild_left(guild.id)
 
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         """Rename the guild."""
         if before.name != after.name:
             logger.info("Guild: %s renamed to %s (ID: %s)", before.name, after.name, after.id)
-            await Guild.rename(before.id, after.name)
+            await self.guild_cache.rename(after.id, after.name)
 
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         """Check for supporter status changes."""

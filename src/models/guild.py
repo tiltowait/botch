@@ -1,9 +1,9 @@
 """Discord guild record classes."""
 
 from datetime import UTC, datetime
-from typing import Optional
+from typing import Annotated, Optional
 
-from beanie import Document
+from beanie import Document, Indexed
 from pydantic import BaseModel, Field
 
 
@@ -16,39 +16,26 @@ class GuildSettings(BaseModel):
 class Guild(Document):
     """A Guild stores name, join date, leave date, and settings."""
 
-    guild: int
+    guild: Annotated[int, Indexed(unique=True)]
     name: str
-    joined: datetime
+    joined: datetime = Field(default_factory=lambda: datetime.now(UTC))
     left: Optional[datetime] = None
     settings: GuildSettings = Field(default_factory=GuildSettings)
 
-    @classmethod
-    async def join(cls, id: int, name: str):
-        """Bot joined the guild."""
-        if guild := await Guild.find_one(Guild.guild == id):
-            # Bot added back to old guild
-            guild.left = None
-        else:
-            guild = cls(
-                guild=id,
-                name=name,
-                joined=datetime.now(UTC),
-            )
-        await guild.save()
+    async def join(self):
+        """The bot re-joined the server."""
+        self.left = None
+        await self.save()
 
-    @classmethod
-    async def leave(cls, id: int):
+    async def leave(self):
         """The bot left the guild."""
-        if guild := await Guild.find_one(Guild.guild == id):
-            guild.left = datetime.now(UTC)
-            await guild.save()
+        self.left = datetime.now(UTC)
+        await self.save()
 
-    @classmethod
-    async def rename(cls, id: int, new_name: str):
+    async def rename(self, new_name: str):
         """Rename the Guild and save."""
-        if guild := await Guild.find_one(Guild.guild == id):
-            guild.name = new_name
-            await guild.save()
+        self.name = new_name
+        await self.save()
 
     class Settings:
         name = "guilds"
@@ -71,5 +58,24 @@ class GuildCache:
 
         return None
 
+    async def guild_joined(self, guild_id: int, name: str):
+        """Mark the guild as having joined."""
+        if guild := self._cache.get(guild_id):
+            await guild.join()
+        else:
+            guild = Guild(guild=guild_id, name=name)
+            self._cache[guild_id] = guild
+            await guild.save()
 
-cache = GuildCache()
+    async def guild_left(self, guild_id: int):
+        """Mark the guild as having left."""
+        if guild := await self.get_or_fetch(guild_id):
+            await guild.leave()
+
+    async def rename(self, guild_id: int, new_name: str):
+        """The guild was renamed."""
+        if guild := await self.get_or_fetch(guild_id):
+            await guild.rename(new_name)
+        else:
+            guild = Guild(guild=guild_id, name=new_name)
+            await guild.save()
