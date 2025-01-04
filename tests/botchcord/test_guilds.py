@@ -5,8 +5,8 @@ from unittest.mock import Mock
 import pytest
 
 from bot import BotchBot
-from botchcord.settings import GuildCache
 from models import Guild
+from models.guild import GuildCache
 
 
 @pytest.fixture
