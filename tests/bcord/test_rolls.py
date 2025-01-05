@@ -18,11 +18,14 @@ from botchcord.roll import textify_dice
 from core.characters import Character, GameLine, Splat, Trait
 from core.rolls import Roll
 from core.rolls.parse import RollParser
+from models.guild import GuildCache
 from tests.characters import gen_char
 
 
 class EmojiMock:
     """For mocking the ctx.bot.find_emoji() calls."""
+
+    guild_cache = GuildCache()
 
     def find_emoji(self, name):
         if re.match(r"^(ss?|f|b)\d+$", name):
@@ -393,6 +396,7 @@ async def test_roll_command(
     inter = AsyncMock()
     inter.user.id = wod_vampire.user
     inter.guild.id = wod_vampire.guild
+    inter.guild.name = "Test Guild"
     ctx = AppCtx(bot, inter)
 
     await core.cache.register(wod_vampire)  # Register so Haven finds her
@@ -428,6 +432,7 @@ async def test_chance_cmd(
     inter = AsyncMock()
     inter.user.id = 0
     inter.guild.id = 0
+    inter.guild.name = "Test Guild"
     ctx = AppCtx(bot, inter)
 
     find_emoji_mock.return_value = die
