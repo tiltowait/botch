@@ -7,22 +7,6 @@ from botchcord.premium import _check_supporter, is_supporter, premium
 from config import SUPPORTER_GUILD, SUPPORTER_ROLE
 
 
-@pytest.fixture
-def bot() -> Mock:
-    bot = Mock()
-    bot.get_guild = Mock()
-    return bot
-
-
-@pytest.fixture
-def ctx(bot: Mock) -> Mock:
-    ctx = Mock()
-    ctx.bot = bot
-    ctx.user = Mock()
-    ctx.user.id = 12345
-    return ctx
-
-
 @pytest.mark.parametrize("has_role", [True, False])
 def test_is_supporter(ctx: Mock, has_role: bool):
     support_server = Mock()
@@ -79,11 +63,6 @@ def test_check_supporter_success(ctx):
 def test_check_supporter_not_ready(ctx):
     ctx.bot.welcomed = False
     ctx.bot.get_guild.return_value = None
-    ctx.bot.user = Mock()
-    ctx.bot.user.mention = "@MockBot"
-    ctx.bot.cmd_mention = Mock(return_value="/mock_command")
-    ctx.command = Mock()
-    ctx.command.qualified_name = "mock_command"
     with pytest.raises(errors.NotReady):
         _check_supporter(ctx)
 
@@ -105,12 +84,6 @@ def test_check_supporter_not_premium(ctx):
 
 def test_check_supporter_not_premium_not_welcomed(ctx):
     ctx.bot.welcomed = False
-    ctx.bot.get_guild.return_value = Mock()
-    ctx.bot.user = Mock()
-    ctx.bot.user.mention = "@MockBot"
-    ctx.bot.cmd_mention = Mock(return_value="/mock_command")
-    ctx.command = Mock()
-    ctx.command.qualified_name = "mock_command"
     with patch("botchcord.premium.is_supporter", return_value=False):
         with pytest.raises(errors.NotReady):
             _check_supporter(ctx)

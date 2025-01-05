@@ -1,12 +1,12 @@
 """Specialties UI test. (Everything but Discord stuff."""
 
 from contextlib import nullcontext as does_not_raise
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import ANY, AsyncMock
 
 import pytest
 
 import errors
-from bot import AppCtx, BotchBot
+from bot import AppCtx
 from botchcord.character.specialties.adjust import _make_embed, add_specialties
 from botchcord.character.specialties.adjust import assign as assign_cmd
 from botchcord.character.specialties.adjust import remove as remove_cmd
@@ -15,13 +15,6 @@ from botchcord.character.specialties.tokenize import tokenize
 from botchcord.utils.text import b
 from core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
-
-
-@pytest.fixture
-def ctx() -> AppCtx:
-    inter = AsyncMock()
-    bot = BotchBot()
-    return AppCtx(bot, inter)
 
 
 @pytest.fixture
@@ -188,15 +181,20 @@ def test_validate_tokens(exception, skill: str, specs: list[str], character: Cha
         ("b", True),
     ],
 )
-async def test_assign_cmd(ctx: AppCtx, character: Character, assignments: str, fails: bool):
-    with patch.object(Character, "save", new_callable=AsyncMock) as mock_save:
-        if fails:
-            with pytest.raises(errors.InvalidSyntax):
-                await assign_cmd(ctx, character, assignments)
-        else:
+async def test_assign_cmd(
+    mock_char_save: AsyncMock,
+    ctx: AppCtx,
+    character: Character,
+    assignments: str,
+    fails: bool,
+):
+    if fails:
+        with pytest.raises(errors.InvalidSyntax):
             await assign_cmd(ctx, character, assignments)
-            ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
-            mock_save.assert_awaited_once()
+    else:
+        await assign_cmd(ctx, character, assignments)
+        ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+        mock_char_save.assert_awaited_once()
 
 
 @pytest.mark.parametrize(
@@ -206,15 +204,20 @@ async def test_assign_cmd(ctx: AppCtx, character: Character, assignments: str, f
         ("b", True),
     ],
 )
-async def test_remove_cmd(ctx: AppCtx, character: Character, assignments: str, fails: bool):
-    with patch.object(Character, "save", new_callable=AsyncMock) as mock_save:
-        if fails:
-            with pytest.raises(errors.InvalidSyntax):
-                await remove_cmd(ctx, character, assignments)
-        else:
+async def test_remove_cmd(
+    mock_char_save: AsyncMock,
+    ctx: AppCtx,
+    character: Character,
+    assignments: str,
+    fails: bool,
+):
+    if fails:
+        with pytest.raises(errors.InvalidSyntax):
             await remove_cmd(ctx, character, assignments)
-            ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
-            mock_save.assert_awaited_once()
+    else:
+        await remove_cmd(ctx, character, assignments)
+        ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+        mock_char_save.assert_awaited_once()
 
 
 def test_validate_tokens_multi_missing(character: Character):

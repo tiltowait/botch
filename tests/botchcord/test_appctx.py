@@ -7,12 +7,11 @@ import pytest
 
 from bot import AppCtx
 
-
-@pytest.fixture
-def ctx() -> AppCtx:
-    bot = Mock()
-    inter = AsyncMock()
-    return AppCtx(bot, inter)
+# @pytest.fixture
+# def ctx() -> AppCtx:
+#     bot = Mock()
+#     inter = AsyncMock()
+#     return AppCtx(bot, inter)
 
 
 @pytest.mark.parametrize("ephemeral", [(True,), (False,)])
@@ -35,5 +34,5 @@ async def test_send_error_with_interaction(ctx: AppCtx, ephemeral: bool):
     inter = AsyncMock()
     await ctx.send_error("title", "desc", interaction=inter, ephemeral=ephemeral)
 
-    ctx.interaction.respond.assert_not_called()
-    inter.respond.assert_called_once_with(embed=ANY, ephemeral=ephemeral)
+    ctx.interaction.respond.assert_not_awaited()
+    inter.respond.assert_awaited_once_with(embed=ANY, ephemeral=ephemeral)

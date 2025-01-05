@@ -1,6 +1,5 @@
 """Discord roll tests."""
 
-import re
 from typing import Optional
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
@@ -18,26 +17,7 @@ from botchcord.roll import textify_dice
 from core.characters import Character, GameLine, Splat, Trait
 from core.rolls import Roll
 from core.rolls.parse import RollParser
-from models.guild import GuildCache
 from tests.characters import gen_char
-
-
-class EmojiMock:
-    """For mocking the ctx.bot.find_emoji() calls."""
-
-    guild_cache = GuildCache()
-
-    def find_emoji(self, name):
-        if re.match(r"^(ss?|f|b)\d+$", name):
-            return name  # The real deal adds \u200b, but we don't need that here
-        raise errors.EmojiNotFound
-
-
-@pytest.fixture
-def ctx() -> Mock:
-    ctx = Mock()
-    ctx.bot = EmojiMock()
-    return ctx
 
 
 @pytest.fixture(autouse=True)
@@ -386,6 +366,7 @@ def test_dice_caps(ctx):
     ],
 )
 async def test_roll_command(
+    mock_respond: AsyncMock,
     pool: str,
     char: str | None,
     specs: str | None,
@@ -411,7 +392,7 @@ async def test_roll_command(
 
     else:
         await roll_cmd(ctx, pool, 6, specs, False, False, None, char)
-        ctx.respond.assert_called_once_with(embed=ANY)
+        mock_respond.assert_called_once_with(embed=ANY)
 
 
 @pytest.mark.parametrize(

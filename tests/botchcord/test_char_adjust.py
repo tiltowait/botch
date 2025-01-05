@@ -27,12 +27,6 @@ VampireType = wod.Vampire | cofd.Vampire
 
 
 @pytest.fixture(autouse=True)
-def mock_char_save():
-    with patch("core.characters.Character.save") as mocked:
-        yield mocked
-
-
-@pytest.fixture(autouse=True)
 def mock_use_emojis():
     with patch("botchcord.settings.use_emojis", new_callable=AsyncMock) as mocked:
         mocked.return_value = False
@@ -175,6 +169,8 @@ async def test_health_adjuster(idx: int, expected: str, char: Character):
     ],
 )
 async def test_willpower_adjuster(
+    mock_edit: AsyncMock,
+    mock_char_save: AsyncMock,
     idx: int,
     count: int,
     expected: str,
@@ -190,10 +186,10 @@ async def test_willpower_adjuster(
         await adjuster.callback(inter)
     assert toggler.character.willpower == expected
 
-    assert toggler.ctx.edit.await_count == count
+    assert mock_edit.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
-    assert toggler.character.save.await_count == count
+    assert mock_char_save.await_count == count
 
 
 @pytest.mark.parametrize(
@@ -213,7 +209,14 @@ async def test_willpower_adjuster(
         (2, 4, 10),
     ],
 )
-async def test_grounding_adjuster(idx: int, count: int, expected: int, toggler: Toggler):
+async def test_grounding_adjuster(
+    mock_edit: AsyncMock,
+    mock_char_save: AsyncMock,
+    idx: int,
+    count: int,
+    expected: int,
+    toggler: Toggler,
+):
     assert toggler.character.grounding.rating == 7
 
     adjuster = toggler.adjusters[2]
@@ -225,10 +228,10 @@ async def test_grounding_adjuster(idx: int, count: int, expected: int, toggler: 
         await adjuster.callback(inter)
     assert toggler.character.grounding.rating == expected
 
-    assert toggler.ctx.edit.await_count == count
+    assert mock_edit.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
-    assert toggler.character.save.await_count == count
+    assert mock_char_save.await_count == count
 
 
 @pytest.mark.parametrize(
@@ -259,6 +262,8 @@ async def test_grounding_adjuster(idx: int, count: int, expected: int, toggler: 
     ],
 )
 async def test_wod_vamp_adjuster(
+    mock_edit: AsyncMock,
+    mock_char_save: AsyncMock,
     idx: int,
     count: int,
     expected: int | tuple[int, ...],
@@ -289,10 +294,10 @@ async def test_wod_vamp_adjuster(
             assert vamp.generation == gen
             assert vamp.max_bp == mbp
 
-    assert toggler.ctx.edit.await_count == count
+    assert mock_edit.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
-    assert toggler.character.save.await_count == count
+    assert mock_char_save.await_count == count
 
 
 @pytest.mark.parametrize(
@@ -322,6 +327,8 @@ async def test_wod_vamp_adjuster(
     ],
 )
 async def test_cofd_vamp_adjuster(
+    mock_edit: AsyncMock,
+    mock_char_save: AsyncMock,
     ctx: AppCtx,
     cvamp: cofd.Vampire,
     idx: int,
@@ -352,10 +359,10 @@ async def test_cofd_vamp_adjuster(
             assert cvamp.blood_potency == gen
             assert cvamp.max_vitae == mbp
 
-    assert toggler.ctx.edit.await_count == count
+    assert mock_edit.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
-    assert toggler.character.save.await_count == count
+    assert mock_char_save.await_count == count
 
 
 @pytest.mark.parametrize(
@@ -367,7 +374,14 @@ async def test_cofd_vamp_adjuster(
         (2, 100, 10),
     ],
 )
-async def test_mummy_sekhem_adjuster(mummy_toggler: Toggler, idx: int, count: int, expected: int):
+async def test_mummy_sekhem_adjuster(
+    mock_edit: AsyncMock,
+    mock_char_save: AsyncMock,
+    mummy_toggler: Toggler,
+    idx: int,
+    count: int,
+    expected: int,
+):
     adjuster = mummy_toggler.adjusters[3]
     assert isinstance(adjuster, MummySekhemAdjuster)
 
@@ -378,9 +392,9 @@ async def test_mummy_sekhem_adjuster(mummy_toggler: Toggler, idx: int, count: in
         await adjuster.callback(inter)
 
     assert mummy_toggler.character.sekhem == expected
-    assert mummy_toggler.ctx.edit.await_count == count
+    assert mock_edit.await_count == count
     assert inter.response.edit_message.await_count == count
-    assert mummy_toggler.character.save.await_count == count
+    assert mock_char_save.await_count == count
 
 
 @pytest.mark.parametrize(
@@ -500,6 +514,7 @@ async def test_mummy_pillar_button_states(
     ],
 )
 async def test_mummy_pillar_adjuster(
+    mock_char_save: AsyncMock,
     mummy_toggler: Toggler,
     pillar_name: str,
     ida: int,
@@ -530,6 +545,8 @@ async def test_mummy_pillar_adjuster(
             assert pillar.temporary == temp
     else:
         assert pillar.temporary == expected
+
+    mock_char_save.assert_awaited()
 
 
 @pytest.mark.parametrize(
