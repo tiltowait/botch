@@ -2,16 +2,20 @@
 reminder to write thorough tests once the settings system is written, since
 they will fail once that work is done."""
 
-from unittest.mock import AsyncMock
+from unittest.mock import Mock
 
 import pytest
 
+from bot import AppCtx, BotchBot
 from botchcord import settings
 
 
 @pytest.fixture
-def ctx():
-    return AsyncMock()
+def ctx() -> AppCtx:
+    inter = Mock()
+    inter.guild.id = 123
+    inter.guild.name = "Test Guild"
+    return AppCtx(BotchBot(), inter)
 
 
 async def test_accessibility(ctx):
