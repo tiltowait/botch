@@ -32,7 +32,6 @@ async def purge_expired_images() -> str:
 async def fetch_purgeable_users() -> list[User]:
     """Fetch users who dropped premium a while ago."""
     users = await User.find({"left_premium": {"$ne": None}}).to_list()
-    print(len(users))
     return [u for u in users if u.should_purge]
 
 

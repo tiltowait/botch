@@ -115,7 +115,6 @@ async def test_register(skilled: Character, fcache: CharCache):
 
     names = await fcache.fetchnames(0, 0)
     assert len(names) == 3
-    print(names)
     assert names == ["One", "Three", "Two"], "Names should be alphabetical!"
 
 

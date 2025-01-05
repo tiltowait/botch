@@ -187,7 +187,6 @@ def get_track_string(track: str) -> str:
 
 def get_default_fields(character: Character) -> tuple[DisplayField, ...]:
     """Get the appropriate default fields for the character."""
-    print(character.line, character.splat)
     if character.line not in DEFAULT_FIELDS:
         raise errors.CharacterTemplateNotFound(f"Unknown game line `{character.line}`.")
 

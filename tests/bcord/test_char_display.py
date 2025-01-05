@@ -49,7 +49,6 @@ def wod_vamp() -> Character:
 
 
 def test_default_fields(character):
-    print(character.line, character.splat)
     if character.line == GameLine.WOD and character.splat == Splat.MUMMY:
         # TODO: Just never return a WoD mummy
         with pytest.raises(errors.CharacterTemplateNotFound):

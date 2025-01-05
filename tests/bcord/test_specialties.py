@@ -64,7 +64,6 @@ def specced(character: Character) -> Character:
 def test_valid_syntax(syntax: str, _expected: list[tuple[str, list[str]]]):
     tokens = tokenize(syntax)
     assert len(tokens) == len(_expected)
-    print(tokens)
 
     for received, expected in zip(tokens, _expected):
         r_trait, r_specs = received
@@ -118,9 +117,7 @@ def test_add_specialties(syntax: str, expected: list, character: Character):
         ("brawl=Kindred,Werewolves,Kine", ["Kine", "Werewolves"]),
     ],
 )
-def test_add_specialties_intersection(
-    syntax: str, expected: list[str], character: Character
-):
+def test_add_specialties_intersection(syntax: str, expected: list[str], character: Character):
     """Ensure that the delta filters out duplicates."""
     character.add_subtraits("Brawl", "Kindred")
 
@@ -191,9 +188,7 @@ def test_validate_tokens(exception, skill: str, specs: list[str], character: Cha
         ("b", True),
     ],
 )
-async def test_assign_cmd(
-    ctx: AppCtx, character: Character, assignments: str, fails: bool
-):
+async def test_assign_cmd(ctx: AppCtx, character: Character, assignments: str, fails: bool):
     with patch.object(Character, "save", new_callable=AsyncMock) as mock_save:
         if fails:
             with pytest.raises(errors.InvalidSyntax):
@@ -211,9 +206,7 @@ async def test_assign_cmd(
         ("b", True),
     ],
 )
-async def test_remove_cmd(
-    ctx: AppCtx, character: Character, assignments: str, fails: bool
-):
+async def test_remove_cmd(ctx: AppCtx, character: Character, assignments: str, fails: bool):
     with patch.object(Character, "save", new_callable=AsyncMock) as mock_save:
         if fails:
             with pytest.raises(errors.InvalidSyntax):
@@ -241,6 +234,4 @@ def test_adding_subtraits_to_subtraited(ctx: AppCtx, specced: Character):
     embed = _make_embed(ctx, specced, additions, "Specialties added")
 
     assert embed.description is not None
-    assert (
-        "***All:*** *Knives*, *Painting*" in embed.description
-    ), "Should show all specs"
+    assert "***All:*** *Knives*, *Painting*" in embed.description, "Should show all specs"

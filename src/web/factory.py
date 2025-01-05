@@ -63,8 +63,6 @@ def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
         extra_traits = fill_cofd(data, splat_args)
 
     cls = SPLAT_MAPPING[wizard.traits.line][data.splat]
-    print(data.splat)
-    print(cls)
     char = cls(
         # Common traits
         name=data.name,

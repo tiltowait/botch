@@ -49,7 +49,6 @@ def test_create_macro_entry(macro: Macro):
 def test_paginate_macros(macro: Macro):
     per_entry = len(create_macro_entry(macro)) + 1  # Add for \n
     macros_per_page = 2000 // per_entry
-    print(macros_per_page, per_entry)
     num_pages = 3
 
     macros = [macro] * (macros_per_page * num_pages)
