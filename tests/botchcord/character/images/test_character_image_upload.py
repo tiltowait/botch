@@ -1,6 +1,6 @@
 """Character image upload tests."""
 
-from typing import AsyncGenerator
+from typing import AsyncGenerator, cast
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
@@ -33,12 +33,12 @@ def test_valid_url(url: str, valid: bool):
     assert valid_url(url) == valid
 
 
-async def test_invalid_url(ctx: AppCtx, character: Character):
+async def test_invalid_url(mock_send_error: AsyncMock, ctx: AppCtx, character: Character):
     image = Mock()
     image.url = "https://example.com/invalid.html"
 
     await upload_image(ctx, character, image)
-    ctx.send_error.assert_awaited_once()
+    mock_send_error.assert_awaited_once()
 
 
 def test_build_embed(ctx: AppCtx, character: Character):
@@ -51,15 +51,25 @@ def test_build_embed(ctx: AppCtx, character: Character):
     assert embed.image.url == MOCKED_URL
 
 
-async def test_upload(mock_api_upload: AsyncMock, ctx: AppCtx, character: Character):
-    image = Mock()
-    image.url = "https://example.com/image.png"
+async def test_upload(
+    mock_respond: AsyncMock,
+    mock_api_upload: AsyncMock,
+    mock_char_save: AsyncMock,
+    ctx: AppCtx,
+    character: Character,
+):
+    image = Mock(url="https://example.com/image.png")
 
     await upload_image(ctx, character, image)
-    ctx.interaction.response.is_done.assert_called_once()
-    ctx.interaction.response.defer.assert_awaited_once_with(ephemeral=True, invisible=False)
+
+    # Prevent Pyright from complaining
+    mock_is_done = cast(Mock, ctx.interaction.response.is_done)
+    mock_defer = cast(AsyncMock, ctx.interaction.response.defer)
+
+    mock_is_done.assert_called_once()
+    mock_defer.assert_awaited_once_with(ephemeral=True, invisible=False)
 
     assert str(character.profile.images[0]) == MOCKED_URL
     mock_api_upload.assert_awaited_once_with(character, image.url)
-    ctx.respond.assert_awaited_once_with(embed=ANY, ephemeral=True)
-    character.save.assert_awaited_once()
+    mock_respond.assert_awaited_once_with(embed=ANY, ephemeral=True)
+    mock_char_save.assert_awaited_once()

@@ -56,7 +56,16 @@ def bot() -> BotchBot:
 
 @pytest.fixture
 async def ctx(bot: BotchBot, guild: Mock, user: Mock) -> AsyncGenerator[AppCtx, None]:
-    inter = AsyncMock(guild=guild, user=user, response=Mock(is_done=Mock(return_value=True)))
+    response_mock = Mock(
+        is_done=Mock(return_value=False),
+        defer=AsyncMock(),
+    )
+    inter = AsyncMock(
+        guild=guild,
+        user=user,
+        response=response_mock,
+    )
+
     ctx = AppCtx(bot, inter)
     ctx.command = Mock(qualified_name="mock_command")
     yield ctx
@@ -86,6 +95,19 @@ async def mock_delete() -> AsyncGenerator[AsyncMock, None]:
         yield mock
 
 
+@pytest.fixture
+async def mock_is_done() -> AsyncGenerator[Mock, None]:
+    with patch("discord.InteractionResponse.is_done") as mock:
+        yield mock
+
+
+@pytest.fixture
+async def mock_defer() -> AsyncGenerator[AsyncMock, None]:
+    with patch("discord.InteractionResponse.defer", new_callable=AsyncMock) as mock:
+        yield mock
+
+
+@pytest.fixture
 def mock_char_save():
-    with patch("core.characters.Character.save") as mocked:
+    with patch("core.characters.Character.save", new_callable=AsyncMock) as mocked:
         yield mocked
