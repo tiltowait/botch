@@ -1,8 +1,10 @@
 """Discord guild record classes."""
 
+import logging
 from datetime import UTC, datetime
-from typing import Annotated, Optional
+from typing import Annotated, Literal, Optional, overload
 
+import discord
 from beanie import Document, Indexed
 from pydantic import BaseModel, Field
 
@@ -24,8 +26,9 @@ class Guild(Document):
 
     async def join(self):
         """The bot re-joined the server."""
-        self.left = None
-        await self.save()
+        if self.left is not None:
+            self.left = None
+            await self.save()
 
     async def leave(self):
         """The bot left the guild."""
@@ -46,36 +49,57 @@ class GuildCache:
 
     def __init__(self):
         self._cache: dict[int, Guild] = {}
+        self.logger = logging.getLogger("GUILD CACHE")
 
-    async def fetch(self, guild_id: int) -> Guild | None:
+    async def _create(self, discord_guild: discord.Guild) -> Guild:
+        """Create a new guild and save it."""
+        self.logger.info(
+            "Creating %s (ID: %s)",
+            discord_guild.name,
+            discord_guild.id,
+        )
+        guild = Guild(guild=discord_guild.id, name=discord_guild.name)
+        await guild.save()
+
+        self._cache[guild.guild] = guild
+        return guild
+
+    @overload
+    async def fetch(self, discord_guild: discord.Guild) -> Guild | None: ...
+
+    @overload
+    async def fetch(self, discord_guild: discord.Guild, create: Literal[True]) -> Guild: ...
+
+    @overload
+    async def fetch(self, discord_guild: discord.Guild, create: Literal[False]) -> Guild | None: ...
+
+    async def fetch(self, discord_guild: discord.Guild, create=False) -> Guild | None:
         """Gets the Guild from the cache. If it misses, fetch from the
         database. If that fails, return None."""
-        if guild := self._cache.get(guild_id):
+        if guild := self._cache.get(discord_guild.id):
             return guild
-        if guild := await Guild.find_one(Guild.guild == guild_id):
-            self._cache[guild_id] = guild
+        if guild := await Guild.find_one(Guild.guild == discord_guild.id):
+            self._cache[discord_guild.id] = guild
+            return guild
+
+        if create:
+            guild = await self._create(discord_guild)
             return guild
 
         return None
 
-    async def guild_joined(self, guild_id: int, name: str):
+    async def guild_joined(self, discord_guild: discord.Guild):
         """Mark the guild as having joined."""
-        if guild := self._cache.get(guild_id):
-            await guild.join()
-        else:
-            guild = Guild(guild=guild_id, name=name)
-            self._cache[guild_id] = guild
-            await guild.save()
+        guild = await self.fetch(discord_guild, create=True)
+        await guild.join()
 
-    async def guild_left(self, guild_id: int):
+    async def guild_left(self, discord_guild: discord.Guild):
         """Mark the guild as having left."""
-        if guild := await self.fetch(guild_id):
+        if guild := await self.fetch(discord_guild):
             await guild.leave()
 
-    async def rename(self, guild_id: int, new_name: str):
+    async def rename(self, discord_guild: discord.Guild, new_name: str):
         """The guild was renamed."""
-        if guild := await self.fetch(guild_id):
-            await guild.rename(new_name)
-        else:
-            guild = Guild(guild=guild_id, name=new_name)
-            await guild.save()
+        guild = await self.fetch(discord_guild, create=True)
+        guild.name = new_name
+        await guild.save()
