@@ -130,7 +130,6 @@ class BotchBot(discord.Bot):
         context: discord.ApplicationContext,
         exception: discord.DiscordException,
     ):
-        # Fix some mypy complaints
         context = cast(AppCtx, context)
         exception = cast(discord.ApplicationCommandInvokeError, exception)
 

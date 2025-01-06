@@ -64,7 +64,7 @@ jobs:
           name: github-action
           fail_ci_if_error: true
 
-  mypy:
+  pyright:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,5 +77,5 @@ jobs:
           cache: poetry
       - name: Install dependencies
         run: poetry install --with dev
-      - name: Mypy check
-        run: poetry run mypy .
+      - name: Pyright check
+        run: poetry run pyright src

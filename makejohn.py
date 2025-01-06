@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """Simple program to insert John or some random characters into the database
 for testing purposes, because mucking about with the wizard over and over again
 gets tedious pretty quickly."""
