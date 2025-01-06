@@ -29,6 +29,8 @@ def char(character: Character) -> Character:
 )
 async def test_macro_deletion(
     mock_char_save: AsyncMock,
+    mock_respond: AsyncMock,
+    mock_send_error: AsyncMock,
     ctx: AppCtx,
     char: Character,
     macro_name: str,
@@ -38,9 +40,9 @@ async def test_macro_deletion(
     await delete_macro(ctx, char, macro_name)  # type: ignore
 
     if err:
-        ctx.send_error.assert_awaited_once_with("Error", err)
+        mock_send_error.assert_awaited_once_with("Error", err)
         assert len(char.macros) == 1
     else:
-        ctx.respond.assert_awaited_once_with(embed=ANY, ephemeral=True)
+        mock_respond.assert_awaited_once_with(embed=ANY, ephemeral=True)
         assert not char.macros
         mock_char_save.assert_awaited_once()

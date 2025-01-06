@@ -69,6 +69,8 @@ def test_build_embed(bot_mock, char):
 async def test_create_cmd(
     embed_mock,
     mock_char_save,
+    mock_respond,
+    mock_send_error,
     ctx: AppCtx,
     char: Character,
     pool: str,
@@ -80,9 +82,9 @@ async def test_create_cmd(
     await create_cmd(ctx, char, "test", pool, 7, None)  # type: ignore
 
     if should_err:
-        ctx.send_error.assert_awaited_once()
+        mock_send_error.assert_awaited_once()
     else:
-        ctx.respond.assert_awaited_once_with(embed=expected_cembed, ephemeral=True)
+        mock_respond.assert_awaited_once_with(embed=expected_cembed, ephemeral=True)
         mock_char_save.assert_awaited_once()
 
         assert len(char.macros) == 1

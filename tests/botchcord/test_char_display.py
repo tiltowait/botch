@@ -22,19 +22,6 @@ from tests.characters import gen_char
 
 
 @pytest.fixture
-def bot_mock() -> Mock:
-    user = Mock()
-    user.display_name = "tiltowait"
-    user.guild_avatar = "https://example.com/img.png"
-
-    bot = Mock()
-    bot.get_user.return_value = user
-    bot.find_emoji = lambda e: e
-
-    return bot
-
-
-@pytest.fixture
 def wod_vamp() -> Character:
     return gen_char(
         GameLine.WOD,
@@ -172,6 +159,7 @@ def test_emoji_track(track: str, expected: str):
 async def test_display(
     emoji_mock: Mock,
     settings_mock: AsyncMock,
+    mock_respond: AsyncMock,
     wod_vamp: Vampire,
 ):
     emoji_mock.return_value = "e"
@@ -182,4 +170,4 @@ async def test_display(
 
     await display(ctx, wod_vamp)
     settings_mock.assert_awaited_once_with(ctx)
-    ctx.respond.assert_awaited_once_with(embed=ANY)
+    mock_respond.assert_awaited_once_with(embed=ANY)

@@ -10,19 +10,6 @@ from models import Guild
 
 
 @pytest.fixture
-def guild() -> Mock:
-    mock = Mock()
-    mock.id = 123
-    mock.name = "Test Guild"
-    return mock
-
-
-@pytest.fixture
-def bot() -> BotchBot:
-    return BotchBot()
-
-
-@pytest.fixture
 async def mock_save() -> AsyncGenerator[AsyncMock, None]:
     with patch("models.Guild.save", new_callable=AsyncMock) as mock:
         yield mock

@@ -2,12 +2,13 @@
 
 from functools import partial
 from typing import Callable
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
 from discord.ui import Button, Select
 
 import errors
+from bot import AppCtx
 from botchcord.haven import Haven
 from core import cache
 from core.characters import Character, GameLine, Splat
@@ -34,16 +35,6 @@ async def mortal() -> Character:
     mortal = gen_char(GameLine.WOD, Splat.MORTAL, name="Sally")
     await mortal.save()
     return mortal
-
-
-@pytest.fixture
-def ctx() -> AsyncMock:
-    ctx = AsyncMock()
-    ctx.guild.id = 0
-    ctx.user.id = 0
-    ctx.respond.return_value = "able"
-
-    return ctx
 
 
 @pytest.mark.parametrize(
@@ -117,7 +108,12 @@ async def test_character_match_character(populate_mock: AsyncMock, ctx: AsyncMoc
 
 @patch("botchcord.haven.Haven.wait", new_callable=AsyncMock)
 async def test_no_character_selected(
-    wait_mock: AsyncMock, ctx: AsyncMock, vamp: Character, mortal: Character
+    wait_mock: AsyncMock,
+    mock_respond: AsyncMock,
+    mock_delete: AsyncMock,
+    ctx: AsyncMock,
+    vamp: Character,
+    mortal: Character,
 ):
     await vamp.save()
     await mortal.save()
@@ -126,8 +122,8 @@ async def test_no_character_selected(
     with pytest.raises(errors.NoCharacterSelected):
         await haven.get_match()
 
-    ctx.respond.assert_called_once_with(embed=ANY, view=haven, ephemeral=True)
-    ctx.delete.assert_awaited_once()
+    mock_respond.assert_awaited_once_with(embed=ANY, view=haven, ephemeral=True)
+    mock_delete.assert_awaited_once()
     wait_mock.assert_awaited_once()
 
 
@@ -174,24 +170,23 @@ async def test_select(ctx: AsyncMock, vamp: Character, mortal: Character):
         assert sel.options[i].label == char.name
 
 
-async def test_send_selection(ctx: AsyncMock):
+async def test_send_selection(mock_respond: AsyncMock, ctx: AppCtx):
     haven = Haven(ctx, None, None, None)
 
     # We need to mock Haven.wait() so we don't lock up
     async def call_callback():
-        inter = AsyncMock()
+        inter = Mock()
         inter.custom_id = haven.children[1].custom_id  # type: ignore
         await haven._callback(inter)
 
-    mock_wait = AsyncMock()
-    mock_wait.side_effect = call_callback
-    haven.wait = mock_wait
+    with patch("botchcord.haven.Haven.wait", new_callable=AsyncMock) as mock_wait:
+        mock_wait.side_effect = call_callback
 
-    # This context will be removed once the function is implemented
-    _ = await haven.get_match()
+        # This context will be removed once the function is implemented
+        _ = await haven.get_match()
 
-    # Make sure everything was called
-    ctx.respond.assert_called_once_with(embed=ANY, view=haven, ephemeral=True)
-    mock_wait.assert_called_once()
+        # Make sure everything was called
+        mock_respond.assert_awaited_once_with(embed=ANY, view=haven, ephemeral=True)
+        mock_wait.assert_awaited_once()
 
-    assert haven.selected == haven.chars[1]
+        assert haven.selected == haven.chars[1]
