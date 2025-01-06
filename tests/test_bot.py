@@ -1,5 +1,6 @@
 """Bot instance tests."""
 
+from typing import AsyncGenerator
 from unittest import mock
 from unittest.mock import ANY, AsyncMock, MagicMock, Mock, PropertyMock, patch
 
@@ -19,15 +20,21 @@ def bot():
 @pytest.fixture
 def ctx(bot: BotchBot) -> AppCtx:
     ctx = AppCtx(bot, AsyncMock())
-    ctx.send_error = AsyncMock()
     ctx.command = Mock()
     ctx.command.qualified_name = "command"
     return ctx
 
 
+@pytest.fixture
+async def mock_send_error() -> AsyncGenerator[AsyncMock, None]:
+    with patch("bot.AppCtx.send_error", new_callable=AsyncMock) as mock:
+        yield mock
+
+
 async def test_on_connect(bot):
-    with mock.patch("bot.db.init", return_value=None), mock.patch(
-        "bot.BotchBot.sync_commands", return_value=None
+    with (
+        mock.patch("bot.db.init", return_value=None),
+        mock.patch("bot.BotchBot.sync_commands", return_value=None),
     ):
         await bot.on_connect()
 
@@ -51,7 +58,7 @@ def test_get_emoji(emoji_name, count, expected, bot):
     # Mocking the emoji object
     mock_emoji = MagicMock()
     mock_emoji.name = "smile"
-    mock_emoji.__str__.return_value = "😊"
+    mock_emoji.__str__.return_value = "😊"  # type:ignore
 
     # Mocking the guild object
     mock_guild = MagicMock()
@@ -74,15 +81,17 @@ async def test_get_ctx(bot: BotchBot):
 
 
 @pytest.mark.parametrize("error_cls", [errors.BotchError, errors.NotPremium])
-async def test_send_error_message(bot: BotchBot, ctx: AppCtx, error_cls: type[errors.BotchError]):
+async def test_send_error_message(
+    mock_send_error: AsyncMock, bot: BotchBot, ctx: AppCtx, error_cls: type[errors.BotchError]
+):
     msg = "This is a test"
     err = ApplicationCommandInvokeError(error_cls(msg))
 
     await bot.on_application_command_error(ctx, err)
     if isinstance(err.original, errors.NotPremium):
-        ctx.send_error.assert_awaited_once_with("This is a premium feature", ANY, ephemeral=True)
+        mock_send_error.assert_awaited_once_with("This is a premium feature", ANY, ephemeral=True)
     else:
-        ctx.send_error.assert_awaited_once_with("Error", msg, ephemeral=True)
+        mock_send_error.assert_awaited_once_with("Error", msg, ephemeral=True)
 
 
 async def test_re_raise_error_message(bot: BotchBot, ctx: AppCtx):
@@ -92,10 +101,10 @@ async def test_re_raise_error_message(bot: BotchBot, ctx: AppCtx):
         await bot.on_application_command_error(ctx, err)
 
 
-async def test_not_found_ignored(bot: BotchBot, ctx: AppCtx):
+async def test_not_found_ignored(mock_send_error: AsyncMock, bot: BotchBot, ctx: AppCtx):
     err = ApplicationCommandInvokeError(NotFound(MagicMock(), None))
     await bot.on_application_command_error(ctx, err)
-    ctx.send_error.assert_not_called()
+    mock_send_error.assert_not_called()
 
 
 @pytest.mark.parametrize(

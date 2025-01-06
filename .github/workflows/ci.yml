@@ -78,4 +78,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev
       - name: Pyright check
-        run: poetry run pyright src
+        run: poetry run pyright .

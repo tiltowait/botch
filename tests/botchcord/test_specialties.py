@@ -182,6 +182,7 @@ def test_validate_tokens(exception, skill: str, specs: list[str], character: Cha
     ],
 )
 async def test_assign_cmd(
+    mock_respond: AsyncMock,
     mock_char_save: AsyncMock,
     ctx: AppCtx,
     character: Character,
@@ -193,7 +194,7 @@ async def test_assign_cmd(
             await assign_cmd(ctx, character, assignments)
     else:
         await assign_cmd(ctx, character, assignments)
-        ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+        mock_respond.assert_called_once_with(embed=ANY, ephemeral=True)
         mock_char_save.assert_awaited_once()
 
 
@@ -205,6 +206,7 @@ async def test_assign_cmd(
     ],
 )
 async def test_remove_cmd(
+    mock_respond: AsyncMock,
     mock_char_save: AsyncMock,
     ctx: AppCtx,
     character: Character,
@@ -216,7 +218,7 @@ async def test_remove_cmd(
             await remove_cmd(ctx, character, assignments)
     else:
         await remove_cmd(ctx, character, assignments)
-        ctx.interaction.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+        mock_respond.assert_called_once_with(embed=ANY, ephemeral=True)
         mock_char_save.assert_awaited_once()
 
 

@@ -96,6 +96,12 @@ async def mock_delete() -> AsyncGenerator[AsyncMock, None]:
 
 
 @pytest.fixture
+async def mock_send_modal() -> AsyncGenerator[AsyncMock, None]:
+    with patch("bot.AppCtx.send_modal", new_callable=AsyncMock) as mock:
+        yield mock
+
+
+@pytest.fixture
 async def mock_is_done() -> AsyncGenerator[Mock, None]:
     with patch("discord.InteractionResponse.is_done") as mock:
         yield mock

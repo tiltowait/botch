@@ -82,7 +82,7 @@ async def test_cache_fetch_not_found(bot: BotchBot, guild: Mock):
 
 
 async def test_cache_fetch_create(bot: BotchBot, guild: Mock, mock_save: AsyncMock):
-    guild = await bot.guild_cache.fetch(guild, create=True)
+    guild = await bot.guild_cache.fetch(guild, create=True)  # type:ignore
     assert guild.guild in bot.guild_cache._cache
     mock_save.assert_awaited_once()
 
