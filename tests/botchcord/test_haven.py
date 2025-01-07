@@ -1,9 +1,10 @@
 """Test character haven class and decorator."""
 
 from functools import partial
-from typing import Callable
-from unittest.mock import ANY, AsyncMock, Mock, patch
+from typing import Callable, Generator, cast
+from unittest.mock import ANY, AsyncMock, Mock, PropertyMock, patch
 
+import discord
 import pytest
 from discord.ui import Button, Select
 
@@ -37,6 +38,17 @@ async def mortal() -> Character:
     return mortal
 
 
+@pytest.fixture
+def invoker() -> Mock:
+    return Mock(id=10)
+
+
+@pytest.fixture
+def mock_admin_user() -> Generator[Mock, None, None]:
+    with patch("bot.AppCtx.admin_user", new_callable=PropertyMock) as mock:
+        yield mock
+
+
 @pytest.mark.parametrize(
     "expected,test",
     [
@@ -49,7 +61,7 @@ async def test_filtering_func(
     test: Callable[[Character], bool],
     ctx: AsyncMock,
 ):
-    haven = Haven(ctx, None, None, None, test)
+    haven = Haven(ctx, None, None, None, None, test)
     await haven._populate()
     assert haven._populated
 
@@ -57,13 +69,13 @@ async def test_filtering_func(
 
 
 async def test_match_none(ctx: AsyncMock):
-    haven = Haven(ctx, GameLine.COFD, Splat.VAMPIRE, None)
+    haven = Haven(ctx, GameLine.COFD, Splat.VAMPIRE, None, None)
     with pytest.raises(errors.NoMatchingCharacter):
         await haven.get_match()
 
 
 async def test_match_one(ctx: AsyncMock, vamp: Character):
-    haven = Haven(ctx, GameLine.WOD, Splat.VAMPIRE, None)
+    haven = Haven(ctx, GameLine.WOD, Splat.VAMPIRE, None, None)
     found = await haven.get_match()
 
     assert found is not None
@@ -81,7 +93,7 @@ async def test_match_name(search_name: str, should_find: bool, ctx: AsyncMock, v
     vamp.name = "Billy"
     await vamp.save()
 
-    haven = Haven(ctx, None, None, search_name)
+    haven = Haven(ctx, None, None, search_name, None)
     if should_find:
         found = await haven.get_match()
         assert found == vamp
@@ -93,14 +105,14 @@ async def test_match_name(search_name: str, should_find: bool, ctx: AsyncMock, v
 async def test_character_ineligible(ctx: AsyncMock, vamp: Character):
     await vamp.save()
 
-    haven = Haven(ctx, None, None, vamp.name, lambda _: False)
+    haven = Haven(ctx, None, None, vamp.name, None, lambda _: False)
     with pytest.raises(errors.CharacterIneligible):
         await haven.get_match()
 
 
 @patch("botchcord.haven.Haven._populate", new_callable=AsyncMock)
 async def test_character_match_character(populate_mock: AsyncMock, ctx: AsyncMock, vamp: Character):
-    haven = Haven(ctx, None, None, vamp)
+    haven = Haven(ctx, None, None, vamp, None)
     v = await haven.get_match()
     assert v == vamp
     populate_mock.assert_not_awaited()
@@ -118,7 +130,7 @@ async def test_no_character_selected(
     await vamp.save()
     await mortal.save()
 
-    haven = Haven(ctx, None, None, None)
+    haven = Haven(ctx, None, None, None, None)
     with pytest.raises(errors.NoCharacterSelected):
         await haven.get_match()
 
@@ -128,7 +140,7 @@ async def test_no_character_selected(
 
 
 async def test_buttons(ctx: AsyncMock, vamp: Character, mortal: Character):
-    haven = Haven(ctx, GameLine.WOD, None, None)
+    haven = Haven(ctx, GameLine.WOD, None, None, None)
     await haven._populate()
     haven._add_buttons()
 
@@ -154,7 +166,7 @@ async def test_select(ctx: AsyncMock, vamp: Character, mortal: Character):
     await c5.save()
     await c6.save()
 
-    haven = Haven(ctx, None, None, None)
+    haven = Haven(ctx, None, None, None, None)
     await haven._populate()
     assert len(haven.chars) == 6
 
@@ -171,7 +183,7 @@ async def test_select(ctx: AsyncMock, vamp: Character, mortal: Character):
 
 
 async def test_send_selection(mock_respond: AsyncMock, ctx: AppCtx):
-    haven = Haven(ctx, None, None, None)
+    haven = Haven(ctx, None, None, None, None)
 
     # We need to mock Haven.wait() so we don't lock up
     async def call_callback():
@@ -190,3 +202,63 @@ async def test_send_selection(mock_respond: AsyncMock, ctx: AppCtx):
         mock_wait.assert_awaited_once()
 
         assert haven.selected == haven.chars[1]
+
+
+async def test_haven_user_matches(ctx: AppCtx):
+    haven = Haven(ctx, GameLine.WOD, Splat.VAMPIRE, None, None)
+    char = await haven.get_match()
+    assert char.user == ctx.author.id
+
+
+@pytest.mark.parametrize("is_admin", [True, False])
+@patch("bot.AppCtx.admin_user", new_callable=PropertyMock)
+async def test_haven_admin_lookup(
+    mock_admin_user: Mock,
+    is_admin: bool,
+    ctx: AppCtx,
+    invoker: Mock,
+    vamp: Character,
+):
+    mock_admin_user.return_value = is_admin
+
+    # Override, since we are looking up another user's character
+    owner = cast(discord.Member, ctx.author)
+    ctx.interaction.user = invoker
+
+    assert ctx.admin_user == is_admin
+
+    if not is_admin:
+        with pytest.raises(LookupError):
+            _ = Haven(ctx, None, None, None, owner)
+            print(owner.id, invoker.id)
+    else:
+        # In real use, the filtering will be by name, owner, and guild (part
+        # of ctx). The mock user has 2 characters in this setup, so we disable
+        # filtering by line and splat and instead supply only the name to be
+        # sure we get the correct character.
+        haven = Haven(ctx, None, None, vamp.name, owner)
+        char = await haven.get_match()
+        assert char.user == owner.id
+        assert char.user != ctx.author.id
+        assert char.name == vamp.name
+
+
+@pytest.mark.parametrize("allow", [True, False])
+async def test_allow_any(
+    mock_admin_user: Mock,
+    ctx: AppCtx,
+    invoker: Mock,
+    vamp: Character,
+    allow: bool,
+):
+    mock_admin_user.return_value = False
+    owner = cast(discord.Member, ctx.author)
+    ctx.interaction.user = invoker
+
+    if allow:
+        haven = Haven(ctx, None, None, vamp.name, owner, permissive=True)
+        char = await haven.get_match()
+        assert char == vamp
+    else:
+        with pytest.raises(LookupError):
+            haven = Haven(ctx, None, None, vamp.name, owner)

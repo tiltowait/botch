@@ -39,6 +39,11 @@ class AppCtx(discord.ApplicationContext):
         else:
             await self.respond(embed=embed, ephemeral=ephemeral)
 
+    @property
+    def admin_user(self) -> bool:
+        """Whether the invoking user is an admin."""
+        return self.channel.permissions_for(self.author).administrator
+
 
 class BotchBot(discord.Bot):
     """The bot class for Botch."""

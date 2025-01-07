@@ -26,6 +26,7 @@ def haven(
     line: GameLine | str | None = GAME_LINE,
     splat: Splat | None = None,
     filter: Callable[[Character], bool] = lambda _: True,
+    permissive=False,
 ) -> Callable[
     [Callable[Concatenate[AppCtx, Character, P], Coroutine[Any, Any, T]]],
     Callable[Concatenate[AppCtx, str | Character, P], Coroutine[Any, Any, T]],
@@ -43,7 +44,12 @@ def haven(
             **kwargs: P.kwargs,
         ) -> T:
             if not isinstance(char, Character):
-                haven = Haven(ctx, line, splat, char, filter)
+                owner = cast(discord.Member | None, kwargs.get("owner"))
+                if owner is not None and not isinstance(owner, discord.Member):
+                    # This shouldn't be reachable. We don't accept discord.User
+                    # since characters are only allowed in guilds.
+                    raise TypeError(f"Unexpected type for owner: {owner}")
+                haven = Haven(ctx, line, splat, char, owner, filter, permissive)
                 char = await haven.get_match()
 
             return await func(ctx, char, *args, **kwargs)
@@ -63,17 +69,23 @@ class Haven(discord.ui.View):
         line: GameLine | str | None,
         splat: Splat | None,
         character: str | Character | None,
+        owner: discord.Member | None,
         filter: Callable[[Character], bool] = lambda _: True,
+        permissive=False,
     ):
         self.ctx = ctx
         self.line = GameLine(line) if line is not None else None
         self.splat = splat
         self.character = character
         self.chars: list[Character] = []
+        self.owner = owner or ctx.author
         self.filter = filter
         self._populated = False
         self.selected: Character | None = None
         self.new_interaction: discord.Interaction | None = None
+
+        if self.owner.id != self.ctx.author.id and not self.ctx.admin_user and not permissive:
+            raise LookupError("You must be an admin to look up others' characters.")
 
         super().__init__(timeout=60, disable_on_timeout=True)
 
@@ -82,7 +94,7 @@ class Haven(discord.ui.View):
         if not self._populated:
             characters = await cache.fetchall(
                 self.ctx.guild.id,
-                self.ctx.user.id,
+                self.owner.id,
                 line=self.line,
                 splat=self.splat,
             )

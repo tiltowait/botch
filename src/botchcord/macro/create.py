@@ -22,7 +22,9 @@ async def create(
     """Create a macro and add it to the character."""
     # can_use_macro() is too complex for the @haven decorator
     try:
-        haven = Haven(ctx, GAME_LINE, None, character, filter=lambda c: can_use_macro(c, pool))
+        haven = Haven(
+            ctx, GAME_LINE, None, character, None, filter=lambda c: can_use_macro(c, pool)
+        )
         char = await haven.get_match()
         macro = create_macro(char, name, pool, diff, comment, rote)
         char.add_macro(macro)

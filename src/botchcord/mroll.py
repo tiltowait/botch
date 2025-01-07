@@ -21,7 +21,7 @@ async def mroll(
 
     The user can override the default difficulty with target_override,
     and the default comment with comment_override."""
-    haven = Haven(ctx, GAME_LINE, None, character, filter=lambda c: has_macro(c, macro_name))
+    haven = Haven(ctx, GAME_LINE, None, character, None, filter=lambda c: has_macro(c, macro_name))
 
     char = await haven.get_match()
     macro = char.find_macro(macro_name)
