@@ -198,7 +198,7 @@ async def test_first_last(pager: ImagePager, uinter: AsyncMock):
 # Like before, we already tested the button eligibility
 
 
-async def test_management_mode(pager: ImagePager, uinter: AsyncMock):
+async def test_management_mode(mock_char_save: AsyncMock, pager: ImagePager, uinter: AsyncMock):
     assert len(pager.children) == 6
     await pager.goto_page(3, uinter)
     assert pager.current_page == 3
@@ -220,14 +220,14 @@ async def test_management_mode(pager: ImagePager, uinter: AsyncMock):
     assert pager.current_image == image
     assert str(pager.character.profile.images[0]) == image
 
-    assert pager.character.save.await_count == 1
+    assert mock_char_save.await_count == 1
 
     await pager._demote_image(uinter)
     assert pager.current_page == pager.num_pages - 1
     assert pager.current_image == image
     assert str(pager.character.profile.images[-1]) == image
 
-    assert pager.character.save.await_count == 2
+    assert mock_char_save.await_count == 2
 
     await pager._delete_image(uinter)
     assert pager.current_page == pager.num_pages - 1, "Should still be on last page"
@@ -235,7 +235,7 @@ async def test_management_mode(pager: ImagePager, uinter: AsyncMock):
     assert pager.num_pages == NUM_IMAGES - 1
     assert pager.indicator.label == f"{NUM_IMAGES - 1}/{NUM_IMAGES - 1}"
 
-    assert pager.character.save.await_count == 3
+    assert mock_char_save.await_count == 3
 
     await pager.mode_toggle(uinter)
     assert pager.children == [
@@ -267,14 +267,15 @@ async def test_delete_all_images(pager: ImagePager, uinter: AsyncMock):
 # All that ... just to test the display command in < 10 lines
 
 
-async def test_display_images(ctx: AppCtx, char: Character):
+async def test_display_images(mock_respond: AsyncMock, ctx: AppCtx, char: Character):
     await display_images(ctx, char, False)
-    ctx.respond.assert_awaited_once_with(embed=ANY, view=ANY)
+    mock_respond.assert_awaited_once_with(embed=ANY, view=ANY)
 
 
-async def test_display_no_images(ctx: AppCtx, character: Character):
+async def test_display_no_images(mock_respond: AsyncMock, ctx: AppCtx, character: Character):
     await core.cache.register(character)
     with pytest.raises(errors.CharacterIneligible):
         await display_images(ctx, character.name, False)
-    ctx.respond.assert_not_awaited()
+
+    mock_respond.assert_not_awaited()
     await core.cache.remove(character)

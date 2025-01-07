@@ -407,7 +407,12 @@ async def test_roll_command(
 @patch("botchcord.roll.emoji_name")
 @patch("botchcord.roll.d10")
 async def test_chance_cmd(
-    find_emoji_mock: Mock, emoji_mock: Mock, d10_mock: Mock, die: int, title: str
+    find_emoji_mock: Mock,
+    emoji_mock: Mock,
+    d10_mock: Mock,
+    mock_respond: AsyncMock,
+    die: int,
+    title: str,
 ):
     bot = BotchBot()
     inter = AsyncMock()
@@ -421,9 +426,9 @@ async def test_chance_cmd(
     d10_mock.return_value = die
 
     await chance_cmd(ctx)
-    ctx.respond.assert_awaited_once_with(embed=ANY)
+    mock_respond.assert_awaited_once_with(embed=ANY)
 
-    embed: discord.Embed = ctx.respond.await_args.kwargs["embed"]
+    embed: discord.Embed = mock_respond.await_args.kwargs["embed"]  # type:ignore
     assert embed.title is not None
     assert title in embed.title
 

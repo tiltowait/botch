@@ -1,11 +1,13 @@
 """Pytest configuration."""
 
 import asyncio
+from typing import cast
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
+from motor.motor_asyncio import AsyncIOMotorClient
 
 from core.characters import Character, GameLine, Splat, Trait
 from db import DOCUMENT_MODELS
@@ -15,7 +17,7 @@ from tests.characters import gen_char
 @pytest.fixture(autouse=True)
 async def beanie_fixture():
     """Configures a mock beanie client for all tests."""
-    client = AsyncMongoMockClient()
+    client = cast(AsyncIOMotorClient, AsyncMongoMockClient())
     await init_beanie(
         database=client.get_database(name="db"),
         document_models=DOCUMENT_MODELS,

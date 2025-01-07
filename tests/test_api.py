@@ -1,5 +1,7 @@
+"""API tests."""
+
 import os
-from unittest.mock import AsyncMock, mock_open, patch
+from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 import pytest
 
@@ -9,18 +11,13 @@ from config import FC_BUCKET
 os.environ["BOTCH_API_TOKEN"] = "test_token"
 
 
-class Character:
-    """Sample Character class for testing purposes."""
-
-    def __init__(self, guild, user, id):
-        self.guild = guild
-        self.user = user
-        self.id = id
+@pytest.fixture
+def character() -> Mock:
+    return Mock(guild="guild1", user="user1", id="char1")
 
 
 @pytest.mark.asyncio
-async def test_upload_faceclaim():
-    character = Character(guild="guild1", user="user1", id="char1")
+async def test_upload_faceclaim(character: Mock):
     image_url = "http://example.com/image.jpg"
 
     with patch("aiohttp.ClientSession.post") as mock_post:
@@ -50,9 +47,7 @@ async def test_delete_single_faceclaim():
 
 
 @pytest.mark.asyncio
-async def test_delete_character_faceclaims():
-    character = Character(guild="guild1", user="user1", id="char1")
-
+async def test_delete_character_faceclaims(character: Mock):
     with patch("aiohttp.ClientSession.delete") as mock_delete:
         mock_response = AsyncMock()
         mock_response.ok = True
@@ -65,10 +60,12 @@ async def test_delete_character_faceclaims():
 
 @pytest.mark.asyncio
 async def test_upload_logs():
-    with patch("glob.glob", return_value=["./logs/log1.txt", "./logs/log2.txt"]), patch(
-        "builtins.open", mock_open(read_data="data")
-    ), patch("aiohttp.ClientSession.post") as mock_post, patch("os.unlink") as mock_unlink:
-
+    with (
+        patch("glob.glob", return_value=["./logs/log1.txt", "./logs/log2.txt"]),
+        patch("builtins.open", mock_open(read_data="data")),
+        patch("aiohttp.ClientSession.post") as mock_post,
+        patch("os.unlink") as mock_unlink,
+    ):
         mock_response = AsyncMock()
         mock_response.ok = True
         mock_response.json = AsyncMock(return_value="Uploaded")

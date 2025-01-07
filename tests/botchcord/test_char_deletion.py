@@ -38,7 +38,7 @@ async def test_deletion_modal(name: str, input: str, should_pass: bool):
 
 @pytest.mark.parametrize("should_delete", [True, False])
 @patch("botchcord.character.delete.DeletionModal")
-async def test_delete(modal_mock: MagicMock, should_delete: bool):
+async def test_delete(modal_mock: MagicMock, mock_send_modal: AsyncMock, should_delete: bool):
     modal_instance = AsyncMock()
     modal_mock.return_value = modal_instance
     inter = AsyncMock()
@@ -59,7 +59,7 @@ async def test_delete(modal_mock: MagicMock, should_delete: bool):
     await core.cache.register(char)
 
     await delete(ctx, char)
-    ctx.send_modal.assert_awaited_once_with(modal_instance)
+    mock_send_modal.assert_awaited_once_with(modal_instance)
 
     if should_delete:
         inter.respond.assert_awaited_once()

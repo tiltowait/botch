@@ -94,5 +94,5 @@ def test_premium_decorator():
     async def mock_command(_):
         pass
 
-    assert len(mock_command.__commands_checks__) == 1
-    assert mock_command.__commands_checks__[0] == _check_supporter
+    assert len(mock_command.__commands_checks__) == 1  # type:ignore
+    assert mock_command.__commands_checks__[0] == _check_supporter  # type:ignore

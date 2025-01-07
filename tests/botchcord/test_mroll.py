@@ -50,11 +50,13 @@ async def test_mroll(
 
 
 @patch("botchcord.roll.Roll.save", new_callable=AsyncMock)
-async def test_mroll_no_mock(mock_roll_save: AsyncMock, ctx: AppCtx, char: Character):
+async def test_mroll_no_mock(
+    mock_roll_save: AsyncMock, mock_respond: AsyncMock, ctx: AppCtx, char: Character
+):
     await char.save()
     macro = char.macros[0]
     await mroll(ctx, macro.name, None, False, False, None, char)  # type: ignore
-    ctx.respond.assert_awaited_once_with(embed=ANY)
+    mock_respond.assert_awaited_once_with(embed=ANY)
     mock_roll_save.assert_awaited_once()
 
 
