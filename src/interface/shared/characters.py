@@ -35,9 +35,10 @@ class CharactersCog(Cog, name="Character info and adjustment"):
 
     @character.command()
     @options.character("The character to display")
-    async def display(self, ctx: AppCtx, character: str):
+    @options.owner()
+    async def display(self, ctx: AppCtx, character: str, owner: discord.Member):
         """Display one of your character's stats."""
-        await botchcord.character.display(ctx, character)
+        await botchcord.character.display(ctx, character, owner=owner)
 
     @character.command()
     @options.character("The character to delete", required=True)
@@ -62,16 +63,23 @@ class CharactersCog(Cog, name="Character info and adjustment"):
         await botchcord.character.web.wizard(ctx, era)
 
     @character.command(name="images")
-    @options.character("The character to display")
+    @options.character("The character to display", permissive=True)
+    @options.owner()
     @option(
         "controls",
         description="Who can control the buttons?",
         choices=[OptionChoice("Only you", True), OptionChoice("Anyone", False)],
         default=True,
     )
-    async def display_images(self, ctx: AppCtx, character: str, controls: bool):
+    async def display_images(
+        self,
+        ctx: AppCtx,
+        character: str,
+        controls: bool,
+        owner: discord.Member,
+    ):
         """View a character's images."""
-        await botchcord.character.images.display(ctx, character, controls)
+        await botchcord.character.images.display(ctx, character, controls, owner=owner)
 
     @images.command(name="upload")
     @option("image", description="The image file to upload")

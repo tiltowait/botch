@@ -37,9 +37,10 @@ class TraitsCog(Cog, name="Character traits and specialties"):
 
     @traits.command(name="list")
     @options.character("The character to display")
-    async def display(self, ctx: AppCtx, character: str):
+    @options.owner()
+    async def display(self, ctx: AppCtx, character: str, owner: discord.Member):
         """Display one of your character's traits."""
-        await botchcord.character.traits.display(ctx, character)
+        await botchcord.character.traits.display(ctx, character, owner=owner)
 
     @traits.command()
     @option("traits", description="The traits to assign. Ex: Foo=1; Bar=2", required=True)

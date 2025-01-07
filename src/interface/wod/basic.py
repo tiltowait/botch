@@ -1,5 +1,6 @@
 """Command interface for basic WoD commands."""
 
+import discord
 from discord import InteractionContextType, option
 from discord.commands import slash_command
 from discord.ext.commands import Cog
@@ -37,6 +38,7 @@ class BasicCog(Cog, name="Basic"):
         max_length=300,
     )
     @options.character("[Optional] The character performing the roll")
+    @options.owner()
     async def roll(
         self,
         ctx: AppCtx,
@@ -46,6 +48,7 @@ class BasicCog(Cog, name="Basic"):
         specialty: str,
         comment: str,
         character: str,
+        owner: discord.Member,
     ):
         """Roll the dice! If you have a character, `pool` can be traits (e.g. `Strength + Brawl`)."""
         await botchcord.roll.roll(
@@ -57,6 +60,7 @@ class BasicCog(Cog, name="Basic"):
             False,
             comment,
             character,
+            owner=owner,
         )
 
     @slash_command(contexts={InteractionContextType.guild})

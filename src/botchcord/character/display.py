@@ -1,6 +1,9 @@
 """Character display routines."""
 
+import logging
 from enum import StrEnum
+
+import discord
 
 import bot
 import botchcord
@@ -9,6 +12,8 @@ from botchcord.haven import haven
 from botchcord.utils import CEmbed
 from botchcord.utils.text import c
 from core.characters import Character, Damage, GameLine, Splat
+
+logger = logging.getLogger("CHAR DISPLAY")
 
 
 class DisplayField(StrEnum):
@@ -79,7 +84,11 @@ DEFAULT_FIELDS = {
 
 
 @haven()
-async def display(ctx: bot.AppCtx, character: Character):
+async def display(ctx: bot.AppCtx, character: Character, *, owner: discord.Member | None = None):
+    """Display a character."""
+    if owner:
+        logger.info("Admin %s invoking %s's %s", ctx.author.name, owner.name, character.name)
+
     use_emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(
         ctx.bot,
