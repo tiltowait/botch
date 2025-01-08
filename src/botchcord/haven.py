@@ -16,6 +16,7 @@ from errors import (
     CharacterNotFound,
     NoCharacterSelected,
     NoMatchingCharacter,
+    NotAdmin,
 )
 
 T = TypeVar("T")
@@ -85,7 +86,7 @@ class Haven(discord.ui.View):
         self.new_interaction: discord.Interaction | None = None
 
         if self.owner.id != self.ctx.author.id and not self.ctx.admin_user and not permissive:
-            raise LookupError("You must be an admin to look up others' characters.")
+            raise NotAdmin("Only admins may invoke other players' characters.")
 
         super().__init__(timeout=60, disable_on_timeout=True)
 

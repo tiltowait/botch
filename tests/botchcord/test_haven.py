@@ -228,7 +228,7 @@ async def test_haven_admin_lookup(
     assert ctx.admin_user == is_admin
 
     if not is_admin:
-        with pytest.raises(LookupError):
+        with pytest.raises(errors.NotAdmin):
             _ = Haven(ctx, None, None, None, owner)
             print(owner.id, invoker.id)
     else:
@@ -243,22 +243,22 @@ async def test_haven_admin_lookup(
         assert char.name == vamp.name
 
 
-@pytest.mark.parametrize("allow", [True, False])
-async def test_allow_any(
+@pytest.mark.parametrize("permissive", [True, False])
+async def test_permissive(
     mock_admin_user: Mock,
     ctx: AppCtx,
     invoker: Mock,
     vamp: Character,
-    allow: bool,
+    permissive: bool,
 ):
     mock_admin_user.return_value = False
     owner = cast(discord.Member, ctx.author)
     ctx.interaction.user = invoker
 
-    if allow:
+    if permissive:
         haven = Haven(ctx, None, None, vamp.name, owner, permissive=True)
         char = await haven.get_match()
         assert char == vamp
     else:
-        with pytest.raises(LookupError):
+        with pytest.raises(errors.NotAdmin):
             haven = Haven(ctx, None, None, vamp.name, owner)

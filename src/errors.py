@@ -5,6 +5,10 @@ class BotchError(Exception):
     """Base error class."""
 
 
+class NotAdmin(BotchError):
+    """Raised when a regular user attempts an admin task."""
+
+
 class NotReady(Exception):
     """Raised when the bot isn't ready yet."""
 
