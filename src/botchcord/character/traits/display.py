@@ -1,5 +1,6 @@
 """Character trait display functions."""
 
+import logging
 from collections import defaultdict
 
 import discord
@@ -10,10 +11,15 @@ from botchcord.utils import CEmbed
 from botchcord.utils.text import b, m
 from core.characters import Character, Trait
 
+logger = logging.getLogger("TRAITS")
+
 
 @haven()
-async def display(ctx: bot.AppCtx, character: Character):
+async def display(ctx: bot.AppCtx, character: Character, *, owner: discord.Member | None = None):
     """Display the character's traits."""
+    if owner:
+        logger.info("%s listing %s's %s's traits", ctx.author.name, owner.name, character.name)
+
     embed = build_embed(ctx.bot, character)
     await ctx.respond(embed=embed, ephemeral=True)
 

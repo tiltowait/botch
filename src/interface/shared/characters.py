@@ -4,7 +4,7 @@ import discord
 from discord import option
 from discord.commands import SlashCommandGroup
 from discord.commands.options import OptionChoice
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, user_command
 
 import botchcord
 from bot import AppCtx, BotchBot
@@ -33,11 +33,17 @@ class CharactersCog(Cog, name="Character info and adjustment"):
     def __init__(self, bot: BotchBot):
         self.bot = bot
 
+    @user_command(name="View: Character")
+    async def user_characters(self, ctx: AppCtx, member: discord.Member):
+        """Display the user's character(s)."""
+        await botchcord.character.display(ctx, "", owner=member)
+
     @character.command()
     @options.character("The character to display")
-    async def display(self, ctx: AppCtx, character: str):
+    @options.owner()
+    async def display(self, ctx: AppCtx, character: str, owner: discord.Member):
         """Display one of your character's stats."""
-        await botchcord.character.display(ctx, character)
+        await botchcord.character.display(ctx, character, owner=owner)
 
     @character.command()
     @options.character("The character to delete", required=True)
@@ -61,17 +67,29 @@ class CharactersCog(Cog, name="Character info and adjustment"):
         """Create a character. This command opens a web browser."""
         await botchcord.character.web.wizard(ctx, era)
 
+    @user_command(name="View: Character Images")
+    async def user_images(self, ctx: AppCtx, member: discord.Member):
+        """Display a user's character's images."""
+        await botchcord.character.images.display(ctx, "", True, owner=member)
+
     @character.command(name="images")
-    @options.character("The character to display")
+    @options.character("The character to display", permissive=True)
+    @options.owner()
     @option(
         "controls",
         description="Who can control the buttons?",
         choices=[OptionChoice("Only you", True), OptionChoice("Anyone", False)],
         default=True,
     )
-    async def display_images(self, ctx: AppCtx, character: str, controls: bool):
+    async def display_images(
+        self,
+        ctx: AppCtx,
+        character: str,
+        controls: bool,
+        owner: discord.Member,
+    ):
         """View a character's images."""
-        await botchcord.character.images.display(ctx, character, controls)
+        await botchcord.character.images.display(ctx, character, controls, owner=owner)
 
     @images.command(name="upload")
     @option("image", description="The image file to upload")

@@ -19,11 +19,13 @@ def _has_image(character: Character) -> bool:
     return len(character.profile.images) > 0
 
 
-@haven(filter=_has_image)
+@haven(filter=_has_image, permissive=True)
 async def display_images(
     ctx: AppCtx,
     character: Character,
     invoker_controls: bool,
+    *,
+    owner: discord.Member | None = None,
 ):
     """Display a character's images inside a paginator.
 
@@ -31,6 +33,15 @@ async def display_images(
         ctx: The command context
         character: The character being displayed
         invoker_controls: Whether only the invoking user can control the buttons"""
+    if owner:
+        logger.info(
+            "%s: %s displaying %s's %s's images",
+            ctx.guild.name,
+            ctx.author.name,
+            owner.name,
+            character.name,
+        )
+
     pager = ImagePager(ctx, character, invoker_controls)
     await pager.respond()
 

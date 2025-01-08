@@ -41,15 +41,21 @@ def promoted_choice(
     return decorator
 
 
-def character(description="The character to use", required=False, param="character"):
+def character(
+    description="The character to use",
+    required=False,
+    param="character",
+    permissive=False,
+):
     """A command decorator letting users choose a character."""
 
     def decorator(func):
+        generator = _available_characters_permissive if permissive else _available_characters_strict
         func.__annotations__[param] = Option(
             str,
             description,
             name=param,
-            autocomplete=_available_characters,
+            autocomplete=generator,
             required=required,
         )
         return func
@@ -57,7 +63,37 @@ def character(description="The character to use", required=False, param="charact
     return decorator
 
 
-async def _available_characters(ctx: discord.AutocompleteContext):
+def owner(param="owner", description="The character's owner (admin only)"):
+    """A command decorator letting users choose character owned by another."""
+
+    def decorator(func):
+        func.__annotations__[param] = Option(
+            discord.Member,
+            description,
+            name=param,
+            required=False,
+        )
+        return func
+
+    return decorator
+
+
+async def _available_characters_strict(
+    ctx: discord.AutocompleteContext,
+) -> list[str] | list[OptionChoice]:
+    return await _available_characters(ctx, False)
+
+
+async def _available_characters_permissive(
+    ctx: discord.AutocompleteContext,
+) -> list[str] | list[OptionChoice]:
+    return await _available_characters(ctx, True)
+
+
+async def _available_characters(
+    ctx: discord.AutocompleteContext,
+    permissive: bool,
+) -> list[str] | list[OptionChoice]:
     """Generate a list of the user's available characters."""
     logger = logging.getLogger("CHAR_OPTION")
 
@@ -71,23 +107,33 @@ async def _available_characters(ctx: discord.AutocompleteContext):
     # Check if they're looking up a player and have lookup permissions
     spcs = []
 
-    if (owner := (ctx.options.get("owner") or ctx.options.get("current_owner"))) is not None:
-        if owner != user.id and not user.guild_permissions.administrator:
-            return [OptionChoice("You do not have admin permissions", "")]
-    else:
-        owner = user.id
+    # The discord.Member value becomes a string here instead of an int, for
+    # some reason, so we have to cast it.
+    owner_id = cast(
+        str | int,
+        ctx.options.get("owner")
+        if ctx.options.get("owner") is not None
+        else ctx.options.get("current_owner")
+        if ctx.options.get("current_owner") is not None
+        else user.id,
+    )
+    owner_id = int(owner_id)
 
-        if user.guild_permissions.administrator:
-            # Add SPCs
-            spcs = await core.cache.fetchnames(guild.id, bot_user.id, GameLine(GAME_LINE))
-            logger.info(
-                "%s: admin %s fetched %s SPCs",
-                guild.name,
-                user.name,
-                len(spcs),
-            )
+    if owner_id != user.id and not user.guild_permissions.administrator and not permissive:
+        # Non-admin tried to look up another user's character
+        return [OptionChoice("You do not have admin permissions", "")]
 
-    chars = await core.cache.fetchnames(guild.id, int(owner), GameLine(GAME_LINE))
+    if user.guild_permissions.administrator:
+        # Add SPCs
+        spcs = await core.cache.fetchnames(guild.id, bot_user.id, GameLine(GAME_LINE))
+        logger.info(
+            "%s: admin %s fetched %s SPCs",
+            guild.name,
+            user.name,
+            len(spcs),
+        )
+
+    chars = await core.cache.fetchnames(guild.id, owner_id, GameLine(GAME_LINE))
     chars.extend(spcs)
 
     name_search = ctx.value.casefold()
