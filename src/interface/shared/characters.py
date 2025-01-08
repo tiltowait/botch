@@ -4,7 +4,7 @@ import discord
 from discord import option
 from discord.commands import SlashCommandGroup
 from discord.commands.options import OptionChoice
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, user_command
 
 import botchcord
 from bot import AppCtx, BotchBot
@@ -32,6 +32,11 @@ class CharactersCog(Cog, name="Character info and adjustment"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+
+    @user_command(name="View: Character")
+    async def user_characters(self, ctx: AppCtx, member: discord.Member):
+        """Display the user's character(s)."""
+        await botchcord.character.display(ctx, "", owner=member)
 
     @character.command()
     @options.character("The character to display")
@@ -61,6 +66,11 @@ class CharactersCog(Cog, name="Character info and adjustment"):
     async def wizard(self, ctx: AppCtx, era: str):
         """Create a character. This command opens a web browser."""
         await botchcord.character.web.wizard(ctx, era)
+
+    @user_command(name="View: Character Images")
+    async def user_images(self, ctx: AppCtx, member: discord.Member):
+        """Display a user's character's images."""
+        await botchcord.character.images.display(ctx, "", True, owner=member)
 
     @character.command(name="images")
     @options.character("The character to display", permissive=True)
