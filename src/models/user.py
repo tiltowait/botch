@@ -53,22 +53,26 @@ class UserStore:
     def __init__(self):
         self._cache: dict[int, User] = {}
         self.logger = logging.getLogger("USER CACHE")
+        self._populated = False
 
     async def _populate(self):
         """Pre-populate the cache with all user objects."""
-        users = await User.find().to_list()
-        self._cache = {u.user: u for u in users}
+        if not self._populated:
+            users = await User.find().to_list()
+            print(users)
+            self._cache = {u.user: u for u in users}
+            self._populated = True
+        print(([(u.user, u.left_premium) for u in self._cache.values()]))
 
-    @property
-    def purgable(self) -> list[User]:
+    async def fetch_purgeable(self) -> list[User]:
         """Users with purgable images due to dropping premium."""
+        await self._populate()
         return [u for u in self._cache.values() if u.should_purge]
 
     async def fetch(self, user_id) -> User:
         """Fetch a user. If it doesn't exist, create it. Created user is not
         persisted in the database."""
         await self._populate()
-
         if user := self._cache.get(user_id):
             return user
 

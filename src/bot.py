@@ -14,7 +14,7 @@ import tasks
 from config import DEBUG_GUILDS, EMOJI_GUILD, SUPPORTER_GUILD, SUPPORTER_ROLE
 from errors import BotchError, NotPremium
 from models import GuildCache
-from models.user import cache as user_cache
+from models.user import cache as user_store
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -56,7 +56,7 @@ class BotchBot(discord.Bot):
             **kwargs,
         )
         self.guild_cache = GuildCache()
-        self.user_store = user_cache  # Singleton instance
+        self.user_store = user_store  # Singleton instance
 
         self.accept_commands = False
         self.welcomed = False

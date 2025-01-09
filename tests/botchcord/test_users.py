@@ -1,5 +1,6 @@
 """User cache tests."""
 
+from datetime import UTC, datetime, timedelta
 from typing import AsyncGenerator
 from unittest.mock import AsyncMock, patch
 
@@ -39,3 +40,19 @@ async def test_cache_hit(cache: UserStore):
     found = await cache.fetch(0)
     assert user.id == found.id
     assert found.settings.accessibility
+
+
+async def test_fetch_purgeable(cache: UserStore):
+    users = [
+        User(user=1, left_premium=datetime.now(UTC) - timedelta(days=31)),  # Should purge
+        User(user=2, left_premium=datetime.now(UTC) - timedelta(days=15)),  # Should not purge
+        User(user=3, left_premium=None),  # Should not purge
+        User(user=4, left_premium=datetime.now(UTC) - timedelta(days=35)),  # Should purge
+    ]
+    for user in users:
+        await user.save()
+
+    purgeable = await cache.fetch_purgeable()
+    purgeable_ids = [u.user for u in purgeable if u.should_purge]
+    assert len(purgeable) == 2
+    assert purgeable_ids == [1, 4]
