@@ -1,5 +1,6 @@
 """Non-PII user, aka player, data."""
 
+import logging
 from datetime import UTC, datetime, timedelta
 from typing import ClassVar, Optional
 
@@ -36,7 +37,7 @@ class User(Document):
 
     def gain_premium(self):
         """Mark the user as having premium."""
-        self.left_premium = None  # TODO: Maybe actually track it here?
+        self.left_premium = None  # TODO: Track times left? Is that useful?
 
     def drop_premium(self):
         """Mark the user as having left premium."""
@@ -44,3 +45,41 @@ class User(Document):
 
     class Settings:
         name = "users"
+
+
+class UserStore:
+    """A cache for managing users."""
+
+    def __init__(self):
+        self._cache: dict[int, User] = {}
+        self.logger = logging.getLogger("USER CACHE")
+
+    async def _populate(self):
+        """Pre-populate the cache with all user objects."""
+        users = await User.find().to_list()
+        self._cache = {u.user: u for u in users}
+
+    @property
+    def purgable(self) -> list[User]:
+        """Users with purgable images due to dropping premium."""
+        return [u for u in self._cache.values() if u.should_purge]
+
+    async def fetch(self, user_id) -> User:
+        """Fetch a user. If it doesn't exist, create it. Created user is not
+        persisted in the database."""
+        await self._populate()
+
+        if user := self._cache.get(user_id):
+            return user
+
+        user = User(user=user_id)
+        self._cache[user_id] = user
+
+        # We don't save the user on creation, because most users never change
+        # settings, and there's no benefit to keeping their records.
+        return user
+
+
+# Unlike the guild cache, we keep a singleton here because the premium
+# culler would otherwise invalidate the bot's cache.
+cache = UserStore()
