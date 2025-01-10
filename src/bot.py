@@ -13,8 +13,8 @@ import errors
 import tasks
 from config import DEBUG_GUILDS, EMOJI_GUILD, SUPPORTER_GUILD, SUPPORTER_ROLE
 from errors import BotchError, NotPremium
-from models import User
-from models.guild import GuildCache
+from models import GuildCache
+from models.user import cache as user_store
 
 __all__ = ("AppCtx", "BotchBot")
 
@@ -56,6 +56,8 @@ class BotchBot(discord.Bot):
             **kwargs,
         )
         self.guild_cache = GuildCache()
+        self.user_store = user_store  # Singleton instance
+
         self.accept_commands = False
         self.welcomed = False
         if DEBUG_GUILDS:
@@ -184,9 +186,7 @@ class BotchBot(discord.Bot):
             """Check if the member is a supporter."""
             return member.get_role(SUPPORTER_ROLE) is not None
 
-        user = await User.find_one(User.user == after.id)
-        if user is None:
-            user = User(user=after.id)
+        user = await self.user_store.fetch(after.id)
 
         if is_supporter(before) and not is_supporter(after):
             logger.info("%s is no longer a supporter :(", after.name)

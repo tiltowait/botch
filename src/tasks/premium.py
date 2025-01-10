@@ -8,6 +8,7 @@ from discord.ext import tasks
 from core import cache
 from core.characters import Character
 from models import User
+from models.user import cache as user_store
 
 
 @tasks.loop(time=time(12, 0, tzinfo=UTC))
@@ -20,19 +21,18 @@ async def purge():
 async def purge_expired_images() -> str:
     """Purge all images on expired premium.
 
-    Returns the total purged images."""
-    users = await fetch_purgeable_users()
+    Returns a description of what was purged."""
+    purgeable = await fetch_purgeable_users()
     total_purged = 0
-    for user in users:
+    for user in purgeable:
         total_purged += await purge_images(user)
 
-    return f"Purged {total_purged} image(s) across {len(users)} user(s)."
+    return f"Purged {total_purged} image(s) across {len(purgeable)} user(s)."
 
 
 async def fetch_purgeable_users() -> list[User]:
     """Fetch users who dropped premium a while ago."""
-    users = await User.find({"left_premium": {"$ne": None}}).to_list()
-    return [u for u in users if u.should_purge]
+    return await user_store.fetch_purgeable()
 
 
 async def fetch_purgeable_characters(user: User) -> list[Character]:

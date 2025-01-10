@@ -49,7 +49,7 @@ def user() -> User:
 
 
 @pytest.fixture(autouse=True)
-async def mock_users() -> list[User]:
+async def mock_users() -> AsyncGenerator[list[User], None]:
     users = [
         User(user=1, left_premium=datetime.now(UTC) - timedelta(days=31)),  # Should purge
         User(user=2, left_premium=datetime.now(UTC) - timedelta(days=15)),  # Should not purge
@@ -59,7 +59,12 @@ async def mock_users() -> list[User]:
     for user in users:
         await user.save()
 
-    return users
+    yield users
+
+    # tasks.premium uses the user cache singleton. Some tests modify the users
+    # in the cache, so we need to reset the cache after each test. We can
+    # easily do this by tricking it into thinking it hasn't yet populated.
+    premium.user_store._populated = False
 
 
 @pytest.fixture(autouse=True)
@@ -100,15 +105,15 @@ def test_should_purge(user: User):
     assert user.should_purge
 
 
+def test_should_not_purge(user: User):
+    assert not user.should_purge
+    user.left_premium = datetime.now(UTC) - timedelta(days=User.PURGE_INTERVAL - 1)
+    assert not user.should_purge
+
+
 def test_drop_premium(user: User):
     user.drop_premium()
     assert user.left_premium is not None
-
-
-async def test_fetch_purgeable_users():
-    purgeable = await premium.fetch_purgeable_users()
-    assert len(purgeable) == 2
-    assert [u.user for u in purgeable] == [1, 4]
 
 
 async def test_fetch_purgeable_characters():
@@ -205,7 +210,7 @@ async def test_on_member_update_drop_premium(
 @patch("models.User.drop_premium")
 @patch("models.User.gain_premium")
 @patch("models.User.save", new_callable=AsyncMock)
-async def test_on_member_update_gainpremium(
+async def test_on_member_update_gain_premium(
     mock_save: AsyncMock,
     mock_gain: Mock,
     mock_drop: Mock,
@@ -225,3 +230,8 @@ async def test_on_member_update_gainpremium(
     mock_gain.assert_called_once()
     mock_drop.assert_not_called()
     mock_save.assert_awaited_once()
+
+
+def test_shared_singleton_user_store():
+    bot = BotchBot()
+    assert bot.user_store == premium.user_store

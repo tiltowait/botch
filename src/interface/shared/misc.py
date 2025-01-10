@@ -7,6 +7,7 @@ from discord import option
 from discord.commands import slash_command
 from discord.ext.commands import Cog
 
+import botchcord
 from bot import AppCtx, BotchBot
 from botchcord.utils.text import m
 from config import VERSION
@@ -41,6 +42,12 @@ class MiscCog(Cog, name="Miscellaneous"):
         else:
             number = random.randint(lower, upper)
             await ctx.respond(f"**[{lower}, {upper}]** -> {number}")
+
+    @slash_command()
+    async def preferences(self, ctx: AppCtx):
+        """View and edit bot preferences."""
+        view = botchcord.settings.SettingsView(ctx)
+        await view.respond()
 
 
 def setup(bot: BotchBot):
