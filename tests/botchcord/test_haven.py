@@ -230,7 +230,6 @@ async def test_haven_admin_lookup(
     if not is_admin:
         with pytest.raises(errors.NotAdmin):
             _ = Haven(ctx, None, None, None, owner)
-            print(owner.id, invoker.id)
     else:
         # In real use, the filtering will be by name, owner, and guild (part
         # of ctx). The mock user has 2 characters in this setup, so we disable

@@ -59,10 +59,13 @@ class UserStore:
         """Pre-populate the cache with all user objects."""
         if not self._populated:
             users = await User.find().to_list()
-            print(users)
             self._cache = {u.user: u for u in users}
             self._populated = True
-        print(([(u.user, u.left_premium) for u in self._cache.values()]))
+
+    def clear(self):
+        """Clear the cache."""
+        self._cache = {}
+        self._populated = False
 
     async def fetch_purgeable(self) -> list[User]:
         """Users with purgable images due to dropping premium."""

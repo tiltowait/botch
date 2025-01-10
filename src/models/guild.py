@@ -64,6 +64,10 @@ class GuildCache:
         self._cache[guild.guild] = guild
         return guild
 
+    def clear(self):
+        """Reset the cache."""
+        self._cache = {}
+
     @overload
     async def fetch(self, discord_guild: discord.Guild) -> Guild | None: ...
 
