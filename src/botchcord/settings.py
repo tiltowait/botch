@@ -33,15 +33,18 @@ class SettingsView(View):
     @property
     def embed(self) -> discord.Embed:
         """An informational embed."""
+        assert self.ctx.bot.user is not None
+        name = self.ctx.bot.user.name
+
         return discord.Embed(
             title="Preferences",
-            description="Use the controls below to update settings.",
+            description=f"Use the controls below to update {name}'s settings.",
         )
 
     async def respond(self):
         """Populate the buttons and display the settings."""
         await self._populate_buttons()
-        await self.ctx.respond(embed=self.embed, view=self)
+        await self.ctx.respond(embed=self.embed, view=self, ephemeral=True)
 
     async def _user(self) -> User:
         """Returns the ctx's user."""
@@ -63,18 +66,26 @@ class SettingsView(View):
         # For a11y, we'll use "Use Emojis" instead of "Accessibility", since
         # it's more descriptive.
         user = await self._user()
+        user_emojis = not user.settings.accessibility
+        label = "Use Emojis (Self)"
+        if not user_emojis:
+            label = "Don't " + label
         user_a11y = Button(
-            label="Use Emojis (Self)",
-            style=self._button_style(not user.settings.accessibility),
+            label=label,
+            style=self._button_style(user_emojis),
             row=0,
         )
         user_a11y.callback = self.toggle_user_a11y
         self.add_item(user_a11y)
 
         guild = await self._guild()
+        guild_emojis = not guild.settings.accessibility
+        label = "Use Emojis (Server)"
+        if not guild_emojis:
+            label = "Don't " + label
         guild_a11y = Button(
-            label="Use Emojis (Server)",
-            style=self._button_style(not guild.settings.accessibility),
+            label=label,
+            style=self._button_style(guild_emojis),
             row=1,
         )
         if self.ctx.admin_user:
