@@ -39,7 +39,8 @@ httpx = "^0.27.2"
 pyright = "^1.1.391"
 
 [tool.poetry.scripts]
-botch = "main:main"
+botch = "launcher:run_bot('botch')"
+beat = "launcher:run_bot('beat')"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,2 +1,4 @@
+.env.beat
+.env.botch
 .coverage
 htmlcov
