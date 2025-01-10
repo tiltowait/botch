@@ -7,15 +7,15 @@
 	<a href="https://app.codecov.io/gh/tiltowait/botch", title="Code coverage report"><img src="https://img.shields.io/codecov/c/github/tiltowait/botch" alt="Code coverage"></a>
 </p>
 
-# Botch
+# Botch & Beat
 
-Botch is a pair of Discord bots (called Botch and Beat) for playing *Vampire: The Masquerade* and *Vampire: The Requiem* games over Discord. They feature a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
+Botch and Beat are a pair of Discord bots for playing World of Darkness and Chronicles of Darkness games over Discord. They feature a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
 
-Botch is being designed from the ground up to be modular and extensible, meaning it can eventually expand to other World/Chronicles of Darkness game lines, depending on community and personal interest.
+Botch and Beat are designed from the ground up to be modular and extensible, allowing them to support multiple World/Chronicles of Darkness game lines. Currently supported games are Vampire: The Masquerade (V20 and DAV20 sheet templates), Vampire: The Requiem, and Mummy: The Curse. Additional lines can be added, depending on community interest.
 
 ## Current status
 
-Botch is currently in beta on the [official server](https://discord.gg/QHnCdSPeEE). After a short testing period, it will open to all users on The Second City (link above). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
+Botch is currently in beta on the [official server](https://discord.gg/QHnCdSPeEE). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
 
 **Need a bot now?** Check out [[Tzimisce]](https://tzimisce.app) for a basic X20 Wod/CofD dice bot without character tracking features. Or add [Inconnu](https://inconnu.app) for a fully-featured V5 dice bot and character manager.
 
@@ -25,9 +25,9 @@ I'd call this the FAQ section, only that feels disingenuous when no one's asked 
 
 ### Why not add this functionality to [Tzimisce]?
 
-[Tzimisce] is my first-ever bot, and my first "real" Python project. While I have a lot of nostalgia for it, it is ... something of a mess, to put it mildly. Adding complex features is a challenge, modules are constructed strangely, and the effort to improve it to the point that it would work with Botch's planned feature set would be more work than simply starting over.
+[Tzimisce] is my first-ever bot, and my first "real" Python project. While I have a lot of nostalgia for it, it is ... a mess. Adding features is a challenge, modules are constructed strangely, and the effort to improve it to the point that it would work with Botch's planned feature set would be more work than simply starting over.
 
-There's also something to be said for familiarity. A new bot allows me to create new interaction conventions that don't mesh well with [Tzimisce]'s design. [Tzimisce] has thousands of users. Inevitably, there will be people who just want to stick with what they know, and it wouldn't be fair to them to take away something that, from their perspective, already works just fine.
+There's also something to be said for familiarity—and not breaking it. A new bot allows me to create new interaction conventions that don't mesh well with [Tzimisce]'s design. [Tzimisce] has thousands of users. Inevitably, many of them will want to stick with what they know, and it wouldn't be fair to take away something that, from their perspective, already works just fine.
 
 ### Okay, so why not add to Inconnu?
 
