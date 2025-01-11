@@ -69,7 +69,6 @@ def clear_cache():
     # tasks.premium uses the user cache singleton. Some tests modify the users
     # in the cache, so we need to reset the cache after each test. We can
     # easily do this by tricking it into thinking it hasn't yet populated.
-    premium.user_store._populated = False
     premium.user_store.clear()
 
 
