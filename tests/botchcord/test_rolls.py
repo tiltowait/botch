@@ -14,7 +14,7 @@ from botchcord.roll import chance as chance_cmd
 from botchcord.roll import embed_color, embed_title, emoji_name, emojify_dice
 from botchcord.roll import roll as roll_cmd
 from botchcord.roll import textify_dice
-from core.characters import Character, GameLine, Splat, Trait
+from core.characters import Character, Damage, GameLine, Splat, Trait
 from core.rolls import Roll
 from core.rolls.parse import RollParser
 from tests.characters import gen_char
@@ -55,7 +55,11 @@ def dice() -> list[int]:
     ],
 )
 def test_textify_dice(
-    target: int, expected: str, spec: Optional[list[str]], line: GameLine, dice: list[int]
+    target: int,
+    expected: str,
+    spec: Optional[list[str]],
+    line: GameLine,
+    dice: list[int],
 ):
     roll = Roll(
         line=line,
@@ -359,13 +363,17 @@ def test_dice_caps(ctx):
         ("strength+brawl", None, "Vicious", False),
         ("strength+brawl", "Nadea Theron", None, False),
         ("strength+brawl+1", "Nadea Theron", None, False),
+        ("strength+brawl+wp", "Nadea Theron", None, False),
+        ("5+wp", None, None, False),
         ("strength+brawl", "Nadea", None, True),
         ("fake", "Nadea", None, True),
         ("fake", "Nadea Theron", None, True),
         ("fake", None, None, True),
     ],
 )
+@patch("bot.BotchBot.find_emoji")
 async def test_roll_command(
+    mock_find_emoji: Mock,
     mock_respond: AsyncMock,
     pool: str,
     char: str | None,
@@ -373,6 +381,7 @@ async def test_roll_command(
     raises: bool,
     wod_vampire: Character,
 ):
+    mock_find_emoji.return_value = "."
     bot = BotchBot()
     inter = AsyncMock()
     inter.user.id = wod_vampire.user
@@ -392,7 +401,21 @@ async def test_roll_command(
 
     else:
         await roll_cmd(ctx, pool, 6, specs, False, False, None, char)
-        mock_respond.assert_called_once_with(embed=ANY)
+        mock_respond.assert_awaited_once_with(embed=ANY)
+
+        assert mock_respond.await_args is not None
+        embed = mock_respond.await_args.kwargs["embed"]
+
+        if "wp" in pool:
+            if char:
+                assert wod_vampire.willpower.count(Damage.BASHING) == 1
+                assert embed.fields[-1].name == "Willpower"
+            else:
+                assert embed.fields[-1].name != "Willpower"
+        else:
+            if char:
+                assert wod_vampire.willpower.count(Damage.BASHING) == 0
+            assert embed.fields[-1].name != "Willpower"
 
 
 @pytest.mark.parametrize(

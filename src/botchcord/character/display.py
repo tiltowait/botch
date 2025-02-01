@@ -129,6 +129,22 @@ def build_embed(
     return embed
 
 
+def add_display_field(
+    embed: discord.Embed,
+    bot: bot.BotchBot,
+    character: Character,
+    field: DisplayField,
+    use_emojis: bool,
+    inline=False,
+):
+    """Add a specified display field to an embed."""
+    embed.add_field(
+        name=get_field_name(character, field),
+        value=get_field_value(bot, character, field, use_emojis),
+        inline=inline,
+    )
+
+
 def get_field_name(character: Character, field: DisplayField) -> str:
     """Return the display field's name."""
     match field:
