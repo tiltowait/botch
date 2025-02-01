@@ -10,9 +10,10 @@ import bot
 import botchcord
 import errors
 import utils
+from botchcord.character.display import DisplayField, add_display_field
 from botchcord.haven import Haven
 from config import GAME_LINE
-from core.characters import Character
+from core.characters import Character, Damage, Tracker
 from core.rolls import Roll, d10
 from core.rolls.parse import RollParser
 
@@ -84,6 +85,9 @@ async def roll(
         extra_specs = re.split(r"\s*,\s*", utils.normalize_text(specialties))
         extra_specs = [e for e in extra_specs if e]  # Remove any empty strings
         roll.add_specs(extra_specs)
+
+    if roll.wp and character:
+        character.increment_damage(Tracker.WILLPOWER, Damage.BASHING)
 
     emojis = await botchcord.settings.use_emojis(ctx)
     embed = build_embed(ctx, roll, extra_specs, comment, emojis)
@@ -163,6 +167,8 @@ def build_embed(
     if roll.uses_traits:
         assert roll.pool is not None
         embed.add_field(name="Pool", value=" ".join(map(str, roll.pool)), inline=False)
+    if roll.wp and roll.character:
+        add_display_field(embed, ctx.bot, roll.character, DisplayField.WILLPOWER, emojis)
 
     embed.set_author(name=author_name, icon_url=icon or None)
 
