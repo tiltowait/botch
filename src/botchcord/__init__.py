@@ -2,10 +2,11 @@
 
 import discord
 
-from botchcord import character, haven, macro, roll, settings
+from botchcord import changelog, character, haven, macro, roll, settings
 from botchcord.mroll import mroll
 
 __all__ = (
+    "changelog",
     "character",
     "haven",
     "macro",
