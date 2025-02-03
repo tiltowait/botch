@@ -6,7 +6,7 @@ profile = "black"
 
 [tool.poetry]
 name = "botch"
-version = "0.9.8-BETA"
+version = "0.9.9-BETA"
 packages = [{ include = "*", from = "src", format = "sdist" }]
 description = "A Discord character manager and dice bot for Wod and CofD."
 authors = ["tiltowait <208040+tiltowait@users.noreply.github.com>"]

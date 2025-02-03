@@ -13,7 +13,7 @@ CHANGELOG = "https://github.com/tiltowait/botch/releases/latest"
 
 
 async def show(ctx: AppCtx, hidden: bool):
-    """Display Inconnu's changelog."""
+    """Display Botch's changelog."""
     try:
         tag, changelog = await fetch_changelog()
         paginator = Chunker(prefix="", suffix="", max_size=4000)
