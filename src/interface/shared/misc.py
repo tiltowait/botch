@@ -49,6 +49,14 @@ class MiscCog(Cog, name="Miscellaneous"):
         view = botchcord.settings.SettingsView(ctx)
         await view.respond()
 
+    @slash_command()
+    @option(
+        "hidden", description="Make the changelog visible only to you (default true).", default=True
+    )
+    async def changelog(self, ctx: AppCtx, hidden: bool):
+        """Show the latest changelog."""
+        await botchcord.changelog.show(ctx, hidden)
+
 
 def setup(bot: BotchBot):
     """Add the cog to the bot."""
