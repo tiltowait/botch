@@ -5,6 +5,7 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import discord
 import pytest
+from cachetools import TTLCache
 
 import core
 import errors
@@ -22,9 +23,9 @@ from tests.characters import gen_char
 
 @pytest.fixture(autouse=True)
 async def clear_cache():
-    core.cache._cache = {}
+    core.cache._cache = TTLCache(maxsize=100, ttl=1800)
     yield
-    core.cache._cache = {}
+    core.cache._cache = TTLCache(maxsize=100, ttl=1800)
 
 
 @pytest.fixture

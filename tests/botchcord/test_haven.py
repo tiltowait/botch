@@ -6,6 +6,7 @@ from unittest.mock import ANY, AsyncMock, Mock, PropertyMock, patch
 
 import discord
 import pytest
+from cachetools import TTLCache
 from discord.ui import Button, Select
 
 import errors
@@ -19,9 +20,9 @@ from tests.characters import gen_char
 @pytest.fixture(autouse=True)
 def clear_cache():
     """Clear the cache after every test."""
-    cache._cache = {}
+    cache._cache = TTLCache(maxsize=100, ttl=1800)
     yield
-    cache._cache = {}
+    cache._cache = TTLCache(maxsize=100, ttl=1800)
 
 
 @pytest.fixture(autouse=True)
