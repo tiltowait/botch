@@ -5,6 +5,7 @@ from typing import Any
 from unittest.mock import Mock
 
 import pytest
+from cachetools import TTLCache
 from discord import OptionChoice
 
 from botchcord.options import _available_characters as generate
@@ -16,9 +17,9 @@ from tests.characters import gen_char
 @pytest.fixture(autouse=True)
 def clear_cache():
     """Clear the cache after every test."""
-    cache._cache = {}
+    cache._cache = TTLCache(maxsize=100, ttl=1800)
     yield
-    cache._cache = {}
+    cache._cache = TTLCache(maxsize=100, ttl=1800)
 
 
 @pytest.fixture(autouse=True)

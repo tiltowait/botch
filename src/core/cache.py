@@ -1,7 +1,8 @@
 """Character cache."""
 
-
 import bisect
+
+from cachetools import TTLCache
 
 import errors
 from core.characters import Character, GameLine, Splat
@@ -13,7 +14,7 @@ class CharCache:
     name, and guild. It does not perform any access control."""
 
     def __init__(self):
-        self._cache = {}
+        self._cache: TTLCache[str, list[Character]] = TTLCache(maxsize=100, ttl=1800)
 
     @staticmethod
     def key(guild: int, user: int) -> str:
