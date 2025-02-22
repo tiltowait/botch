@@ -3,7 +3,7 @@
 import logging
 import os
 
-from beanie import init_beanie
+from beanie import Document, init_beanie
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -15,7 +15,7 @@ from models import Guild, User
 load_dotenv()
 
 logger = logging.getLogger("DB")
-DOCUMENT_MODELS = [
+DOCUMENT_MODELS: list[type[Document]] = [
     Character,
     wod.Vampire,
     wod.Ghoul,

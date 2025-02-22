@@ -14,7 +14,7 @@ from db import DOCUMENT_MODELS
 from tests.characters import gen_char
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="session")
 async def beanie_fixture():
     """Configures a mock beanie client for all tests."""
     client = cast(AsyncIOMotorClient, AsyncMongoMockClient())
@@ -22,6 +22,15 @@ async def beanie_fixture():
         database=client.get_database(name="db"),
         document_models=DOCUMENT_MODELS,
     )
+
+
+@pytest.fixture(autouse=True)
+async def clear_collections():
+    """Clear all collections. Doing it this way results in a 20% speedup over
+    re-initializing the collections on each test."""
+    yield
+    for model in DOCUMENT_MODELS:
+        await model.delete_all()
 
 
 @pytest.fixture(params=list(Splat), scope="function")
