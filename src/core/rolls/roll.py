@@ -191,6 +191,7 @@ class Roll(Document):
         target: int,
         line: GameLine | str | None = GAME_LINE,
         rote=False,
+        autos=0,
     ):
         """Create a roll from a RollParser and a target number."""
         if not line:
@@ -210,6 +211,7 @@ class Roll(Document):
             specialties=p.specialties,
             pool=p.pool,
             syntax=p.raw_syntax,
+            autos=autos,
             character=p.character,
         )
 

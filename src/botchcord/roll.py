@@ -58,6 +58,7 @@ async def roll(
     comment: Optional[str],
     character: Optional[str | Character],
     *,
+    autos=0,
     owner: discord.Member | None = None,
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
@@ -78,7 +79,7 @@ async def roll(
             raise errors.RollError(f"No characters able to roll `{pool}`.")
 
     rp.parse()
-    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, target, GAME_LINE, rote).roll()
+    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, target, GAME_LINE, rote, autos).roll()
 
     extra_specs = []
     if specialties:
@@ -150,6 +151,9 @@ def build_embed(
     else:
         dice_description = textify_dice(roll)
 
+    if roll.autos:
+        auto_str = "auto" if roll.autos == 1 else "autos"
+        dice_description += f" *+ {roll.autos} {auto_str}*"
     if roll.line == GameLine.WOD and roll.wp:
         dice_description += " *+ WP*"
 
