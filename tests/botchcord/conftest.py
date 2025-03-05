@@ -38,7 +38,7 @@ def bot() -> BotchBot:
     )
 
     def find_emoji(name):
-        if re.match(r"^(ss?|f|b)\d+$", name):
+        if re.match(r"^((ss?|f|b)\d+|no_dmg)$", name):
             return name  # The real deal adds \u200b, but we don't need that here
         raise errors.EmojiNotFound
 
