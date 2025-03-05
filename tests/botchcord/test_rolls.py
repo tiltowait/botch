@@ -170,7 +170,10 @@ def test_botch_logic(dice: list[int], should_botch: bool):
     ],
 )
 def test_wod_roll_embed_with_specialties(
-    syntax: str, pool: str, extra_specs: list[str], wod_vampire: Character
+    syntax: str,
+    pool: str,
+    extra_specs: list[str],
+    wod_vampire: Character,
 ):
     rp = RollParser(syntax, wod_vampire).parse()
     roll = Roll.from_parser(rp, 0, 0, 6)
@@ -185,6 +188,34 @@ def test_wod_roll_embed_with_specialties(
         f += 1
     assert embed.fields[f].name == "Pool"
     assert embed.fields[f].value == pool
+
+
+@pytest.mark.parametrize(
+    "line,syntax,emojis",
+    [
+        (GameLine.WOD, "5", True),
+        (GameLine.WOD, "5", False),
+        (GameLine.WOD, "5+wp", True),
+        (GameLine.WOD, "5+wp", False),
+        (GameLine.COFD, "5+wp", True),
+        (GameLine.COFD, "5+wp", False),
+    ],
+)
+def test_wod_roll_embed_with_willpower(
+    line: GameLine,
+    syntax: str,
+    emojis: bool,
+    ctx: AppCtx,
+):
+    rp = RollParser(syntax, None).parse()
+    roll = Roll.from_parser(rp, 0, 0, 6, line)
+
+    embed = build_embed(ctx, roll, None, None, emojis)
+    assert embed.description is not None
+    if roll.wp and line == GameLine.WOD:
+        assert embed.description.endswith(" *+ WP*")
+    else:
+        assert not embed.description.endswith(" *+ WP*")
 
 
 def test_build_embed_author_no_char():

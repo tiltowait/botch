@@ -13,7 +13,7 @@ import utils
 from botchcord.character.display import DisplayField, add_display_field
 from botchcord.haven import Haven
 from config import GAME_LINE
-from core.characters import Character, Damage, Tracker
+from core.characters import Character, Damage, GameLine, Tracker
 from core.rolls import Roll, d10
 from core.rolls.parse import RollParser
 
@@ -149,6 +149,9 @@ def build_embed(
             dice_description = textify_dice(roll)
     else:
         dice_description = textify_dice(roll)
+
+    if roll.line == GameLine.WOD and roll.wp:
+        dice_description += " *+ WP*"
 
     embed = discord.Embed(
         title=embed_title(roll),
