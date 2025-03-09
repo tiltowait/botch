@@ -1,6 +1,6 @@
 """Character adjuster tests."""
 
-from typing import cast
+from typing import AsyncGenerator, cast
 from unittest.mock import ANY, AsyncMock, Mock, call, patch
 
 import discord
@@ -99,6 +99,12 @@ async def toggler(ctx: AppCtx, vamp: wod.Vampire) -> Toggler:
 
 
 @pytest.fixture
+async def mock_update_display() -> AsyncGenerator[None, AsyncMock]:
+    with patch("botchcord.character.adjust.Toggler.update_display", new_callable=AsyncMock) as mock:
+        yield mock
+
+
+@pytest.fixture
 async def mummy_toggler(ctx: AppCtx, mummy: cofd.Mummy) -> Toggler:
     with patch("bot.AppCtx.edit", new_callable=AsyncMock):
         toggler = Toggler(ctx, mummy)
@@ -169,7 +175,7 @@ async def test_health_adjuster(idx: int, expected: str, char: Character):
     ],
 )
 async def test_willpower_adjuster(
-    mock_edit: AsyncMock,
+    mock_update_display: AsyncMock,
     mock_char_save: AsyncMock,
     idx: int,
     count: int,
@@ -186,7 +192,7 @@ async def test_willpower_adjuster(
         await adjuster.callback(inter)
     assert toggler.character.willpower == expected
 
-    assert mock_edit.await_count == count
+    assert mock_update_display.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
     assert mock_char_save.await_count == count
@@ -210,7 +216,7 @@ async def test_willpower_adjuster(
     ],
 )
 async def test_grounding_adjuster(
-    mock_edit: AsyncMock,
+    mock_update_display: AsyncMock,
     mock_char_save: AsyncMock,
     idx: int,
     count: int,
@@ -228,7 +234,7 @@ async def test_grounding_adjuster(
         await adjuster.callback(inter)
     assert toggler.character.grounding.rating == expected
 
-    assert mock_edit.await_count == count
+    assert mock_update_display.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
     assert mock_char_save.await_count == count
@@ -262,7 +268,7 @@ async def test_grounding_adjuster(
     ],
 )
 async def test_wod_vamp_adjuster(
-    mock_edit: AsyncMock,
+    mock_update_display: AsyncMock,
     mock_char_save: AsyncMock,
     idx: int,
     count: int,
@@ -294,7 +300,7 @@ async def test_wod_vamp_adjuster(
             assert vamp.generation == gen
             assert vamp.max_bp == mbp
 
-    assert mock_edit.await_count == count
+    assert mock_update_display.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
     assert mock_char_save.await_count == count
@@ -327,7 +333,7 @@ async def test_wod_vamp_adjuster(
     ],
 )
 async def test_cofd_vamp_adjuster(
-    mock_edit: AsyncMock,
+    mock_update_display: AsyncMock,
     mock_char_save: AsyncMock,
     ctx: AppCtx,
     cvamp: cofd.Vampire,
@@ -359,7 +365,7 @@ async def test_cofd_vamp_adjuster(
             assert cvamp.blood_potency == gen
             assert cvamp.max_vitae == mbp
 
-    assert mock_edit.await_count == count
+    assert mock_update_display.await_count == count
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
     assert mock_char_save.await_count == count
@@ -375,7 +381,7 @@ async def test_cofd_vamp_adjuster(
     ],
 )
 async def test_mummy_sekhem_adjuster(
-    mock_edit: AsyncMock,
+    mock_update_display: AsyncMock,
     mock_char_save: AsyncMock,
     mummy_toggler: Toggler,
     idx: int,
@@ -392,7 +398,7 @@ async def test_mummy_sekhem_adjuster(
         await adjuster.callback(inter)
 
     assert mummy_toggler.character.sekhem == expected
-    assert mock_edit.await_count == count
+    assert mock_update_display.await_count == count
     assert inter.response.edit_message.await_count == count
     assert mock_char_save.await_count == count
 
