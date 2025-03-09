@@ -113,7 +113,6 @@ class Haven(discord.ui.View):
             CharacterIneligible if the user specified a non-matching character.
             CharacterNotFound if the user specified a nonexistent character.
             NoMatchingCharacter if none of the user's characters match.
-
         """
         if isinstance(self.character, Character):
             # We were given a character already
@@ -127,7 +126,7 @@ class Haven(discord.ui.View):
                 char = next(c for c in self.unfiltered if c.name.lower() == self.character.lower())
                 if self.filter(char):
                     return char
-                raise CharacterIneligible(f"**{char.name}** does not match." "")
+                raise CharacterIneligible(f"**{char.name}** does not match.")
             except StopIteration as err:
                 raise CharacterNotFound(f"**{self.character}** not found.") from err
 
@@ -142,7 +141,6 @@ class Haven(discord.ui.View):
         await self.ctx.respond(embed=self._embed(), view=self, ephemeral=True)
         await self.wait()
         await self.ctx.delete()
-
         if self.selected is None:
             raise NoCharacterSelected
         return self.selected
@@ -178,3 +176,12 @@ class Haven(discord.ui.View):
             if child.custom_id == interaction.custom_id:
                 self.selected = self.chars[i]
                 break
+
+    async def on_timeout(self):
+        """Ignore NotFound."""
+        try:
+            await super().on_timeout()
+        except discord.NotFound:
+            # This won't raise an ApplicationCommandError, so we have to catch
+            # it here instead of the regular handler.
+            pass

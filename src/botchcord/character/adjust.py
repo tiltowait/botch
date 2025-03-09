@@ -43,6 +43,7 @@ class Toggler(View):
         self.ctx = ctx
         self.character = char
         self.adjusters: list["Adjuster"] = []
+        self.display_msg: discord.WebhookMessage | discord.Interaction | None = None
 
         self.selector: Select = Select(placeholder="Select a stat to adjust")
         self.selector.callback = self.select_adjuster
@@ -93,17 +94,28 @@ class Toggler(View):
         self.adjusters.append(adjuster)
         self.selector.add_option(label=label, default=default)
 
+    async def update_display(self):
+        """Updates the displayed stats."""
+        if self.display_msg is not None:
+            use_emojis = await botchcord.settings.use_emojis(self.ctx)
+            await self.display_msg.edit(embed=self._embed(use_emojis))
+
     async def update(self, interaction: discord.Interaction):
         """Update the character display and the view."""
-        use_emojis = await botchcord.settings.use_emojis(self.ctx)
-        await self.ctx.edit(embed=self._embed(use_emojis))
+        await self.update_display()
         await interaction.response.edit_message(view=self)
         await self.character.save()
 
     async def display(self):
         """Display the character stats adjuster."""
         use_emojis = await botchcord.settings.use_emojis(self.ctx)
-        await self.ctx.respond(embed=self._embed(use_emojis))
+
+        # If the user used the character selector, then we can't make use of
+        # Interaction.edit(), because the message containing the display
+        # embed is a WebhookMessage. Luckily, both it and Interaction have
+        # an edit(), so we just have to store the response from ctx.respond()
+        # and call edit() on it whenever we need to update.
+        self.display_msg = await self.ctx.respond(embed=self._embed(use_emojis))
         await self.ctx.respond(view=self, ephemeral=True)
 
     def _embed(self, use_emojis: bool) -> discord.Embed:

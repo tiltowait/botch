@@ -3,6 +3,7 @@
 from pyparsing import DelimitedList, Dict, Group, ParseException, Suppress, Word, nums
 
 import bot
+import errors
 from botchcord.haven import haven
 from botchcord.utils import CEmbed
 from botchcord.utils.text import m
@@ -69,16 +70,22 @@ def parse_input(user_input: str) -> dict[str, int]:
     try:
         parsed = traits.parse_string(user_input, parse_all=True)
     except ParseException:
-        raise SyntaxError("Invalid syntax! **Example:** `Brawl=3; Strength=2`")
+        raise errors.TraitSyntaxError("Invalid syntax!\n\n**Example:** `Brawl=3; Strength=2`")
 
     # Create dictionary, converting ratings to ints
     traits_dict: dict[str, int] = {}
     seen: set[str] = set()
+    duplicates = set()
     for trait_name, rating in parsed:
         if trait_name in seen:
-            raise SyntaxError(f"Duplicate trait: {trait}")
+            duplicates.add(trait_name)
 
         seen.add(trait_name)
         traits_dict[trait_name] = int(rating)
+
+    if duplicates:
+        raise errors.TraitSyntaxError(
+            "Duplicate trait(s):\n" + "\n".join(f"* {m(dup)}" for dup in duplicates)
+        )
 
     return traits_dict
