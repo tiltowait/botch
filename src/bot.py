@@ -12,7 +12,7 @@ import db
 import errors
 import tasks
 from config import DEBUG_GUILDS, EMOJI_GUILD, SUPPORTER_GUILD, SUPPORTER_ROLE
-from errors import BotchError, NotPremium
+from errors import BotchError, NoCharacterSelected, NotPremium
 from models import GuildCache
 from models.user import cache as user_store
 
@@ -142,9 +142,8 @@ class BotchBot(discord.Bot):
 
         err = exception.original
         match err:
-            case discord.NotFound():
-                # This might be dangerous during development
-                pass
+            case discord.NotFound() | NoCharacterSelected():
+                logger.debug("Ignoring %s", err.__class__.__name__)
             case BotchError():
                 await context.send_error("Error", str(err), ephemeral=True)
             case NotPremium():
