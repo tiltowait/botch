@@ -20,6 +20,7 @@ from botchcord.character.traits.display import (
 from botchcord.utils import CEmbed
 from botchcord.utils.text import b
 from core.characters import Character, GameLine, Splat, Trait
+from errors import TraitSyntaxError
 from tests.characters import gen_char
 
 # __init__.py only exposes the assign function, so we have to import
@@ -228,7 +229,7 @@ def test_parse_input(text: str, expected: dict[str, int]):
 
 @pytest.mark.parametrize("text", ["t", "t=", "t==1", "1=1", "1t=1", "=1", "1=t", "t=t", "a=1 b=2"])
 def test_parse_errors(text: str):
-    with pytest.raises(SyntaxError):
+    with pytest.raises(TraitSyntaxError):
         _ = assign.parse_input(text)
 
 
@@ -289,7 +290,7 @@ async def test_assign(ctx, skilled: Character):
 
 
 def test_parse_duplicates():
-    with pytest.raises(SyntaxError):
+    with pytest.raises(TraitSyntaxError):
         assign.parse_input("strength=3 strength=5")
 
 
@@ -314,7 +315,7 @@ def test_parse_deletion_input(user_input: str, expected: list[str]):
 
 @pytest.mark.parametrize("user_input", ["1", "foo.bar", "1foo", "foo 3", ""])
 def test_parse_deletion_error(user_input: str):
-    with pytest.raises(SyntaxError):
+    with pytest.raises(TraitSyntaxError):
         _ = remove.parse_input(user_input)
 
 

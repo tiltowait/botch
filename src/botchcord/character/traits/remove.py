@@ -65,6 +65,6 @@ def parse_input(user_input: str) -> list[str]:
     try:
         parsed = trait.parse_string(user_input, parse_all=True)
     except ParseException:
-        raise SyntaxError("Invalid syntax! **Example:** `foo; bar`")
+        raise errors.TraitSyntaxError("Invalid syntax!\n\n**Example:** `foo; bar`")
 
     return list(parsed)

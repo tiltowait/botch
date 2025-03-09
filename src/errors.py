@@ -69,6 +69,10 @@ class TraitError(BotchError):
     """Base trait-related errors."""
 
 
+class TraitSyntaxError(TraitError):
+    """Raised when invalid trait assignment/removal syntax is used."""
+
+
 class AmbiguousTraitError(TraitError):
     """Raised when multiple traits are found."""
 
