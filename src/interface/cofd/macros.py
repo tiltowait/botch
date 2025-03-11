@@ -77,6 +77,7 @@ class MacrosCog(Cog, name="Macros"):
         description="Override the macro to use WP",
         default=False,
     )
+    @option("autos", description="Add automatic successes", choices=list(range(11)), default=0)
     @option("comment", description="Override the default comment", required=False)
     @options.character("The character performing the roll")
     async def mroll(
@@ -86,11 +87,12 @@ class MacrosCog(Cog, name="Macros"):
         again: int,
         rote: bool,
         use_wp: bool,
+        autos: int,
         comment: str,
         character: str,
     ):
         """Roll using a macro."""
-        await botchcord.mroll(ctx, name, again, use_wp, rote, comment, character)
+        await botchcord.mroll(ctx, name, again, use_wp, rote, comment, character, autos=autos)
 
 
 def setup(bot: BotchBot):
