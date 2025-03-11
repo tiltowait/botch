@@ -85,8 +85,8 @@ class MacrosCog(Cog, name="Macros"):
         ctx: AppCtx,
         name: str,
         difficulty: int,
-        autos: int,
         use_wp: bool,
+        autos: int,
         comment: str,
         character: str,
     ):
