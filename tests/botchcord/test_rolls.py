@@ -218,6 +218,24 @@ def test_wod_roll_embed_with_willpower(
         assert not embed.description.endswith(" *+ WP*")
 
 
+@pytest.mark.parametrize(
+    "autos",
+    [0, 1, 2],
+)
+def test_roll_embed_with_autos(autos: int, ctx: AppCtx):
+    rp = RollParser("5", None).parse()
+    roll = Roll.from_parser(rp, 0, 0, 6, autos=autos)
+    embed = build_embed(ctx, roll, None, None, False)
+
+    assert embed.description is not None
+    if autos == 0:
+        assert "auto" not in embed.description
+    elif autos == 1:
+        assert embed.description.endswith(f" *+ {autos} auto*")
+    else:
+        assert embed.description.endswith(f" *+ {autos} autos*")
+
+
 def test_build_embed_author_no_char():
     rp = RollParser("6", None).parse()
     roll = Roll.from_parser(rp, 0, 0, 6, GameLine.WOD)

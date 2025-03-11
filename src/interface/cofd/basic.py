@@ -31,6 +31,7 @@ class BasicCog(Cog, name="Basic"):
         required=False,
     )
     @option("rote", description="Whether to apply the Rote quality", default=False)
+    @option("autos", description="Add automatic successes", choices=list(range(11)), default=0)
     @option(
         "comment",
         description="A comment to show alongside the roll",
@@ -46,6 +47,7 @@ class BasicCog(Cog, name="Basic"):
         use_wp: bool,
         again: int,
         rote: bool,
+        autos: int,
         specialty: str,
         comment: str,
         character: str,
@@ -53,7 +55,7 @@ class BasicCog(Cog, name="Basic"):
     ):
         """Roll the dice! If you have a character, `pool` can be traits (e.g. `Strength + Brawl`)."""
         await botchcord.roll.roll(
-            ctx, pool, again, specialty, use_wp, rote, comment, character, owner=owner
+            ctx, pool, again, specialty, use_wp, rote, comment, character, autos=autos, owner=owner
         )
 
     @slash_command()

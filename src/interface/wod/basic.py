@@ -31,6 +31,7 @@ class BasicCog(Cog, name="Basic"):
         description="A specialty to apply to the roll. You may also use trait.spec syntax in pool.",
         required=False,
     )
+    @option("autos", description="Add automatic successes", choices=list(range(11)), default=0)
     @option(
         "comment",
         description="A comment to show alongside the roll",
@@ -46,6 +47,7 @@ class BasicCog(Cog, name="Basic"):
         difficulty: int,
         use_wp: bool,
         specialty: str,
+        autos: int,
         comment: str,
         character: str,
         owner: discord.Member,
@@ -60,6 +62,7 @@ class BasicCog(Cog, name="Basic"):
             False,
             comment,
             character,
+            autos=autos,
             owner=owner,
         )
 
