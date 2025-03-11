@@ -25,12 +25,12 @@ class BasicCog(Cog, name="Basic"):
         default=False,
     )
     @option("again", description="The number at which dice explode", choices=[10, 9, 8], default=10)
+    @option("rote", description="Whether to apply the Rote quality", default=False)
     @option(
         "specialty",
         description="A specialty to apply to the roll. You may also use trait.spec syntax in pool.",
         required=False,
     )
-    @option("rote", description="Whether to apply the Rote quality", default=False)
     @option("autos", description="Add automatic successes", choices=list(range(11)), default=0)
     @option(
         "comment",
@@ -47,8 +47,8 @@ class BasicCog(Cog, name="Basic"):
         use_wp: bool,
         again: int,
         rote: bool,
-        autos: int,
         specialty: str,
+        autos: int,
         comment: str,
         character: str,
         owner: discord.Member,
