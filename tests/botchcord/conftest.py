@@ -2,8 +2,9 @@
 
 import re
 from typing import AsyncGenerator
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, PropertyMock, patch
 
+import discord
 import pytest
 
 import errors
@@ -16,7 +17,9 @@ from models.guild import GuildCache
 
 @pytest.fixture
 def guild() -> Mock:
-    mock = Mock()
+    mock = Mock(spec=discord.Guild)
+    everyone_role = Mock(spec=discord.Role)
+    mock.default_role = everyone_role
     mock.configure_mock(id=0, name="Test Guild")
     return mock
 
@@ -38,7 +41,7 @@ def bot() -> BotchBot:
     )
 
     def find_emoji(name):
-        if re.match(r"^((ss?|f|b)\d+|no_dmg)$", name):
+        if re.match(r"^((ss?|f|b)?\d+|no_dmg|bash)$", str(name)):
             return name  # The real deal adds \u200b, but we don't need that here
         raise errors.EmojiNotFound
 
@@ -60,9 +63,15 @@ async def ctx(bot: BotchBot, guild: Mock, user: Mock) -> AsyncGenerator[AppCtx, 
         is_done=Mock(return_value=False),
         defer=AsyncMock(),
     )
+    perms = Mock(spec=discord.Permissions)
+    type(perms).external_emojis = PropertyMock(return_value=True)
+    channel = Mock(spec=discord.TextChannel)
+    channel.permissions_for.return_value = perms
+
     inter = AsyncMock(
         guild=guild,
         user=user,
+        channel=channel,
         response=response_mock,
     )
 

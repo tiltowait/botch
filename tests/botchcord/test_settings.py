@@ -5,15 +5,9 @@ they will fail once that work is done."""
 from typing import Any, NamedTuple, cast
 from unittest.mock import AsyncMock, Mock, PropertyMock, patch
 
+import discord
 import pytest
-from discord import (
-    ButtonStyle,
-    Guild,
-    PartialMessageable,
-    Permissions,
-    Role,
-    TextChannel,
-)
+from discord import ButtonStyle
 from discord.ui import Button
 
 from bot import AppCtx
@@ -48,25 +42,25 @@ def test_external_emojis_dms(mock_ctx):
 
 
 def test_external_emojis_missing_channel(mock_ctx):
-    mock_ctx.interaction.guild = Mock(spec=Guild)
+    mock_ctx.interaction.guild = Mock(spec=discord.Guild)
     mock_ctx.interaction.channel = None
 
     assert settings.can_use_external_emoji(mock_ctx) is False
 
 
 def test_external_emojis_partialmessageable(mock_ctx):
-    mock_ctx.interaction.guild = Mock(spec=Guild)
-    mock_ctx.interaction.channel = Mock(spec=PartialMessageable)
+    mock_ctx.interaction.guild = Mock(spec=discord.Guild)
+    mock_ctx.interaction.channel = Mock(spec=discord.PartialMessageable)
 
     assert settings.can_use_external_emoji(mock_ctx) is False
 
 
 @pytest.mark.parametrize("able", [True, False])
 def test_external_emojis_everyone_role(mock_ctx, able: bool):
-    guild = Mock(spec=Guild)
-    channel = Mock(spec=TextChannel)
-    everyone_role = Mock(spec=Role)
-    perms = Mock(spec=Permissions)
+    guild = Mock(spec=discord.Guild)
+    channel = Mock(spec=discord.TextChannel)
+    everyone_role = Mock(spec=discord.Role)
+    perms = Mock(spec=discord.Permissions)
     type(perms).external_emojis = PropertyMock(return_value=able)
 
     channel.permissions_for.return_value = perms
