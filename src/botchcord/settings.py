@@ -1,11 +1,29 @@
 """Various settings handlers."""
 
 import discord
-from discord import ButtonStyle
+from discord import ButtonStyle, PartialMessageable
 from discord.ui import Button, View
 
 from bot import AppCtx
 from models import Guild, User
+
+
+def can_use_external_emoji(ctx: AppCtx) -> bool:
+    """Returns True if the default role can use external emoji.
+    NOTE: This will become unnecessary once we get app emojis."""
+    if ctx.interaction.guild is None:
+        # We're in a DM and should always be able to use external emoji.
+        return True
+    if ctx.interaction.channel is None:
+        # Somehow, there isn't a channel.
+        return False
+    if isinstance(ctx.interaction.channel, PartialMessageable):
+        # We don't know from this without making a slow API call.
+        return False
+
+    # At present, bots run on the @everyone permissions.
+    everyone = ctx.interaction.guild.default_role
+    return ctx.interaction.channel.permissions_for(everyone).external_emojis
 
 
 async def accessibility(ctx: AppCtx) -> bool:
