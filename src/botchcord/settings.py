@@ -28,6 +28,9 @@ def can_use_external_emoji(ctx: AppCtx) -> bool:
 
 async def accessibility(ctx: AppCtx) -> bool:
     """Whether to use accessibility mode for the current operation."""
+    if not can_use_external_emoji(ctx):
+        return True
+
     guild = await ctx.bot.guild_cache.fetch(ctx.guild, create=True)
     if guild.settings.accessibility:
         return True

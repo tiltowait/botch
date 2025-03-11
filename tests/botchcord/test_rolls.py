@@ -9,7 +9,7 @@ from cachetools import TTLCache
 
 import core
 import errors
-from bot import AppCtx, BotchBot
+from bot import AppCtx
 from botchcord.roll import DICE_CAP, DICE_CAP_MESSAGE, Color, add_wp, build_embed
 from botchcord.roll import chance as chance_cmd
 from botchcord.roll import embed_color, embed_title, emoji_name, emojify_dice
@@ -424,6 +424,7 @@ def test_dice_caps(ctx):
 @patch("bot.BotchBot.find_emoji")
 async def test_roll_command(
     mock_find_emoji: Mock,
+    ctx: AppCtx,
     mock_respond: AsyncMock,
     pool: str,
     char: str | None,
@@ -432,12 +433,12 @@ async def test_roll_command(
     wod_vampire: Character,
 ):
     mock_find_emoji.return_value = "."
-    bot = BotchBot()
-    inter = AsyncMock()
-    inter.user.id = wod_vampire.user
-    inter.guild.id = wod_vampire.guild
-    inter.guild.name = "Test Guild"
-    ctx = AppCtx(bot, inter)
+
+    assert ctx.interaction.guild is not None
+    assert ctx.interaction.user is not None
+    ctx.interaction.guild.id = wod_vampire.guild
+    ctx.interaction.user.id = wod_vampire.user
+    ctx.interaction.guild.name = "Test Guild"
 
     await core.cache.register(wod_vampire)  # Register so Haven finds her
 
@@ -483,17 +484,11 @@ async def test_chance_cmd(
     find_emoji_mock: Mock,
     emoji_mock: Mock,
     d10_mock: Mock,
+    ctx: AppCtx,
     mock_respond: AsyncMock,
     die: int,
     title: str,
 ):
-    bot = BotchBot()
-    inter = AsyncMock()
-    inter.user.id = 0
-    inter.guild.id = 0
-    inter.guild.name = "Test Guild"
-    ctx = AppCtx(bot, inter)
-
     find_emoji_mock.return_value = die
     emoji_mock.return_value = die
     d10_mock.return_value = die
