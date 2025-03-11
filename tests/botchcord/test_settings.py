@@ -2,11 +2,18 @@
 reminder to write thorough tests once the settings system is written, since
 they will fail once that work is done."""
 
-from typing import NamedTuple, cast
+from typing import Any, NamedTuple, cast
 from unittest.mock import AsyncMock, Mock, PropertyMock, patch
 
 import pytest
-from discord import ButtonStyle
+from discord import (
+    ButtonStyle,
+    Guild,
+    PartialMessageable,
+    Permissions,
+    Role,
+    TextChannel,
+)
 from discord.ui import Button
 
 from bot import AppCtx
@@ -26,6 +33,48 @@ A11Y_TEST_CASES = [
     A11yParams(False, True, True),
     A11yParams(True, True, True),
 ]
+
+
+@pytest.fixture
+def mock_ctx() -> Any:
+    ctx = Mock()
+    ctx.interaction = Mock()
+    return ctx
+
+
+def test_external_emojis_dms(mock_ctx):
+    mock_ctx.interaction.guild = None
+    assert settings.can_use_external_emoji(mock_ctx) is True
+
+
+def test_external_emojis_missing_channel(mock_ctx):
+    mock_ctx.interaction.guild = Mock(spec=Guild)
+    mock_ctx.interaction.channel = None
+
+    assert settings.can_use_external_emoji(mock_ctx) is False
+
+
+def test_external_emojis_partialmessageable(mock_ctx):
+    mock_ctx.interaction.guild = Mock(spec=Guild)
+    mock_ctx.interaction.channel = Mock(spec=PartialMessageable)
+
+    assert settings.can_use_external_emoji(mock_ctx) is False
+
+
+@pytest.mark.parametrize("able", [True, False])
+def test_external_emojis_everyone_role(mock_ctx, able: bool):
+    guild = Mock(spec=Guild)
+    channel = Mock(spec=TextChannel)
+    everyone_role = Mock(spec=Role)
+    perms = Mock(spec=Permissions)
+    type(perms).external_emojis = PropertyMock(return_value=able)
+
+    channel.permissions_for.return_value = perms
+    guild.default_role = everyone_role
+    mock_ctx.interaction.guild = guild
+    mock_ctx.interaction.channel = channel
+
+    assert settings.can_use_external_emoji(mock_ctx) == able
 
 
 async def test_accessibility(ctx: AppCtx):
