@@ -84,7 +84,7 @@
           "Occult",
           "Politics",
           "Seneschal",
-          "Technology"
+          "Theology"
         ]
       }
     ]
@@ -104,7 +104,9 @@
   ],
   "special": [
     {
-      "splats": ["vampire"],
+      "splats": [
+        "vampire"
+      ],
       "traits": [
         {
           "label": "Generation",
