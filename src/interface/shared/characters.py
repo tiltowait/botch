@@ -78,18 +78,18 @@ class CharactersCog(Cog, name="Character info and adjustment"):
     @option(
         "controls",
         description="Who can control the buttons?",
-        choices=[OptionChoice("Only you", True), OptionChoice("Anyone", False)],
-        default=True,
+        choices=[OptionChoice("Anyone", 0), OptionChoice("Only you", 1)],
+        default=0,
     )
     async def display_images(
         self,
         ctx: AppCtx,
         character: str,
-        controls: bool,
+        controls: int,
         owner: discord.Member,
     ):
         """View a character's images."""
-        await botchcord.character.images.display(ctx, character, controls, owner=owner)
+        await botchcord.character.images.display(ctx, character, bool(controls), owner=owner)
 
     @images.command(name="upload")
     @option("image", description="The image file to upload")
