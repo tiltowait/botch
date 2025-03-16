@@ -8,11 +8,12 @@ from discord.ext import commands
 
 from bot import BotchBot
 from web.app import app
+from src.interface import BotchCog
 
 logger = logging.getLogger("APICOG")
 
 
-class APIServerCog(commands.Cog):
+class APIServerCog(BotchCog, commands.Cog):
     """Starts the FastAPI server."""
 
     def __init__(self, bot: BotchBot):

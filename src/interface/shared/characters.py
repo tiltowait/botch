@@ -5,6 +5,8 @@ from discord import option
 from discord.commands import SlashCommandGroup
 from discord.commands.options import OptionChoice
 from discord.ext.commands import Cog, user_command
+from src.interface import BotchCog
+from src.config import DOCS_URL
 
 import botchcord
 from bot import AppCtx, BotchBot
@@ -19,7 +21,7 @@ else:
     ERAS = [OptionChoice("Modern", "vtr")]
 
 
-class CharactersCog(Cog, name="Character info and adjustment"):
+class CharactersCog(BotchCog, Cog, name="Character info and adjustment"):
     """Commands for displaying and updating character status as well as images\
     (premium users only)."""
 
@@ -32,6 +34,7 @@ class CharactersCog(Cog, name="Character info and adjustment"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/characters"
 
     @user_command(name="View: Character")
     async def user_characters(self, ctx: AppCtx, member: discord.Member):
