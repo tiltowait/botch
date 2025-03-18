@@ -11,19 +11,10 @@ import botchcord
 from bot import AppCtx, BotchBot
 from botchcord.utils.text import m
 from config import VERSION, DOCS_URL
-from src.interface import BotchCog
+from interface import BotchCog
 
-# Create a subclass of discord.ui.View for the documentation link
-class DocumentationView(discord.ui.View):
-    def __init__(self, url: str):
-        super().__init__()
-        self.add_item(discord.ui.Button(
-            style=discord.ButtonStyle.link,
-            label="Documentation",
-            url=url
-        ))
 
-class MiscCog(BotchCog, Cog, name="Miscellaneous"):
+class MiscCog(BotchCog, name="Miscellaneous"):
     """Miscellaneous commands that don't belong to any other sections."""
 
     def __init__(self, bot: BotchBot):
@@ -35,10 +26,7 @@ class MiscCog(BotchCog, Cog, name="Miscellaneous"):
         assert ctx.bot.user is not None
         embed = discord.Embed(title=ctx.bot.user.name, description=f"**Build:** {m(VERSION)}")
 
-        # Create an instance of our View subclass
-        view = DocumentationView(DOCS_URL)
-
-        await ctx.respond(embed=embed, view=view)
+        await ctx.respond(embed=embed, view=self.documentation_view)
 
     @slash_command(name="coin")
     async def coin_flip(self, ctx: AppCtx):

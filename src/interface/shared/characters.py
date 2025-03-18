@@ -5,14 +5,13 @@ from discord import option
 from discord.commands import SlashCommandGroup
 from discord.commands.options import OptionChoice
 from discord.ext.commands import Cog, user_command
-from src.interface import BotchCog
-from src.config import DOCS_URL
+from interface import BotchCog
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
 from botchcord.premium import premium
-from config import GAME_LINE
+from config import GAME_LINE, DOCS_URL
 from core.characters.base import GameLine
 
 if GAME_LINE == GameLine.WOD:
@@ -21,7 +20,7 @@ else:
     ERAS = [OptionChoice("Modern", "vtr")]
 
 
-class CharactersCog(BotchCog, Cog, name="Character info and adjustment"):
+class CharactersCog(BotchCog, name="Character info and adjustment"):
     """Commands for displaying and updating character status as well as images\
     (premium users only)."""
 
