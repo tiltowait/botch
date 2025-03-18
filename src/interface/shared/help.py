@@ -7,12 +7,12 @@ from discord import slash_command
 from discord.cog import Cog
 from discord.commands.core import SlashCommand
 from discord.ext.pages import Page, PageGroup, Paginator
-from src.interface import BotchCog
+from interface import BotchCog
 
 from bot import AppCtx, BotchBot
 
 
-class HelpCog(BotchCog, Cog, name="Help"):
+class HelpCog(BotchCog, name="Help"):
     """These help menus are generated dynamically, and I thought it was funny\
     not to filter out this section, so here it is. There's nothing helpful on\
     this page. Move along!"""
@@ -62,19 +62,12 @@ class HelpCog(BotchCog, Cog, name="Help"):
                 continue
             page = Page(embeds=embeds)  # type: ignore
             
-             # Create a custom view for documentation link if the cog has a docs_url
-            if hasattr(cog, 'docs_url'):
-                custom_view = discord.ui.View()
-                custom_view.add_item(discord.ui.Button(
-                    style=discord.ButtonStyle.link,
-                    label="Documentation",
-                    url=cog.docs_url
-                ))
-                # Add the custom view to the PageGroup
-                page_group = PageGroup(pages=[page], label=cog_name, custom_view=custom_view)
-            else:
-                page_group = PageGroup(pages=[page], label=cog_name)
-                
+            # Use the cog's documentation_view property directly
+            page_group = PageGroup(
+                pages=[page], 
+                label=cog_name,
+                custom_view=cog.documentation_view
+            )
             page_groups.append(page_group)
 
         paginator = Paginator(

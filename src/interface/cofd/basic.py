@@ -4,15 +4,15 @@ import discord
 from discord import option
 from discord.commands import slash_command
 from discord.ext.commands import Cog
-from src.interface import BotchCog
-from src.config import DOCS_URL
+from interface import BotchCog
+from config import DOCS_URL
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
 
 
-class BasicCog(BotchCog, Cog, name="Basic"):
+class BasicCog(BotchCog, name="Basic"):
     """These commands are available to any user, whether you have a character\
     or not."""
 
