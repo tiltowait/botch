@@ -3,7 +3,7 @@
 import discord
 from discord import option
 from discord.commands import SlashCommandGroup
-from discord.ext.commands import Cog, user_command
+from discord.ext.commands import user_command
 
 import botchcord
 from bot import AppCtx, BotchBot
