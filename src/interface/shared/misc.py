@@ -5,12 +5,11 @@ import random
 import discord
 from discord import option
 from discord.commands import slash_command
-from discord.ext.commands import Cog
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord.utils.text import m
-from config import VERSION, DOCS_URL
+from config import VERSION
 from interface import BotchCog
 
 

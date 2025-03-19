@@ -1,4 +1,3 @@
-from abc import ABC
 import discord
 from discord.ext import commands
 from config import DOCS_URL

@@ -7,9 +7,10 @@ from discord import slash_command
 from discord.cog import Cog
 from discord.commands.core import SlashCommand
 from discord.ext.pages import Page, PageGroup, Paginator
-from interface import BotchCog
 
 from bot import AppCtx, BotchBot
+from interface import BotchCog
+from typing import cast
 
 
 class HelpCog(BotchCog, name="Help"):
@@ -66,7 +67,7 @@ class HelpCog(BotchCog, name="Help"):
             page_group = PageGroup(
                 pages=[page], 
                 label=cog_name,
-                custom_view=cog.documentation_view
+                custom_view=cast(BotchCog, cog).documentation_view
             )
             page_groups.append(page_group)
 

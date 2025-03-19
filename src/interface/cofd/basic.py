@@ -3,7 +3,6 @@
 import discord
 from discord import option
 from discord.commands import slash_command
-from discord.ext.commands import Cog
 from interface import BotchCog
 from config import DOCS_URL
 

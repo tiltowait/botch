@@ -2,14 +2,14 @@
 
 import discord
 from discord import SlashCommandGroup, option, slash_command
-from discord.ext.commands import Cog
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
+from interface import BotchCog
 
 
-class MacrosCog(Cog, name="Macros"):
+class MacrosCog(BotchCog, name="Macros"):
     """Macros are shortcuts for your most commonly used rolls. For instance,\
     if you often roll `Perception + Alertness`, you can create a macro called\
     `spot` that rolls those traits, at a difficulty you specify, and even\
