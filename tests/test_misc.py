@@ -7,24 +7,22 @@ from unittest import mock
 import mongomock_motor
 import pytest
 
-import config
-import db
-import utils
+from botch import config, db, utils
 
 
 # Mock the necessary components
 @pytest.mark.asyncio
 async def test_db_init():
-    with mock.patch.dict(os.environ, {"MONGO_URL": "mock_url", "MONGO_DB": "mock_db"}), mock.patch(
-        "db.init_beanie"
-    ) as mock_init_beanie:
-
+    with (
+        mock.patch.dict(os.environ, {"MONGO_URL": "mock_url", "MONGO_DB": "mock_db"}),
+        mock.patch("botch.db.init_beanie") as mock_init_beanie,
+    ):
         # Use AsyncMongoMockClient as the mock client
         client = mongomock_motor.AsyncMongoMockClient()
         database = client["mock_db"]
 
         # Mock the AsyncIOMotorClient to return the AsyncMongoMockClient
-        with mock.patch("db.AsyncIOMotorClient", return_value=client):
+        with mock.patch("botch.db.AsyncIOMotorClient", return_value=client):
             await db.init()
 
             # Ensure the mocks were called as expected

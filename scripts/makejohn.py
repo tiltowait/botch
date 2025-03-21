@@ -9,11 +9,10 @@ from random import randint
 import requests
 from dotenv import load_dotenv
 
-import db
-import utils
-from core.characters import Character, Damage, GameLine, Grounding, Splat
-from core.characters.factory import Factory
-from core.characters.wod import Vampire, gen_virtues
+from botch import db, utils
+from botch.core.characters import Character, Damage, GameLine, Grounding, Splat
+from botch.core.characters.factory import Factory
+from botch.core.characters.wod import Vampire, gen_virtues
 
 load_dotenv()  # You *MUST* have MONGO_URL and MONGO_DB defined!
 

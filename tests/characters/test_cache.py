@@ -4,9 +4,9 @@ import copy
 
 import pytest
 
-import errors
-from core.cache import CharCache
-from core.characters import Character, GameLine, Splat
+from botch import errors
+from botch.core.cache import CharCache
+from botch.core.characters import Character, GameLine, Splat
 
 
 @pytest.fixture

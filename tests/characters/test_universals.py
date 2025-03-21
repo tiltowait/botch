@@ -7,10 +7,9 @@ from unittest.mock import patch
 import pydantic
 import pytest
 
-import api
-import errors
-from config import FC_BUCKET, MAX_NAME_LEN
-from core.characters import Character, Damage, GameLine, Splat, Tracker, Trait
+from botch import api, errors
+from botch.config import FC_BUCKET, MAX_NAME_LEN
+from botch.core.characters import Character, Damage, GameLine, Splat, Tracker, Trait
 from tests.characters import gen_char
 
 # Using function-scoped fixture "character" from conftest
@@ -212,7 +211,7 @@ async def test_single_image_processing(sample_image):
     await char.insert()
 
     with patch(
-        "core.characters.base.api.upload_faceclaim",
+        "botch.core.characters.base.api.upload_faceclaim",
         return_value=f"https://{FC_BUCKET}/123a/456b.webp",
     ) as mock_add:
         inserted = await char.add_image(sample_image)
@@ -222,7 +221,7 @@ async def test_single_image_processing(sample_image):
         assert inserted in map(str, char.profile.images)  # Images are type Url
 
     with patch(
-        "core.characters.base.api.delete_single_faceclaim",
+        "botch.core.characters.base.api.delete_single_faceclaim",
         return_value=True,
     ) as mock_delete:
         await char.delete_image(inserted)
@@ -240,7 +239,7 @@ async def test_multiple_image_deletion(sample_image):
     def randurl(*args, **kwargs):
         return f"https://{FC_BUCKET}/{random.randint(1, 1000)}/{random.randint(1, 1000)}.webp"
 
-    with patch("core.characters.base.api.upload_faceclaim", side_effect=randurl) as mock_add:
+    with patch("botch.core.characters.base.api.upload_faceclaim", side_effect=randurl) as mock_add:
         # Insert some images
         urls = []
         for _ in range(3):
@@ -252,7 +251,7 @@ async def test_multiple_image_deletion(sample_image):
         assert len(set(urls)) == len(urls)
         assert [str(i) for i in char.profile.images] == urls, "The image URLs don't match"
 
-    with patch("core.characters.base.api.delete_character_faceclaims") as mock_delete:
+    with patch("botch.core.characters.base.api.delete_character_faceclaims") as mock_delete:
         # Make sure delete_all_images() clears profile.images
         await char.delete_all_images()
         assert not char.is_changed

@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from bot import BotchBot
-from models import Guild
+from botch.bot import BotchBot
+from botch.models import Guild
 
 
 @pytest.fixture
 async def mock_save() -> AsyncGenerator[AsyncMock, None]:
-    with patch("models.Guild.save", new_callable=AsyncMock) as mock:
+    with patch("botch.models.Guild.save", new_callable=AsyncMock) as mock:
         yield mock
 
 

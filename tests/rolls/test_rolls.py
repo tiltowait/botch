@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-import errors
-from core.characters import Character, GameLine
-from core.rolls.parse import RollParser, evaluate
-from core.rolls.roll import Roll
+from botch import errors
+from botch.core.characters import Character, GameLine
+from botch.core.rolls.parse import RollParser, evaluate
+from botch.core.rolls.roll import Roll
 
 TRIALS = 1000
 
@@ -178,7 +178,7 @@ async def test_roll_spec_coalescing():
     assert roll.specialties == ["Throws"]
 
 
-@patch("core.rolls.Roll.save")
+@patch("botch.core.rolls.Roll.save")
 async def test_add_specs(mocked):
     roll = Roll(
         line=GameLine.WOD,

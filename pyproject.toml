@@ -1,3 +1,11 @@
+[project]
+name = "botch"
+version = "0.9.14"
+description = "A Discord character manager and dice bot for Wod and CofD."
+authors = [{ name = "tiltowait", email = "tiltowait <208040+tiltowait@users.noreply.github.com>" }]
+requires-python = "~=3.12"
+readme = "README.md"
+
 [tool.ruff]
 line-length = 100
 
@@ -5,15 +13,10 @@ line-length = 100
 profile = "black"
 
 [tool.poetry]
-name = "botch"
-version = "0.9.9-BETA"
-packages = [{ include = "*", from = "src", format = "sdist" }]
-description = "A Discord character manager and dice bot for Wod and CofD."
-authors = ["tiltowait <208040+tiltowait@users.noreply.github.com>"]
-readme = "README.md"
+packages = [{ include = "botch", from = "src" }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "~=3.12"
 beanie = "^1.20.0"
 python-dotenv = "^1.0.0"
 aiohttp = "^3.8.5"
@@ -39,8 +42,8 @@ httpx = "^0.27.2"
 pyright = "^1.1.391"
 
 [tool.poetry.scripts]
-botch = "launcher:run_bot('botch')"
-beat = "launcher:run_bot('beat')"
+botch = "botch.launcher:botch"
+beat = "botch.launcher:beat"
 
 [build-system]
 requires = ["poetry-core"]

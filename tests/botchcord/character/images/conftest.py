@@ -11,6 +11,6 @@ async def mock_char_cd() -> AsyncGenerator[AsyncMock, None]:
     # We already have a base character fixture, but its save method
     # isn't mocked
     with patch.multiple(
-        "core.characters.base.Character", save=AsyncMock(), delete=AsyncMock()
+        "botch.core.characters.base.Character", save=AsyncMock(), delete=AsyncMock()
     ) as mocked:
         yield mocked

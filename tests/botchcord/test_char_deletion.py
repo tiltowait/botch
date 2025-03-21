@@ -5,10 +5,10 @@ from unittest.mock import ANY, AsyncMock, MagicMock, Mock, patch
 
 import pytest
 
-import core
-from bot import AppCtx
-from botchcord.character.delete import DeletionModal, delete
-from core.characters import GameLine, Splat
+from botch import core
+from botch.bot import AppCtx
+from botch.botchcord.character.delete import DeletionModal, delete
+from botch.core.characters import GameLine, Splat
 from tests.characters import gen_char
 
 mk_char = partial(gen_char, line=GameLine.WOD, splat=Splat.VAMPIRE)
@@ -37,7 +37,7 @@ async def test_deletion_modal(name: str, input: str, should_pass: bool):
 
 
 @pytest.mark.parametrize("should_delete", [True, False])
-@patch("botchcord.character.delete.DeletionModal")
+@patch("botch.botchcord.character.delete.DeletionModal")
 async def test_delete(modal_mock: MagicMock, mock_send_modal: AsyncMock, should_delete: bool):
     modal_instance = AsyncMock()
     modal_mock.return_value = modal_instance

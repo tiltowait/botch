@@ -4,10 +4,10 @@ from unittest.mock import ANY, AsyncMock
 
 import pytest
 
-from bot import AppCtx
-from botchcord.macro.create import create_macro
-from botchcord.macro.delete import delete as delete_macro
-from core.characters import Character
+from botch.bot import AppCtx
+from botch.botchcord.macro.create import create_macro
+from botch.botchcord.macro.delete import delete as delete_macro
+from botch.core.characters import Character
 
 
 @pytest.fixture

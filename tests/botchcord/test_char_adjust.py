@@ -7,8 +7,8 @@ import discord
 import pytest
 from discord.ui import Select
 
-from bot import AppCtx, BotchBot
-from botchcord.character.adjust import (
+from botch.bot import AppCtx, BotchBot
+from botch.botchcord.character.adjust import (
     Adjuster,
     GroundingAdjuster,
     HealthAdjuster,
@@ -19,16 +19,16 @@ from botchcord.character.adjust import (
     WillpowerAdjuster,
     adjust,
 )
-from core.characters import Character, GameLine, Splat, cofd, wod
+from botch.core.characters import Character, GameLine, Splat, cofd, wod
+from botch.utils import max_vtm_bp, max_vtr_vitae
 from tests.characters import gen_char
-from utils import max_vtm_bp, max_vtr_vitae
 
 VampireType = wod.Vampire | cofd.Vampire
 
 
 @pytest.fixture(autouse=True)
 def mock_use_emojis():
-    with patch("botchcord.settings.use_emojis", new_callable=AsyncMock) as mocked:
+    with patch("botch.botchcord.settings.use_emojis", new_callable=AsyncMock) as mocked:
         mocked.return_value = False
         yield mocked
 
@@ -93,20 +93,22 @@ def ctx() -> AppCtx:
 
 @pytest.fixture
 async def toggler(ctx: AppCtx, vamp: wod.Vampire) -> Toggler:
-    with patch("bot.AppCtx.edit", new_callable=AsyncMock):
+    with patch("botch.bot.AppCtx.edit", new_callable=AsyncMock):
         toggler = Toggler(ctx, vamp)
         return toggler
 
 
 @pytest.fixture
 async def mock_update_display() -> AsyncGenerator[None, AsyncMock]:
-    with patch("botchcord.character.adjust.Toggler.update_display", new_callable=AsyncMock) as mock:
+    with patch(
+        "botch.botchcord.character.adjust.Toggler.update_display", new_callable=AsyncMock
+    ) as mock:
         yield mock
 
 
 @pytest.fixture
 async def mummy_toggler(ctx: AppCtx, mummy: cofd.Mummy) -> Toggler:
-    with patch("bot.AppCtx.edit", new_callable=AsyncMock):
+    with patch("botch.bot.AppCtx.edit", new_callable=AsyncMock):
         toggler = Toggler(ctx, mummy)
         return toggler
 
@@ -634,7 +636,7 @@ def test_vtr_button_states(
     pass
 
 
-@patch("bot.AppCtx.respond", new_callable=AsyncMock)
+@patch("botch.bot.AppCtx.respond", new_callable=AsyncMock)
 async def test_adjust_command(mock_respond: AsyncMock, ctx: AppCtx, avamp: VampireType):
     await adjust(ctx, avamp)
 
@@ -659,7 +661,7 @@ async def test_timeout(toggler: Toggler):
 
 
 @pytest.mark.parametrize("err", [discord.NotFound, discord.Forbidden])
-@patch("botchcord.character.adjust.Toggler.message", new_callable=AsyncMock)
+@patch("botch.botchcord.character.adjust.Toggler.message", new_callable=AsyncMock)
 async def test_timeout_error_handling(
     mock_message: AsyncMock, toggler: Toggler, err: type[Exception]
 ):

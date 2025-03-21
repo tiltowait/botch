@@ -4,9 +4,9 @@ import random
 
 import pytest
 
-import errors
-from core.characters.base import Character, GameLine, Splat, Trait
-from core.characters.wod.base import WoD
+from botch import errors
+from botch.core.characters.base import Character, GameLine, Splat, Trait
+from botch.core.characters.wod.base import WoD
 from tests.characters import gen_char
 
 

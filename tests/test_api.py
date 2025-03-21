@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 import pytest
 
-import api
-from config import FC_BUCKET
+from botch import api
+from botch.config import FC_BUCKET
 
 os.environ["BOTCH_API_TOKEN"] = "test_token"
 

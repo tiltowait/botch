@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, Mock, PropertyMock, patch
 import discord
 import pytest
 
-import errors
-from bot import AppCtx, BotchBot
-from models.guild import GuildCache
+from botch import errors
+from botch.bot import AppCtx, BotchBot
+from botch.models.guild import GuildCache
 
 # We use configure_mock(), because kwarg-based instantiation causes problems
 # with pydantic.
@@ -82,31 +82,31 @@ async def ctx(bot: BotchBot, guild: Mock, user: Mock) -> AsyncGenerator[AppCtx, 
 
 @pytest.fixture
 async def mock_respond() -> AsyncGenerator[AsyncMock, None]:
-    with patch("bot.AppCtx.respond", new_callable=AsyncMock) as mock:
+    with patch("botch.bot.AppCtx.respond", new_callable=AsyncMock) as mock:
         yield mock
 
 
 @pytest.fixture
 async def mock_send_error() -> AsyncGenerator[AsyncMock, None]:
-    with patch("bot.AppCtx.send_error", new_callable=AsyncMock) as mock:
+    with patch("botch.bot.AppCtx.send_error", new_callable=AsyncMock) as mock:
         yield mock
 
 
 @pytest.fixture
 async def mock_edit() -> AsyncGenerator[AsyncMock, None]:
-    with patch("bot.AppCtx.edit", new_callable=AsyncMock) as mock:
+    with patch("botch.bot.AppCtx.edit", new_callable=AsyncMock) as mock:
         yield mock
 
 
 @pytest.fixture
 async def mock_delete() -> AsyncGenerator[AsyncMock, None]:
-    with patch("bot.AppCtx.delete", new_callable=AsyncMock) as mock:
+    with patch("botch.bot.AppCtx.delete", new_callable=AsyncMock) as mock:
         yield mock
 
 
 @pytest.fixture
 async def mock_send_modal() -> AsyncGenerator[AsyncMock, None]:
-    with patch("bot.AppCtx.send_modal", new_callable=AsyncMock) as mock:
+    with patch("botch.bot.AppCtx.send_modal", new_callable=AsyncMock) as mock:
         yield mock
 
 
@@ -124,5 +124,5 @@ async def mock_defer() -> AsyncGenerator[AsyncMock, None]:
 
 @pytest.fixture
 def mock_char_save():
-    with patch("core.characters.Character.save", new_callable=AsyncMock) as mocked:
+    with patch("botch.core.characters.Character.save", new_callable=AsyncMock) as mocked:
         yield mocked

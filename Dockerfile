@@ -28,4 +28,4 @@ COPY src .
 # Copy only the virtual environment
 COPY --from=builder /app/.venv/lib/python3.12/site-packages /usr/local/lib/python3.12/dist-packages
 
-ENTRYPOINT ["python3", "main.py"]
+ENTRYPOINT ["python3", "-m", "botch"]

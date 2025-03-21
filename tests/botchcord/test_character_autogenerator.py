@@ -8,9 +8,9 @@ import pytest
 from cachetools import TTLCache
 from discord import OptionChoice
 
-from botchcord.options import _available_characters as generate
-from core.cache import cache
-from core.characters import Character, GameLine, Splat
+from botch.botchcord.options import _available_characters as generate
+from botch.core.cache import cache
+from botch.core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
 
 

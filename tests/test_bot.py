@@ -7,9 +7,8 @@ from unittest.mock import ANY, AsyncMock, MagicMock, Mock, PropertyMock, patch
 import pytest
 from discord import ApplicationCommandInvokeError, NotFound
 
-import config
-import errors
-from bot import AppCtx, BotchBot
+from botch import config, errors
+from botch.bot import AppCtx, BotchBot
 
 
 @pytest.fixture
@@ -27,14 +26,14 @@ def ctx(bot: BotchBot) -> AppCtx:
 
 @pytest.fixture
 async def mock_send_error() -> AsyncGenerator[AsyncMock, None]:
-    with patch("bot.AppCtx.send_error", new_callable=AsyncMock) as mock:
+    with patch("botch.bot.AppCtx.send_error", new_callable=AsyncMock) as mock:
         yield mock
 
 
 async def test_on_connect(bot):
     with (
-        mock.patch("bot.db.init", return_value=None),
-        mock.patch("bot.BotchBot.sync_commands", return_value=None),
+        mock.patch("botch.bot.db.init", return_value=None),
+        mock.patch("botch.bot.BotchBot.sync_commands", return_value=None),
     ):
         await bot.on_connect()
 
@@ -114,7 +113,7 @@ async def test_not_found_ignored(mock_send_error: AsyncMock, bot: BotchBot, ctx:
         ("blep", False),
     ],
 )
-@patch("bot.BotchBot.get_application_command")
+@patch("botch.bot.BotchBot.get_application_command")
 def test_cmd_mention(mock_get_cmd: Mock, bot: BotchBot, cmd: str, exists: bool):
     # We can't use the real function, so let's just test our logic as we slave
     # over high code coverage.

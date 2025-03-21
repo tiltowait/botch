@@ -2,9 +2,9 @@
 
 import pytest
 
-import errors
-from core.characters import Character, GameLine, Splat
-from core.rolls.parse import RollParser
+from botch import errors
+from botch.core.characters import Character, GameLine, Splat
+from botch.core.rolls.parse import RollParser
 from tests.characters import gen_char
 
 

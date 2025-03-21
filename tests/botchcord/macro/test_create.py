@@ -4,13 +4,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import errors
-from bot import AppCtx
-from botchcord.macro.create import build_embed, can_use_macro
-from botchcord.macro.create import create as create_cmd
-from botchcord.macro.create import create_macro
-from botchcord.utils import CEmbed
-from core.characters import Character
+from botch import errors
+from botch.bot import AppCtx
+from botch.botchcord.macro.create import build_embed, can_use_macro
+from botch.botchcord.macro.create import create as create_cmd
+from botch.botchcord.macro.create import create_macro
+from botch.botchcord.utils import CEmbed
+from botch.core.characters import Character
 
 
 @pytest.fixture
@@ -65,7 +65,7 @@ def test_build_embed(bot_mock, char):
         ("Strength + Brawl", False),
     ],
 )
-@patch("botchcord.macro.create.build_embed")
+@patch("botch.botchcord.macro.create.build_embed")
 async def test_create_cmd(
     embed_mock,
     mock_char_save,

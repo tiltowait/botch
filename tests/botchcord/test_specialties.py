@@ -5,15 +5,18 @@ from unittest.mock import ANY, AsyncMock
 
 import pytest
 
-import errors
-from bot import AppCtx
-from botchcord.character.specialties.adjust import _make_embed, add_specialties
-from botchcord.character.specialties.adjust import assign as assign_cmd
-from botchcord.character.specialties.adjust import remove as remove_cmd
-from botchcord.character.specialties.adjust import remove_specialties, validate_tokens
-from botchcord.character.specialties.tokenize import tokenize
-from botchcord.utils.text import b
-from core.characters import Character, GameLine, Splat
+from botch import errors
+from botch.bot import AppCtx
+from botch.botchcord.character.specialties.adjust import _make_embed, add_specialties
+from botch.botchcord.character.specialties.adjust import assign as assign_cmd
+from botch.botchcord.character.specialties.adjust import remove as remove_cmd
+from botch.botchcord.character.specialties.adjust import (
+    remove_specialties,
+    validate_tokens,
+)
+from botch.botchcord.character.specialties.tokenize import tokenize
+from botch.botchcord.utils.text import b
+from botch.core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
 
 

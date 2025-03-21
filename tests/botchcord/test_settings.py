@@ -10,9 +10,9 @@ import pytest
 from discord import ButtonStyle
 from discord.ui import Button
 
-from bot import AppCtx
-from botchcord import settings
-from models import Guild, User
+from botch.bot import AppCtx
+from botch.botchcord import settings
+from botch.models import Guild, User
 
 
 class A11yParams(NamedTuple):
@@ -100,7 +100,7 @@ async def test_settings_logic(ctx: AppCtx, a11y: A11yParams):
 
 @pytest.mark.parametrize("a11y", A11Y_TEST_CASES)
 @pytest.mark.parametrize("admin", [False, True])
-@patch("bot.AppCtx.admin_user", new_callable=PropertyMock)
+@patch("botch.bot.AppCtx.admin_user", new_callable=PropertyMock)
 async def test_settings_control_states(
     mock_admin: PropertyMock,
     ctx: AppCtx,
@@ -140,7 +140,7 @@ async def test_settings_control_states(
 
     inter = AsyncMock()
 
-    with patch("models.user.User.save", new_callable=AsyncMock) as mock_user_save:
+    with patch("botch.models.user.User.save", new_callable=AsyncMock) as mock_user_save:
         await view.toggle_user_a11y(inter)
         mock_user_save.assert_awaited_once()
 
@@ -150,7 +150,7 @@ async def test_settings_control_states(
         assert user_a11y_btn.style == ButtonStyle.primary if a11y.user else ButtonStyle.secondary
 
     if admin:
-        with patch("models.guild.Guild.save", new_callable=AsyncMock) as mock_guild_save:
+        with patch("botch.models.guild.Guild.save", new_callable=AsyncMock) as mock_guild_save:
             await view.toggle_guild_a11y(inter)
             mock_guild_save.assert_awaited_once()
 

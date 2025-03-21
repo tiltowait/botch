@@ -7,17 +7,16 @@ import discord
 import pytest
 from cachetools import TTLCache
 
-import core
-import errors
-from bot import AppCtx
-from botchcord.roll import DICE_CAP, DICE_CAP_MESSAGE, Color, add_wp, build_embed
-from botchcord.roll import chance as chance_cmd
-from botchcord.roll import embed_color, embed_title, emoji_name, emojify_dice
-from botchcord.roll import roll as roll_cmd
-from botchcord.roll import textify_dice
-from core.characters import Character, Damage, GameLine, Splat, Trait
-from core.rolls import Roll
-from core.rolls.parse import RollParser
+from botch import core, errors
+from botch.bot import AppCtx
+from botch.botchcord.roll import DICE_CAP, DICE_CAP_MESSAGE, Color, add_wp, build_embed
+from botch.botchcord.roll import chance as chance_cmd
+from botch.botchcord.roll import embed_color, embed_title, emoji_name, emojify_dice
+from botch.botchcord.roll import roll as roll_cmd
+from botch.botchcord.roll import textify_dice
+from botch.core.characters import Character, Damage, GameLine, Splat, Trait
+from botch.core.rolls import Roll
+from botch.core.rolls.parse import RollParser
 from tests.characters import gen_char
 
 
@@ -421,7 +420,7 @@ def test_dice_caps(ctx):
         ("fake", None, None, True),
     ],
 )
-@patch("bot.BotchBot.find_emoji")
+@patch("botch.bot.BotchBot.find_emoji")
 async def test_roll_command(
     mock_find_emoji: Mock,
     ctx: AppCtx,
@@ -477,9 +476,9 @@ async def test_roll_command(
         (10, "Marginal success"),
     ],
 )
-@patch("bot.BotchBot.find_emoji")
-@patch("botchcord.roll.emoji_name")
-@patch("botchcord.roll.d10")
+@patch("botch.bot.BotchBot.find_emoji")
+@patch("botch.botchcord.roll.emoji_name")
+@patch("botch.botchcord.roll.d10")
 async def test_chance_cmd(
     find_emoji_mock: Mock,
     emoji_mock: Mock,

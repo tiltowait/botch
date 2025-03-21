@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-import logconfig
+from botch import logconfig
 
 
 @pytest.fixture(autouse=True)

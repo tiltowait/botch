@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 from cachetools import TTLCache
 
-from web.cache import WizardCache
-from web.models import WizardSchema
+from botch.web.cache import WizardCache
+from botch.web.models import WizardSchema
 
 
 @pytest.fixture

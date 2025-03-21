@@ -6,11 +6,10 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
 
-import core
-import errors
-from bot import AppCtx
-from botchcord.character.images.display import ImagePager, display_images
-from core.characters import Character, GameLine, Splat
+from botch import core, errors
+from botch.bot import AppCtx
+from botch.botchcord.character.images.display import ImagePager, display_images
+from botch.core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
 
 NUM_IMAGES = 5
@@ -18,7 +17,7 @@ NUM_IMAGES = 5
 
 @pytest.fixture(autouse=True)
 async def mock_api_delete() -> AsyncGenerator[AsyncMock, None]:
-    with patch("api.delete_single_faceclaim", new_callable=AsyncMock) as mocked:
+    with patch("botch.api.delete_single_faceclaim", new_callable=AsyncMock) as mocked:
         mocked.return_value = True
         yield mocked
 
