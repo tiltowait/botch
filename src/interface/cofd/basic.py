@@ -3,19 +3,21 @@
 import discord
 from discord import option
 from discord.commands import slash_command
-from discord.ext.commands import Cog
+from interface import BotchCog
+from config import DOCS_URL
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
 
 
-class BasicCog(Cog, name="Basic"):
+class BasicCog(BotchCog, name="Basic"):
     """These commands are available to any user, whether you have a character\
     or not."""
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/rolls"
 
     @slash_command()
     @option("pool", description="The dice pool. May be a number or trait + attribute equation")

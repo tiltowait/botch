@@ -7,9 +7,10 @@ from discord.ext import commands
 
 from bot import BotchBot
 from interface.models import CommandRecord
+from interface import BotchCog
 
 
-class LoggingCog(commands.Cog):
+class LoggingCog(BotchCog):
     """A simple cog for logging command events."""
 
     logger = logging.getLogger("COMMAND")

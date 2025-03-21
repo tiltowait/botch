@@ -5,15 +5,15 @@ import random
 import discord
 from discord import option
 from discord.commands import slash_command
-from discord.ext.commands import Cog
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord.utils.text import m
 from config import VERSION
+from interface import BotchCog
 
 
-class MiscCog(Cog, name="Miscellaneous"):
+class MiscCog(BotchCog, name="Miscellaneous"):
     """Miscellaneous commands that don't belong to any other sections."""
 
     def __init__(self, bot: BotchBot):
@@ -24,7 +24,7 @@ class MiscCog(Cog, name="Miscellaneous"):
         """View bot information."""
         assert ctx.bot.user is not None
         embed = discord.Embed(title=ctx.bot.user.name, description=f"**Build:** {m(VERSION)}")
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, view=self.documentation_view)
 
     @slash_command(name="coin")
     async def coin_flip(self, ctx: AppCtx):

@@ -3,15 +3,15 @@
 import discord
 from discord import InteractionContextType, option
 from discord.commands import slash_command
-from discord.ext.commands import Cog
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
 from core.rolls import Roll
+from interface import BotchCog
 
 
-class BasicCog(Cog, name="Basic"):
+class BasicCog(BotchCog, name="Basic"):
     """These commands are available to any user, whether you have a character\
     or not."""
 

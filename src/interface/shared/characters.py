@@ -4,13 +4,14 @@ import discord
 from discord import option
 from discord.commands import SlashCommandGroup
 from discord.commands.options import OptionChoice
-from discord.ext.commands import Cog, user_command
+from discord.ext.commands import user_command
+from interface import BotchCog
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
 from botchcord.premium import premium
-from config import GAME_LINE
+from config import GAME_LINE, DOCS_URL
 from core.characters.base import GameLine
 
 if GAME_LINE == GameLine.WOD:
@@ -19,7 +20,7 @@ else:
     ERAS = [OptionChoice("Modern", "vtr")]
 
 
-class CharactersCog(Cog, name="Character info and adjustment"):
+class CharactersCog(BotchCog, name="Character info and adjustment"):
     """Commands for displaying and updating character status as well as images\
     (premium users only)."""
 
@@ -32,6 +33,7 @@ class CharactersCog(Cog, name="Character info and adjustment"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/characters"
 
     @user_command(name="View: Character")
     async def user_characters(self, ctx: AppCtx, member: discord.Member):

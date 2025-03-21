@@ -9,9 +9,11 @@ from discord.commands.core import SlashCommand
 from discord.ext.pages import Page, PageGroup, Paginator
 
 from bot import AppCtx, BotchBot
+from interface import BotchCog
+from typing import cast
 
 
-class HelpCog(Cog, name="Help"):
+class HelpCog(BotchCog, name="Help"):
     """These help menus are generated dynamically, and I thought it was funny\
     not to filter out this section, so here it is. There's nothing helpful on\
     this page. Move along!"""
@@ -60,7 +62,14 @@ class HelpCog(Cog, name="Help"):
             if embeds is None:
                 continue
             page = Page(embeds=embeds)  # type: ignore
-            page_groups.append(PageGroup(pages=[page], label=cog_name))
+            
+            # Use the cog's documentation_view property directly
+            page_group = PageGroup(
+                pages=[page], 
+                label=cog_name,
+                custom_view=cast(BotchCog, cog).documentation_view
+            )
+            page_groups.append(page_group)
 
         paginator = Paginator(
             pages=page_groups,

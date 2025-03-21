@@ -3,14 +3,15 @@
 import discord
 from discord import option
 from discord.commands import SlashCommandGroup
-from discord.ext.commands import Cog, user_command
+from discord.ext.commands import user_command
 
 import botchcord
 from bot import AppCtx, BotchBot
 from botchcord import options
+from interface import BotchCog
 
 
-class TraitsCog(Cog, name="Character traits and specialties"):
+class TraitsCog(BotchCog, name="Character traits and specialties"):
     """Traits are Attributes, Skills, Disciplines, and anything else you might\
     roll as part of a dice pool. In addition to the standard traits all\
     characters have, such as `Strength`, `Intelligence`, `Athletics`, etc.,\
