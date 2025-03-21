@@ -5,13 +5,13 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-import core
-from botchcord.character.web import get_schema_file
-from config import GAME_LINE, MAX_NAME_LEN
-from core.characters import GameLine, Trait
-from core.characters.wod import Ghoul, Mortal, Vampire
-from web.app import app, cache
-from web.models import CharacterData, Grounding, NameCheck, Virtue, WizardSchema
+from botch import core
+from botch.botchcord.character.web import get_schema_file
+from botch.config import GAME_LINE, MAX_NAME_LEN
+from botch.core.characters import GameLine, Trait
+from botch.core.characters.wod import Ghoul, Mortal, Vampire
+from botch.web.app import app, cache
+from botch.web.models import CharacterData, Grounding, NameCheck, Virtue, WizardSchema
 
 
 @pytest.fixture
@@ -120,8 +120,8 @@ async def test_create_character(
         (False, "A"),
     ],
 )
-@patch("core.cache.CharCache.has_character", new_callable=AsyncMock)
-@patch("web.cache.WizardCache.get")
+@patch("botch.core.cache.CharCache.has_character", new_callable=AsyncMock)
+@patch("botch.web.cache.WizardCache.get")
 async def test_name_check(mock_get, mock_has, client, exists, name):
     mock_cache = Mock()
     mock_cache.guild_id = 0
@@ -146,8 +146,8 @@ async def test_name_check(mock_get, mock_has, client, exists, name):
         ("AA" * MAX_NAME_LEN, False, "is too long"),
     ],
 )
-@patch("core.cache.CharCache.has_character", new_callable=AsyncMock)
-@patch("web.cache.WizardCache.get")
+@patch("botch.core.cache.CharCache.has_character", new_callable=AsyncMock)
+@patch("botch.web.cache.WizardCache.get")
 async def test_create_exceptions(mock_get, mock_has, client, character_data, name, exists, needle):
     mock_cache = Mock()
     mock_cache.guild_id = 0

@@ -7,7 +7,7 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 import discord
 import pytest
 
-from botchcord.character.traits.display import (
+from botch.botchcord.character.traits.display import (
     add_specialties_field,
     add_trait_category,
     add_trait_subcategory,
@@ -17,16 +17,16 @@ from botchcord.character.traits.display import (
     format_specialties,
     printout,
 )
-from botchcord.utils import CEmbed
-from botchcord.utils.text import b
-from core.characters import Character, GameLine, Splat, Trait
-from errors import TraitSyntaxError
+from botch.botchcord.utils import CEmbed
+from botch.botchcord.utils.text import b
+from botch.core.characters import Character, GameLine, Splat, Trait
+from botch.errors import TraitSyntaxError
 from tests.characters import gen_char
 
 # __init__.py only exposes the assign function, so we have to import
 # the module using importlib.
-assign = importlib.import_module("botchcord.character.traits.assign")
-remove = importlib.import_module("botchcord.character.traits.remove")
+assign = importlib.import_module("botch.botchcord.character.traits.assign")
+remove = importlib.import_module("botch.botchcord.character.traits.remove")
 
 
 @pytest.fixture
@@ -282,7 +282,7 @@ def test_build_assignment_embed(bot_mock, skilled: Character):
 
 
 async def test_assign(ctx, skilled: Character):
-    with patch("core.characters.Character.save", return_value=None):
+    with patch("botch.core.characters.Character.save", return_value=None):
         await assign.assign(ctx, skilled, "brawl=2")
 
         ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)

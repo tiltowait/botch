@@ -4,8 +4,8 @@ from functools import partial
 
 import pytest
 
-import errors
-from core.characters import Character, Macro
+from botch import errors
+from botch.core.characters import Character, Macro
 
 mc = partial(
     Macro,

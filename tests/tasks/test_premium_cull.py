@@ -7,12 +7,12 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from bot import BotchBot
-from config import SUPPORTER_GUILD
-from core import cache
-from core.characters import Character, GameLine, Splat
-from models import User
-from tasks import premium
+from botch.bot import BotchBot
+from botch.config import SUPPORTER_GUILD
+from botch.core import cache
+from botch.core.characters import Character, GameLine, Splat
+from botch.models import User
+from botch.tasks import premium
 from tests.characters import gen_char
 
 # We don't care about the save and delete operations in the database, so we
@@ -22,19 +22,19 @@ from tests.characters import gen_char
 
 @pytest.fixture(autouse=True)
 async def mock_save() -> AsyncGenerator[AsyncMock, None]:
-    with patch("core.characters.Character.save", new_callable=AsyncMock) as mocked:
+    with patch("botch.core.characters.Character.save", new_callable=AsyncMock) as mocked:
         yield mocked
 
 
 @pytest.fixture(autouse=True)
 async def mock_delete() -> AsyncGenerator[AsyncMock, None]:
-    with patch("core.characters.Character.delete", new_callable=AsyncMock) as mocked:
+    with patch("botch.core.characters.Character.delete", new_callable=AsyncMock) as mocked:
         yield mocked
 
 
 @pytest.fixture(autouse=True)
 async def mock_api() -> AsyncGenerator[AsyncMock, None]:
-    with patch("api.delete_character_faceclaims", new_callable=AsyncMock) as mocked:
+    with patch("botch.api.delete_character_faceclaims", new_callable=AsyncMock) as mocked:
         yield mocked
 
 
@@ -158,7 +158,7 @@ async def test_purge_expired():
     assert purge_info == "Purged 7 image(s) across 2 user(s)."
 
 
-@patch("models.User.save", new_callable=AsyncMock)
+@patch("botch.models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_wrong_guild(mock_save: AsyncMock, bot: BotchBot):
     member = Mock()
     member.guild.id = SUPPORTER_GUILD + 1
@@ -167,9 +167,9 @@ async def test_on_member_update_wrong_guild(mock_save: AsyncMock, bot: BotchBot)
     mock_save.assert_not_awaited()
 
 
-@patch("models.User.drop_premium")
-@patch("models.User.gain_premium")
-@patch("models.User.save", new_callable=AsyncMock)
+@patch("botch.models.User.drop_premium")
+@patch("botch.models.User.gain_premium")
+@patch("botch.models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_wrong_role(
     mock_save: AsyncMock,
     mock_gain: Mock,
@@ -187,9 +187,9 @@ async def test_on_member_update_wrong_role(
     mock_save.assert_awaited_once()
 
 
-@patch("models.User.drop_premium")
-@patch("models.User.gain_premium")
-@patch("models.User.save", new_callable=AsyncMock)
+@patch("botch.models.User.drop_premium")
+@patch("botch.models.User.gain_premium")
+@patch("botch.models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_drop_premium(
     mock_save: AsyncMock,
     mock_gain: Mock,
@@ -212,9 +212,9 @@ async def test_on_member_update_drop_premium(
     mock_save.assert_awaited_once()
 
 
-@patch("models.User.drop_premium")
-@patch("models.User.gain_premium")
-@patch("models.User.save", new_callable=AsyncMock)
+@patch("botch.models.User.drop_premium")
+@patch("botch.models.User.gain_premium")
+@patch("botch.models.User.save", new_callable=AsyncMock)
 async def test_on_member_update_gain_premium(
     mock_save: AsyncMock,
     mock_gain: Mock,

@@ -9,11 +9,11 @@ import pytest
 from cachetools import TTLCache
 from discord.ui import Button, Select
 
-import errors
-from bot import AppCtx
-from botchcord.haven import Haven
-from core import cache
-from core.characters import Character, GameLine, Splat
+from botch import errors
+from botch.bot import AppCtx
+from botch.botchcord.haven import Haven
+from botch.core import cache
+from botch.core.characters import Character, GameLine, Splat
 from tests.characters import gen_char
 
 
@@ -46,7 +46,7 @@ def invoker() -> Mock:
 
 @pytest.fixture
 def mock_admin_user() -> Generator[Mock, None, None]:
-    with patch("bot.AppCtx.admin_user", new_callable=PropertyMock) as mock:
+    with patch("botch.bot.AppCtx.admin_user", new_callable=PropertyMock) as mock:
         yield mock
 
 
@@ -111,7 +111,7 @@ async def test_character_ineligible(ctx: AsyncMock, vamp: Character):
         await haven.get_match()
 
 
-@patch("botchcord.haven.Haven._populate", new_callable=AsyncMock)
+@patch("botch.botchcord.haven.Haven._populate", new_callable=AsyncMock)
 async def test_character_match_character(populate_mock: AsyncMock, ctx: AsyncMock, vamp: Character):
     haven = Haven(ctx, None, None, vamp, None)
     v = await haven.get_match()
@@ -119,7 +119,7 @@ async def test_character_match_character(populate_mock: AsyncMock, ctx: AsyncMoc
     populate_mock.assert_not_awaited()
 
 
-@patch("botchcord.haven.Haven.wait", new_callable=AsyncMock)
+@patch("botch.botchcord.haven.Haven.wait", new_callable=AsyncMock)
 async def test_no_character_selected(
     wait_mock: AsyncMock,
     mock_respond: AsyncMock,
@@ -192,7 +192,7 @@ async def test_send_selection(mock_respond: AsyncMock, ctx: AppCtx):
         inter.custom_id = haven.children[1].custom_id  # type: ignore
         await haven._callback(inter)
 
-    with patch("botchcord.haven.Haven.wait", new_callable=AsyncMock) as mock_wait:
+    with patch("botch.botchcord.haven.Haven.wait", new_callable=AsyncMock) as mock_wait:
         mock_wait.side_effect = call_callback
 
         # This context will be removed once the function is implemented
@@ -212,7 +212,7 @@ async def test_haven_user_matches(ctx: AppCtx):
 
 
 @pytest.mark.parametrize("is_admin", [True, False])
-@patch("bot.AppCtx.admin_user", new_callable=PropertyMock)
+@patch("botch.bot.AppCtx.admin_user", new_callable=PropertyMock)
 async def test_haven_admin_lookup(
     mock_admin_user: Mock,
     is_admin: bool,
