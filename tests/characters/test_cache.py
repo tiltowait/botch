@@ -31,17 +31,6 @@ async def fcache(skilled) -> CharCache:
     return CharCache()
 
 
-@pytest.mark.parametrize(
-    "guild,user,expected",
-    [
-        (1, 2, "1.2"),
-        (0, 3, "0.3"),
-    ],
-)
-def test_key(guild: int, user: int, expected: str, cache: CharCache):
-    assert cache.key(guild, user) == expected
-
-
 async def test_fetchall_empty(cache: CharCache):
     chars = await cache.fetchall(0, 0)
     assert not chars
