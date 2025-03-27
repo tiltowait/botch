@@ -2,9 +2,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import errors
-from botchcord.premium import _check_supporter, is_supporter, premium
-from config import SUPPORTER_GUILD, SUPPORTER_ROLE
+from botch import errors
+from botch.botchcord.premium import _check_supporter, is_supporter, premium
+from botch.config import SUPPORTER_GUILD, SUPPORTER_ROLE
 
 
 @pytest.mark.parametrize("has_role", [True, False])
@@ -56,7 +56,7 @@ def test_is_supporter_custom_user(ctx: Mock):
 def test_check_supporter_success(ctx):
     ctx.bot.get_guild.return_value = Mock()
     ctx.bot.welcomed = True
-    with patch("botchcord.premium.is_supporter", return_value=True):
+    with patch("botch.botchcord.premium.is_supporter", return_value=True):
         assert _check_supporter(ctx) is True
 
 
@@ -77,14 +77,14 @@ def test_check_supporter_support_server_not_configured(ctx):
 def test_check_supporter_not_premium(ctx):
     ctx.bot.welcomed = True
     ctx.bot.get_guild.return_value = Mock()
-    with patch("botchcord.premium.is_supporter", return_value=False):
+    with patch("botch.botchcord.premium.is_supporter", return_value=False):
         with pytest.raises(errors.NotPremium):
             _check_supporter(ctx)
 
 
 def test_check_supporter_not_premium_not_welcomed(ctx):
     ctx.bot.welcomed = False
-    with patch("botchcord.premium.is_supporter", return_value=False):
+    with patch("botch.botchcord.premium.is_supporter", return_value=False):
         with pytest.raises(errors.NotReady):
             _check_supporter(ctx)
 

@@ -4,9 +4,9 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
 
-import errors
-from bot import AppCtx, BotchBot
-from botchcord.character.display import (
+from botch import errors
+from botch.bot import AppCtx, BotchBot
+from botch.botchcord.character.display import (
     DisplayField,
     build_embed,
     display,
@@ -16,8 +16,8 @@ from botchcord.character.display import (
     get_field_value,
     get_track_string,
 )
-from core.characters import Character, Damage, Experience, GameLine, Splat
-from core.characters.wod import Vampire
+from botch.core.characters import Character, Damage, Experience, GameLine, Splat
+from botch.core.characters.wod import Vampire
 from tests.characters import gen_char
 
 
@@ -154,8 +154,8 @@ def test_emoji_track(track: str, expected: str):
     assert emoji == expected
 
 
-@patch("botchcord.settings.use_emojis")
-@patch("bot.BotchBot.find_emoji")
+@patch("botch.botchcord.settings.use_emojis")
+@patch("botch.bot.BotchBot.find_emoji")
 async def test_display(
     emoji_mock: Mock,
     settings_mock: AsyncMock,

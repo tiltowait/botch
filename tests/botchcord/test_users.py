@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from models import User, UserStore
+from botch.models import User, UserStore
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def cache() -> UserStore:
 
 @pytest.fixture
 async def mock_save() -> AsyncGenerator[AsyncMock, None]:
-    with patch("models.user.User.save", new_callable=AsyncMock) as mock:
+    with patch("botch.models.user.User.save", new_callable=AsyncMock) as mock:
         yield mock
 
 

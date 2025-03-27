@@ -5,9 +5,9 @@ from unittest.mock import ANY, AsyncMock
 import discord
 import pytest
 
-from botchcord.character.web import get_schema_file, wizard
-from core.characters.factory import Schema
-from web.models import WizardSchema
+from botch.botchcord.character.web import get_schema_file, wizard
+from botch.core.characters.factory import Schema
+from botch.web.models import WizardSchema
 
 
 def test_wizard_schema_create(guild):

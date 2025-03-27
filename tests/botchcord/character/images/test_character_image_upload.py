@@ -5,16 +5,16 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest
 
-from bot import AppCtx
-from botchcord.character.images.upload import build_embed, upload_image, valid_url
-from core.characters import Character
+from botch.bot import AppCtx
+from botch.botchcord.character.images.upload import build_embed, upload_image, valid_url
+from botch.core.characters import Character
 
 MOCKED_URL = "https://pcs.botch.lol/fake/char/img.webp"
 
 
 @pytest.fixture(autouse=True)
 async def mock_api_upload() -> AsyncGenerator[AsyncMock, None]:
-    with patch("api.upload_faceclaim", new_callable=AsyncMock) as mocked:
+    with patch("botch.api.upload_faceclaim", new_callable=AsyncMock) as mocked:
         mocked.return_value = MOCKED_URL
         yield mocked
 

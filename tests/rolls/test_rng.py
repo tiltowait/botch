@@ -2,7 +2,7 @@
 
 import pytest
 
-from core.rolls.roll import d10
+from botch.core.rolls.roll import d10
 
 
 def test_single_d10():

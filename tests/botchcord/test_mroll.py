@@ -4,11 +4,11 @@ from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
 
-import errors
-from bot import AppCtx
-from botchcord.macro.create import create_macro
-from botchcord.mroll import mroll
-from core.characters import Character
+from botch import errors
+from botch.bot import AppCtx
+from botch.botchcord.macro.create import create_macro
+from botch.botchcord.mroll import mroll
+from botch.core.characters import Character
 
 
 @pytest.fixture
@@ -33,7 +33,7 @@ async def test_macro_not_found(ctx, char):
         (3, "Flip"),
     ],
 )
-@patch("botchcord.roll.roll", new_callable=AsyncMock)
+@patch("botch.botchcord.roll.roll", new_callable=AsyncMock)
 async def test_mroll(
     roll_mock: AsyncMock,
     ctx: AppCtx,
@@ -51,7 +51,7 @@ async def test_mroll(
     )
 
 
-@patch("botchcord.roll.Roll.save", new_callable=AsyncMock)
+@patch("botch.botchcord.roll.Roll.save", new_callable=AsyncMock)
 async def test_mroll_no_mock(
     mock_roll_save: AsyncMock, mock_respond: AsyncMock, ctx: AppCtx, char: Character
 ):
@@ -62,7 +62,7 @@ async def test_mroll_no_mock(
     mock_roll_save.assert_awaited_once()
 
 
-@patch("botchcord.roll.Roll.save", new_callable=AsyncMock)
+@patch("botch.botchcord.roll.Roll.save", new_callable=AsyncMock)
 async def test_mroll_specs(mock_roll_save: AsyncMock, ctx: AppCtx, char: Character, mock_respond):
     char.add_subtraits("Brawl", ["Grappling"])
     macro = create_macro(char, "specs", "str+b.g", 6, None)

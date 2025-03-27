@@ -9,8 +9,8 @@ from beanie import init_beanie
 from mongomock_motor import AsyncMongoMockClient
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from core.characters import Character, GameLine, Splat, Trait
-from db import DOCUMENT_MODELS
+from botch.core.characters import Character, GameLine, Splat, Trait
+from botch.db import DOCUMENT_MODELS
 from tests.characters import gen_char
 
 
@@ -83,7 +83,7 @@ def ctx(bot_mock) -> AsyncMock:
 
 @pytest.fixture
 def mock_char_save():
-    with patch("core.characters.Character.save") as mocked:
+    with patch("botch.core.characters.Character.save") as mocked:
         yield mocked
 
 

@@ -7,10 +7,10 @@ from glob import glob
 
 import pytest
 
-import errors
-from core.characters import Damage, GameLine, Grounding, Splat, Trait
-from core.characters.factory import Factory, Schema
-from core.characters.wod import Vampire, gen_virtues
+from botch import errors
+from botch.core.characters import Damage, GameLine, Grounding, Splat, Trait
+from botch.core.characters.factory import Factory, Schema
+from botch.core.characters.wod import Vampire, gen_virtues
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def factory() -> Factory:
     return Factory(GameLine.WOD, Splat.VAMPIRE, Vampire, args, schema_filter="vtm.json")
 
 
-@pytest.fixture(params=glob("src/core/characters/schemas/*/*.json"))
+@pytest.fixture(params=glob("src/botch/core/characters/schemas/*/*.json"))
 def schema_file(request: pytest.FixtureRequest) -> str:
     return request.param
 
@@ -58,7 +58,7 @@ def test_valid_schema():
 
 
 def test_wod_trait_categories_and_subcategories(factory: Factory):
-    with open("src/core/characters/schemas/wod/vtm.json") as f:
+    with open("src/botch/core/characters/schemas/wod/vtm.json") as f:
         data = json.load(f)
 
     sections = ["inherent", "learned"]

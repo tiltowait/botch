@@ -5,7 +5,7 @@ from unittest.mock import ANY, AsyncMock, Mock, patch
 import discord
 import pytest
 
-from bot import AppCtx
+from botch.bot import AppCtx
 
 
 @pytest.mark.parametrize("ephemeral", [(True,), (False,)])

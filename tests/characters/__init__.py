@@ -2,19 +2,17 @@
 
 from typing import Type, TypeVar, overload
 
-from core.characters import Character, Damage, GameLine, Grounding, Splat
+from botch.core.characters import Character, Damage, GameLine, Grounding, Splat
 
 T = TypeVar("T", bound=Character)
 
 
 @overload
-def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character:
-    ...
+def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character: ...
 
 
 @overload
-def gen_char(line: GameLine, splat: Splat, cls: Type[T], **kwargs) -> T:
-    ...
+def gen_char(line: GameLine, splat: Splat, cls: Type[T], **kwargs) -> T: ...
 
 
 def gen_char(line: GameLine, splat: Splat, cls: Type[T] = Character, **kwargs) -> T:

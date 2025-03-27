@@ -5,12 +5,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from discord.ext.pages import Paginator
 
-from bot import AppCtx
-from botchcord.macro.display import create_macro_entry, create_paginator
-from botchcord.macro.display import display as display_cmd
-from botchcord.macro.display import paginate_macros
-from botchcord.utils.text import i, m
-from core.characters import Character, Macro
+from botch.bot import AppCtx
+from botch.botchcord.macro.display import create_macro_entry, create_paginator
+from botch.botchcord.macro.display import display as display_cmd
+from botch.botchcord.macro.display import paginate_macros
+from botch.botchcord.utils.text import i, m
+from botch.core.characters import Character, Macro
 
 
 @pytest.fixture
