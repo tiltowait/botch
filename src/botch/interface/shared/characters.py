@@ -60,6 +60,13 @@ class CharactersCog(BotchCog, name="Character info and adjustment"):
         await botchcord.character.adjust(ctx, character)
 
     @character.command()
+    @options.character("The character to rename", required=True)
+    @option("new_name", description="The character's new name")
+    async def rename(self, ctx: AppCtx, character: str, new_name: str):
+        """Rename a character."""
+        await botchcord.character.rename(ctx, character, new_name)
+
+    @character.command()
     @option(
         "era",
         description="Which era of sheet do you need?",
