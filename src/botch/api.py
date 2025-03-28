@@ -22,7 +22,6 @@ dumps = partial(json.dumps, default=str)
 # An argument can be made that these should simply live with their appropriate
 # command counterparts, but I see a value in keeping them together.
 
-AUTH_HEADER = {"Authorization": os.environ["BOTCH_API_TOKEN"]}
 BASE_API = "https://api.botch.lol/"
 
 logger = logging.getLogger("API")
@@ -42,6 +41,11 @@ def measure(func):
         return val
 
     return wrapper
+
+
+def headers() -> dict[str, str]:
+    """The API's authorization header."""
+    return {"Authorization": os.getenv("BOTCH_API_TOKEN", "")}
 
 
 async def upload_faceclaim(character: "core.characters.Character", image_url: str) -> str:
@@ -115,7 +119,7 @@ async def _post(*, path: str, data: dict[str, Any] | str) -> str:
     url = BASE_API + path.lstrip("/")
 
     async with async_timeout.timeout(60):
-        async with aiohttp.ClientSession(headers=AUTH_HEADER) as session:
+        async with aiohttp.ClientSession(headers=headers()) as session:
             async with session.post(url, data=data) as response:
                 json = await response.json()
 
@@ -131,7 +135,7 @@ async def _delete(*, path: str) -> str:
     url = BASE_API + path.lstrip("/")
 
     async with async_timeout.timeout(60):
-        async with aiohttp.ClientSession(headers=AUTH_HEADER) as session:
+        async with aiohttp.ClientSession(headers=headers()) as session:
             async with session.delete(url) as response:
                 json = await response.json()
 
