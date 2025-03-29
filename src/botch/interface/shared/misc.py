@@ -56,7 +56,7 @@ class MiscCog(BotchCog, name="Miscellaneous"):
     )
     async def changelog(self, ctx: AppCtx, hidden: bool):
         """Show the latest changelog."""
-        await botchcord.changelog.show(ctx, hidden)
+        await botchcord.changelog.show(ctx, VERSION == "local", hidden)
 
 
 def setup(bot: BotchBot):

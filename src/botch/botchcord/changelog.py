@@ -12,7 +12,7 @@ from botch.bot import AppCtx
 CHANGELOG = "https://github.com/tiltowait/botch/releases/latest"
 
 
-async def show(ctx: AppCtx, hidden: bool):
+async def show(ctx: AppCtx, version_warning: bool, hidden: bool):
     """Display Botch's changelog."""
     try:
         tag, changelog = await fetch_changelog()
@@ -26,6 +26,15 @@ async def show(ctx: AppCtx, hidden: bool):
             embed = discord.Embed(title=f"Botch {tag}", description=page, url=CHANGELOG)
             if ctx.bot.user:
                 embed.set_thumbnail(url=ctx.bot.user.display_avatar)
+
+            if version_warning:
+                if ctx.bot.user:
+                    bot_name = ctx.bot.user.name
+                else:
+                    bot_name = "The bot"
+                embed.set_footer(
+                    text=f"{bot_name} is running a local build that may differ from the above."
+                )
             embeds.append(embed)
 
         show_buttons = len(embeds) > 1
