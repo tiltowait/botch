@@ -6,6 +6,7 @@ from discord import SlashCommandGroup, option
 from botch.bot import AppCtx, BotchBot
 from botch.botchcord import options
 from botch.botchcord.character import virtues
+from botch.config import DOCS_URL
 from botch.interface import BotchCog
 
 
@@ -20,6 +21,7 @@ class VirtuesCog(BotchCog, name="Virtues"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/virtues"
 
     @virtues.command(name="set")
     @option(

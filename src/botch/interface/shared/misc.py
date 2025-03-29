@@ -9,7 +9,7 @@ from discord.commands import slash_command
 from botch import botchcord
 from botch.bot import AppCtx, BotchBot
 from botch.botchcord.utils.text import m
-from botch.config import VERSION
+from botch.config import DOCS_URL, VERSION
 from botch.interface import BotchCog
 
 
@@ -18,6 +18,7 @@ class MiscCog(BotchCog, name="Miscellaneous"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/misc"
 
     @slash_command()
     async def info(self, ctx: AppCtx):

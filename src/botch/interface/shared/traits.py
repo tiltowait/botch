@@ -8,6 +8,7 @@ from discord.ext.commands import user_command
 from botch import botchcord
 from botch.bot import AppCtx, BotchBot
 from botch.botchcord import options
+from botch.config import DOCS_URL
 from botch.interface import BotchCog
 
 
@@ -35,6 +36,7 @@ class TraitsCog(BotchCog, name="Character traits and specialties"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/traits"
 
     @user_command(name="View: Traits")
     async def user_characters(self, ctx: AppCtx, member: discord.Member):

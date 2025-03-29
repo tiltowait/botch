@@ -7,6 +7,7 @@ from discord.commands import slash_command
 from botch import botchcord
 from botch.bot import AppCtx, BotchBot
 from botch.botchcord import options
+from botch.config import DOCS_URL
 from botch.core.rolls import Roll
 from botch.interface import BotchCog
 
@@ -17,6 +18,7 @@ class BasicCog(BotchCog, name="Basic"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/rolls"
 
     @slash_command()
     @option("pool", description="The dice pool. May be a number or trait + attribute equation")

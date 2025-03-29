@@ -6,6 +6,7 @@ from discord import SlashCommandGroup, option, slash_command
 from botch import botchcord
 from botch.bot import AppCtx, BotchBot
 from botch.botchcord import options
+from botch.config import DOCS_URL
 from botch.interface import BotchCog
 
 
@@ -29,6 +30,7 @@ class MacrosCog(BotchCog, name="Macros"):
 
     def __init__(self, bot: BotchBot):
         self.bot = bot
+        self.docs_url = f"{DOCS_URL}/reference/macros"
 
     @macro.command(name="create")
     @option("name", description="The new macro's name")
