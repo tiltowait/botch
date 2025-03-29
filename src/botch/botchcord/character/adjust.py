@@ -13,6 +13,7 @@ from botch.botchcord import settings
 from botch.botchcord.character.display import DisplayField, build_embed
 from botch.botchcord.haven import haven
 from botch.core.characters import Character, Damage, GameLine, Tracker, cofd, wod
+from botch.utils import normalize_text
 
 __all__ = (
     "Adjuster",
@@ -81,6 +82,10 @@ class Toggler(View):
             opt.default = opt.label == selected
 
         await interaction.response.edit_message(view=self)
+
+    def update_grounding_selector_name(self):
+        """Updates the name of the Grounding selector."""
+        self.selector.options[2].label = f"Adjust: {self.character.grounding.path}"
 
     def add_adjuster(self, label: str, adjuster_cls: type["Adjuster"], *args: Any, **kwargs: Any):
         """Add a subview behind a select menu option."""
@@ -284,6 +289,10 @@ class WillpowerAdjuster(Adjuster):
 class GroundingAdjuster(Adjuster):
     """Adjust character grounding (path/humanity)."""
 
+    def __init__(self, container: Toggler, char: Character):
+        self.allow_path_change = char.line == GameLine.WOD
+        super().__init__(container, char)
+
     def _populate(self):
         self.add_stepper(
             1,
@@ -294,9 +303,27 @@ class GroundingAdjuster(Adjuster):
         for btn in self.buttons:
             btn.callback = self.callback
 
+        if self.allow_path_change:
+            button = Button(label="Change Path", style=ButtonStyle.primary, row=2)
+            button.callback = self.change_path
+            self.add_item(button)
+
     def _update_buttons(self):
         self.buttons[0].disabled = self.character.grounding.rating == 0
         self.buttons[2].disabled = self.character.grounding.rating == 10
+        self.buttons[1].label = self.character.grounding.path
+
+    async def change_path(self, interaction: discord.Interaction):
+        """Present a modal to change the character's Path."""
+        modal = PathModal(self.character.name, self.character.grounding.path)
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+
+        if modal.new_path:
+            self.character.grounding.path = modal.new_path
+            if modal.interaction:
+                self.container.update_grounding_selector_name()
+                await super().callback(modal.interaction)
 
     async def callback(self, interaction: discord.Interaction):
         i, _ = self.get_button(interaction.custom_id)
@@ -306,6 +333,32 @@ class GroundingAdjuster(Adjuster):
             self.character.grounding.increment()
 
         await super().callback(interaction)
+
+
+class PathModal(discord.ui.Modal):
+    """A modal for changing a character's Path."""
+
+    def __init__(self, char_name: str, current_path: str, *args, **kwargs):
+        super().__init__(title=f"Change {char_name}'s Path", *args, **kwargs)
+        self.current_path = current_path
+        self.interaction: discord.Interaction | None = None
+        self.new_path = current_path
+
+        self.add_item(
+            discord.ui.InputText(
+                label="New Path",
+                placeholder=current_path,
+                min_length=1,
+                max_length=30,
+            )
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        self.interaction = interaction
+        if user_input := self.children[0].value:
+            normalized = normalize_text(user_input)
+            if normalized:
+                self.new_path = normalized
 
 
 class VampAdjuster(Adjuster):
