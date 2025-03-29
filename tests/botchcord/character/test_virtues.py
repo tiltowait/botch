@@ -28,7 +28,7 @@ def char(virtues: list[Trait]) -> Mortal:
         ("Conscience", "Conscience"),
         ("Conviction", "Conscience"),
         ("SelfControl", "SelfControl"),
-        ("Instincts", "SelfControl"),
+        ("Instinct", "SelfControl"),
         ("Courage", "Courage"),
     ],
 )
