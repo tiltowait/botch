@@ -1,7 +1,7 @@
 """Character adjuster tests."""
 
 from typing import AsyncGenerator, cast
-from unittest.mock import ANY, AsyncMock, Mock, call, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, Mock, call, patch
 
 import discord
 import pytest
@@ -14,6 +14,7 @@ from botch.botchcord.character.adjust import (
     HealthAdjuster,
     MummyPillarAdjuster,
     MummySekhemAdjuster,
+    PathModal,
     Toggler,
     VampAdjuster,
     WillpowerAdjuster,
@@ -240,6 +241,63 @@ async def test_grounding_adjuster(
     assert inter.response.edit_message.await_count == count
     inter.response.edit_message.assert_has_awaits([call(view=toggler)] * count)
     assert mock_char_save.await_count == count
+
+
+async def test_grounding_adjuster_allows_path_change(
+    ctx: AppCtx,
+    vamp: wod.Vampire,
+    mummy: cofd.Mummy,
+):
+    toggler = Toggler(ctx, vamp)
+    grounding = cast(GroundingAdjuster, toggler.adjusters[2])
+    assert grounding.allow_path_change
+    assert grounding.buttons[-1].label == "Change Path"
+
+    toggler = Toggler(ctx, mummy)
+    grounding = cast(GroundingAdjuster, toggler.adjusters[2])
+    assert not grounding.allow_path_change
+    assert grounding.buttons[-1].label != "Change Path"
+
+
+@pytest.mark.parametrize("new_path", ["Humanity", "Foo"])
+@patch("botch.botchcord.character.adjust.PathModal")
+async def test_grounding_adjuster_change_path(
+    modal_mock: MagicMock,
+    mock_update_display: AsyncMock,
+    mock_char_save: AsyncMock,
+    toggler: Toggler,
+    new_path: str,
+):
+    old_path = toggler.character.grounding.path
+
+    modal_instance = AsyncMock(spec=PathModal)
+    modal_mock.return_value = modal_instance
+
+    inter = AsyncMock()
+
+    async def wait_side_effect():
+        modal_instance.new_path = new_path
+        modal_instance.interaction = inter
+
+    modal_instance.wait.side_effect = wait_side_effect
+    grounding = cast(GroundingAdjuster, toggler.adjusters[2])
+
+    base_inter = AsyncMock()
+    await grounding.change_path(base_inter)
+
+    base_inter.response.send_modal.assert_awaited_once()
+
+    if new_path != old_path:
+        assert toggler.character.grounding.path == new_path
+    else:
+        assert toggler.character.grounding.path == old_path
+
+    assert grounding.buttons[1].label == new_path
+    assert toggler.selector.options[2].label == f"Adjust: {new_path}"
+
+    assert inter.response.edit_message.await_count == 1
+    mock_update_display.assert_awaited_once()
+    mock_char_save.assert_awaited_once()
 
 
 @pytest.mark.parametrize(
