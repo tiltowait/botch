@@ -50,7 +50,7 @@ def character_data(wizard_schema):
         "traits": {"Strength": 4, "Brawl": 3},
         "virtues": [
             Virtue(name="Conscience", rating=3),
-            Virtue(name="Self-Control", rating=2),
+            Virtue(name="SelfControl", rating=2),
             Virtue(name="Courage", rating=4),
         ],
     }

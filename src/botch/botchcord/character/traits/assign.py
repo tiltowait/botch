@@ -76,6 +76,8 @@ def parse_input(user_input: str) -> dict[str, int]:
     seen: set[str] = set()
     duplicates = set()
     for trait_name, rating in parsed:
+        if len(trait_name) > 20:
+            raise errors.TraitError("Traits cannot be more than 20 characters long.")
         if trait_name in seen:
             duplicates.add(trait_name)
 

@@ -1,20 +1,37 @@
 """Mortal character templates."""
 
+from enum import StrEnum
+
+from pydantic import field_validator
+
 from botch.core.characters.base import GameLine, Splat, Trait
 from botch.core.characters.wod.base import WoD
 
 
-def gen_virtues(virtues: dict[str, int]):
+class Virtue(Trait):
+    """A Virtue is a Trait with predefined category and subcategory."""
+
+    class Name(StrEnum):
+        CONSCIENCE = "Conscience"
+        CONVICTION = "Conviction"
+        SELF_CONTROL = "SelfControl"
+        INSTINCT = "Instinct"
+        COURAGE = "Courage"
+
+    category: Trait.Category = Trait.Category.SPECIAL
+    subcategory: Trait.Subcategory = Trait.Subcategory.VIRTUES
+
+    @field_validator("name")
+    @classmethod
+    def validate_virtue_name(cls, v: str):
+        if v not in cls.Name:
+            raise ValueError(f"Unknown Virtue: {v}")
+        return v
+
+
+def gen_virtues(virtues: dict[str, int]) -> list[Virtue]:
     """Generate a list of virtue Traits."""
-    return [
-        Trait(
-            name=k,
-            rating=v,
-            category=Trait.Category.SPECIAL,
-            subcategory=Trait.Subcategory.VIRTUES,
-        )
-        for k, v in virtues.items()
-    ]
+    return [Virtue(name=k, rating=v) for k, v in virtues.items()]
 
 
 class Mortal(WoD):

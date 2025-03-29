@@ -6,11 +6,11 @@ import copy
 from collections import Counter
 from enum import StrEnum
 from itertools import product
-from typing import Collection, Literal, Optional, overload
+from typing import Annotated, Collection, Literal, Optional, overload
 
 import pymongo
 from beanie import Delete, Document, before_event
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 
 from botch import api, errors
 from botch.config import MAX_NAME_LEN
@@ -159,11 +159,13 @@ class Trait(BaseModel):
         subtraits: list[str]  # The list of subtraits selected
         category: str  # The Trait.Category. Must be str due to placement here
 
-    name: str
+    name: str = Field(min_length=1, max_length=20)
     rating: int
     category: Category
     subcategory: Subcategory
-    subtraits: list[str] = Field(default_factory=list)
+    subtraits: list[Annotated[str, StringConstraints(min_length=1, max_length=20)]] = Field(
+        default_factory=list
+    )
 
     def add_subtraits(self, subtraits: str | Collection[str]):
         """Add subtraits to the trait."""
@@ -173,6 +175,8 @@ class Trait(BaseModel):
             subtraits = set(subtraits)
 
         for subtrait in subtraits:
+            if len(subtrait) > 20:
+                raise errors.TraitError("Subtraits cannot be more than 20 characters long.")
             if subtrait.casefold() not in map(str.casefold, self.subtraits):
                 self.subtraits.append(subtrait)
 
@@ -294,7 +298,7 @@ class Character(Document):
     unexpected behavior. Do not directly work on these objects; use
     Character.get_traits() instead."""
 
-    name: str = Field(max_length=MAX_NAME_LEN)
+    name: str = Field(min_length=1, max_length=MAX_NAME_LEN)
     profile: Profile = Field(default_factory=Profile, repr=False)
     line: GameLine
     splat: Splat

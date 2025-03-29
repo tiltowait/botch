@@ -7,13 +7,14 @@ import pytest
 
 from botch import errors
 from botch.bot import AppCtx
-from botch.botchcord.character.specialties.adjust import _make_embed, add_specialties
-from botch.botchcord.character.specialties.adjust import assign as assign_cmd
-from botch.botchcord.character.specialties.adjust import remove as remove_cmd
 from botch.botchcord.character.specialties.adjust import (
+    _make_embed,
+    add_specialties,
     remove_specialties,
     validate_tokens,
 )
+from botch.botchcord.character.specialties.adjust import assign as assign_cmd
+from botch.botchcord.character.specialties.adjust import remove as remove_cmd
 from botch.botchcord.character.specialties.tokenize import tokenize
 from botch.botchcord.utils.text import b
 from botch.core.characters import Character, GameLine, Splat
@@ -33,6 +34,11 @@ def specced(character: Character) -> Character:
     character.add_subtraits("Brawl", ["Kindred", "Kine"])
     character.add_subtraits("Craft", ["Knives"])
     return character
+
+
+def test_specialties_fails_too_long(specced: Character):
+    with pytest.raises(errors.TraitError):
+        specced.add_subtraits("Brawl", "This thing is way too long to ever be allowed")
 
 
 @pytest.mark.parametrize(

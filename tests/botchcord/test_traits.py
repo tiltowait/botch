@@ -20,7 +20,7 @@ from botch.botchcord.character.traits.display import (
 from botch.botchcord.utils import CEmbed
 from botch.botchcord.utils.text import b
 from botch.core.characters import Character, GameLine, Splat, Trait
-from botch.errors import TraitSyntaxError
+from botch.errors import TraitError, TraitSyntaxError
 from tests.characters import gen_char
 
 # __init__.py only exposes the assign function, so we have to import
@@ -225,6 +225,11 @@ async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
 def test_parse_input(text: str, expected: dict[str, int]):
     parsed = assign.parse_input(text)
     assert parsed == expected
+
+
+def test_parse_input_fails_too_long():
+    with pytest.raises(TraitError):
+        assign.parse_input("This is way too long to ever allow=2")
 
 
 @pytest.mark.parametrize("text", ["t", "t=", "t==1", "1=1", "1t=1", "=1", "1=t", "t=t", "a=1 b=2"])
