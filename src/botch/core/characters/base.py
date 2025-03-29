@@ -10,7 +10,7 @@ from typing import Collection, Literal, Optional, overload
 
 import pymongo
 from beanie import Delete, Document, before_event
-from pydantic import AnyUrl, BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 
 from botch import api, errors
 from botch.config import MAX_NAME_LEN
@@ -91,11 +91,11 @@ class Profile(BaseModel):
 
     def add_image(self, url: str):
         """Add an image."""
-        self.images.append(AnyUrl(url))
+        self.images.append(HttpUrl(url))
 
     def remove_image(self, url: str):
         """Remove an image."""
-        self.images.remove(AnyUrl(url))
+        self.images.remove(HttpUrl(url))
 
 
 class Macro(BaseModel):
