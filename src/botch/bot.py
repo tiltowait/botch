@@ -74,6 +74,7 @@ class BotchBot(discord.Bot):
 
         tasks.premium.purge.start()
         logger.info("Tasks scheduled")
+        await self._set_presence()
 
     def load_cogs(self, directories: list[str]) -> None:
         """Load cogs from specified directories relative to this script."""
@@ -161,11 +162,13 @@ class BotchBot(discord.Bot):
         """Notify guild joining."""
         logger.info("Joined %s :)", guild.name)
         await self.guild_cache.guild_joined(guild)
+        await self._set_presence()
 
     async def on_guild_remove(self, guild: discord.Guild):
         """Notify guild removal."""
         logger.info("Left %s :(", guild.name)
         await self.guild_cache.guild_left(guild)
+        await self._set_presence()
 
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         """Rename the guild."""
@@ -193,6 +196,15 @@ class BotchBot(discord.Bot):
             user.gain_premium()
 
         await user.save()
+
+    async def _set_presence(self):
+        """Set the bot's presence message."""
+        servers = len(self.guilds)
+        message = f"/help | {servers} chronicles"
+
+        logger.info("Setting presence")
+        activity = discord.Activity(type=discord.ActivityType.watching, name=message)
+        await self.change_presence(activity=activity)
 
     def cmd_mention(
         self,

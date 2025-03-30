@@ -1,7 +1,7 @@
 """Pytest configuration."""
 
 import asyncio
-from typing import cast
+from typing import AsyncGenerator, cast
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -94,3 +94,12 @@ def event_loop():
     asyncio.set_event_loop(loop)
     yield loop
     loop.close()
+
+
+@pytest.fixture(autouse=True, scope="session")
+async def mock_set_presence() -> AsyncGenerator[AsyncMock, None]:
+    # It might be nice to test this at some point, but it's such a
+    # simple function that it's not worth the scaffolding to make
+    # it happen.
+    with patch("botch.bot.BotchBot._set_presence", new_callable=AsyncMock) as mock:
+        yield mock
