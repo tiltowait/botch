@@ -136,6 +136,9 @@ class Toggler(View):
         elif isinstance(self.character, cofd.Vampire):
             fields.append(DisplayField.VITAE)
             fields.append(DisplayField.BLOOD_POTENCY)
+        elif isinstance(self.character, cofd.Mummy):
+            fields.append(DisplayField.SEKHEM)
+            fields.append(DisplayField.PILLARS)
         return build_embed(self.ctx.bot, self.character, use_emojis, fields=tuple(fields))
 
     async def on_timeout(self):
