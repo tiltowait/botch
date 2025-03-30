@@ -44,6 +44,17 @@ def haven(
             *args: P.args,
             **kwargs: P.kwargs,
         ) -> T:
+            """Prompt the user to select a character, then run the wrapped
+            function.
+
+            The prompt only appears if all of the following are true:
+                * The user has more than one character
+                * The user has not explicitly selected a character
+                * The filtering function does not yield a single character
+
+            If the above conditions are not met, the wrapped function runs
+            immediately.
+            """
             if not isinstance(char, Character):
                 owner = cast(discord.Member | None, kwargs.get("owner"))
                 if owner is not None and not isinstance(owner, discord.Member):
