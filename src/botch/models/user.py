@@ -68,7 +68,7 @@ class UserStore:
         self._populated = False
 
     async def fetch_purgeable(self) -> list[User]:
-        """Users with purgable images due to dropping premium."""
+        """Users with purgeable images due to dropping premium."""
         await self._populate()
         return [u for u in self._cache.values() if u.should_purge]
 
