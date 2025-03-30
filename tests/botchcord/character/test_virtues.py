@@ -7,18 +7,18 @@ import pytest
 from botch.bot import AppCtx
 from botch.botchcord.character import virtues as vr
 from botch.core.characters import GameLine, Splat, Trait
-from botch.core.characters.wod import Mortal, gen_virtues
+from botch.core.characters.wod import Mortal, Virtue, gen_virtues
 from botch.errors import CharacterError
 from tests.characters import gen_char
 
 
 @pytest.fixture
-def virtues() -> list[Trait]:
+def virtues() -> list[Virtue]:
     return gen_virtues({"Conscience": 1, "SelfControl": 2, "Courage": 3})
 
 
 @pytest.fixture
-def char(virtues: list[Trait]) -> Mortal:
+def char(virtues: list[Virtue]) -> Mortal:
     return gen_char(GameLine.WOD, Splat.MORTAL, Mortal, virtues=virtues)
 
 

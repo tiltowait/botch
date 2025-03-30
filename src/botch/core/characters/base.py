@@ -35,7 +35,7 @@ class Experience(BaseModel):
     lifetime: int = 0
 
 
-class Grounding(BaseModel):
+class Grounding(BaseModel, validate_assignment=True):
     """Humanity, Paths of Enlightenment, Integrity, etc."""
 
     path: str
@@ -77,11 +77,11 @@ class Damage(StrEnum):
         return emoji[e]
 
 
-class Profile(BaseModel):
+class Profile(BaseModel, validate_assignment=True):
     """Contains the character's description, history, and image URLs."""
 
-    description: Optional[str] = Field(default=None, max_length=1024)
-    history: Optional[str] = Field(default=None, max_length=1024)
+    description: Optional[str] = Field(default=None, max_length=1500)
+    history: Optional[str] = Field(default=None, max_length=1500)
     images: list[HttpUrl] = Field(default_factory=list)
 
     @property
@@ -121,7 +121,7 @@ class Macro(BaseModel):
         return " ".join(map(str, self.keys))
 
 
-class Trait(BaseModel):
+class Trait(BaseModel, validate_assignment=True):
     """A trait represents an Attribute, Ability, Discipline, etc."""
 
     _DELIMITER = "."
@@ -163,9 +163,9 @@ class Trait(BaseModel):
     rating: int
     category: Category
     subcategory: Subcategory
-    subtraits: list[Annotated[str, StringConstraints(min_length=1, max_length=20)]] = Field(
-        default_factory=list
-    )
+    subtraits: list[
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=20)]
+    ] = Field(default_factory=list)
 
     def add_subtraits(self, subtraits: str | Collection[str]):
         """Add subtraits to the trait."""
@@ -291,7 +291,7 @@ class Trait(BaseModel):
         return i.lower().startswith(t)
 
 
-class Character(Document):
+class Character(Document, validate_assignment=True):
     """The character class contains all the standard fields for any character.
 
     WARNING: Character.traits items may be modified by a receiver, resulting in

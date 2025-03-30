@@ -60,9 +60,9 @@ class Vampire(Mortal):
 
     splat: Splat = Splat.VAMPIRE
 
-    blood_potency: int = Field(ge=1, le=10)
+    blood_potency: int = Field(ge=0, le=10)
     vitae: int = Field(ge=0)
-    max_vitae: int = Field(ge=1, le=75)
+    max_vitae: int = Field(ge=0, le=75)
 
     @property
     def blood_pool(self) -> int:

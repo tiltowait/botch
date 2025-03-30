@@ -44,15 +44,6 @@ def test_default_fields(character):
         fields = get_default_fields(character)
         assert isinstance(fields, tuple)
 
-    character.line = "fake"
-    with pytest.raises(errors.CharacterTemplateNotFound):
-        _ = get_default_fields(character)
-
-    character.line = GameLine.WOD
-    character.splat = "fake"
-    with pytest.raises(errors.CharacterTemplateNotFound):
-        _ = get_default_fields(character)
-
 
 @pytest.mark.parametrize(
     "track,expected",
