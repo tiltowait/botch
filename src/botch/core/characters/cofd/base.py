@@ -6,6 +6,7 @@ from typing import ClassVar
 from pydantic import BaseModel, Field, model_validator
 
 from botch.core.characters.base import Character, GameLine, Splat, Trait
+from botch.errors import TraitAlreadyExists
 from botch.utils import max_vtr_vitae
 
 
@@ -174,3 +175,27 @@ class Mummy(Mortal):
             if pillar.name.lower() == name.lower():
                 return pillar
         raise ValueError("Unknown Pillar")
+
+    def add_trait(
+        self,
+        name: str,
+        rating: int,
+        category=Trait.Category.CUSTOM,
+        subcategory=Trait.Subcategory.BLANK,
+    ) -> Trait:
+        """Add a new trait.
+        Args:
+            name (str): The new Trait's name
+            rating (int): The new Trait's rating
+            category (enum): The new Trait's category
+
+        The Traits list is automatically kept sorted.
+
+        Returns a copy of the new Trait, if created.
+        Raises TraitAlreadyExists if a Trait by that name already exists.
+        Raises TraitAlreadyExists if the Trait is a Pillar."""
+        titled = name.title()
+        if titled in Mummy.Pillars:
+            raise TraitAlreadyExists(f"**{titled}** is a Pillar! Use `/character adjust` instead.")
+
+        return super().add_trait(name, rating, category, subcategory)
