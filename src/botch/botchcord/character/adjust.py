@@ -136,6 +136,9 @@ class Toggler(View):
         elif isinstance(self.character, cofd.Vampire):
             fields.append(DisplayField.VITAE)
             fields.append(DisplayField.BLOOD_POTENCY)
+        elif isinstance(self.character, cofd.Mummy):
+            fields.append(DisplayField.SEKHEM)
+            fields.append(DisplayField.PILLARS)
         return build_embed(self.ctx.bot, self.character, use_emojis, fields=tuple(fields))
 
     async def on_timeout(self):
@@ -469,9 +472,15 @@ class MummyPillarAdjuster(Adjuster):
         bad = ButtonStyle.danger
         good = ButtonStyle.success
 
-        for i, pillar in enumerate(self.pillars):
-            self.add_stepper(i + 1, f"{pillar.value} (Permanent)", dec_color=bad, inc_color=good)
-            self.add_stepper(i + 2, f"{pillar.value} (Current)", dec_color=bad, inc_color=good)
+        row_offset = 0
+        for pillar in self.pillars:
+            self.add_stepper(
+                row_offset + 1, f"{pillar.value} (Permanent)", dec_color=bad, inc_color=good
+            )
+            self.add_stepper(
+                row_offset + 2, f"{pillar.value} (Current)", dec_color=bad, inc_color=good
+            )
+            row_offset += 2
 
     def _update_buttons(self):
         pillar = self.character.get_pillar(self.pillars[0])

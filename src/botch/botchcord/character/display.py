@@ -8,8 +8,9 @@ import discord
 from botch import bot, botchcord, errors
 from botch.botchcord.haven import haven
 from botch.botchcord.utils import CEmbed
-from botch.botchcord.utils.text import c
+from botch.botchcord.utils.text import b
 from botch.core.characters import Character, Damage, GameLine, Splat
+from botch.core.characters.cofd import Mummy
 
 logger = logging.getLogger("CHAR DISPLAY")
 
@@ -27,6 +28,7 @@ class DisplayField(StrEnum):
     EXPERIENCE = "Experience"
     BLOOD_POTENCY = "Blood Potency"
     VITAE = "Vitae"
+    PILLARS = "Pillars"
 
 
 DEFAULT_FIELDS = {
@@ -50,6 +52,7 @@ DEFAULT_FIELDS = {
             DisplayField.WILLPOWER,
             DisplayField.GROUNDING,
             DisplayField.SEKHEM,
+            DisplayField.PILLARS,
             DisplayField.EXPERIENCE,
         ),
     },
@@ -116,11 +119,12 @@ def build_embed(
     if not fields:
         fields = get_default_fields(character)
     for field in fields:
-        embed.add_field(
-            name=get_field_name(character, field),
-            value=get_field_value(bot, character, field, emojis),
-            inline=False,
-        )
+        add_display_field(embed, bot, character, field, emojis)
+        # embed.add_field(
+        #     name=get_field_name(character, field),
+        #     value=get_field_value(bot, character, field, emojis),
+        #     inline=False,
+        # )
     if footer:
         embed.set_footer(text=footer)
 
@@ -136,11 +140,12 @@ def add_display_field(
     inline=False,
 ):
     """Add a specified display field to an embed."""
-    embed.add_field(
-        name=get_field_name(character, field),
-        value=get_field_value(bot, character, field, use_emojis),
-        inline=inline,
-    )
+    if field_value := get_field_value(bot, character, field, use_emojis):
+        embed.add_field(
+            name=get_field_name(character, field),
+            value=field_value,
+            inline=inline,
+        )
 
 
 def get_field_name(character: Character, field: DisplayField) -> str:
@@ -159,7 +164,7 @@ def get_field_value(
     character: Character,
     field: DisplayField,
     use_emoji: bool,
-) -> str:
+) -> str | None:
     """Get the value for a particular field."""
     match field:
         case DisplayField.NAME:
@@ -175,7 +180,7 @@ def get_field_value(
         case DisplayField.GROUNDING:
             return str(character.grounding.rating)
         case DisplayField.SEKHEM:
-            return c(character.sekhem)
+            return character.sekhem
         case DisplayField.GENERATION:
             return str(character.generation)
         case DisplayField.BLOOD_POOL:
@@ -186,6 +191,8 @@ def get_field_value(
             return f"```{character.blood_potency}```"
         case DisplayField.VITAE:
             return f"```{character.vitae} / {character.max_vitae}```"
+        case DisplayField.PILLARS:
+            return get_pillars(character)
 
 
 def emojify_track(bot: bot.BotchBot, track: str) -> str:
@@ -218,3 +225,15 @@ def get_default_fields(character: Character) -> tuple[DisplayField, ...]:
         raise errors.CharacterTemplateNotFound(f"Unknown splat `{character.splat}`.")
 
     return line[character.splat]
+
+
+def get_pillars(mummy: Character) -> str | None:
+    """Get the Mummy's Pillars."""
+    if not isinstance(mummy, Mummy):
+        return None
+
+    lines = []
+    for pillar in mummy.pillars:
+        lines.append(f"{b(pillar.name)}: {pillar.temporary} / {pillar.rating}")
+
+    return "\n".join(lines)
