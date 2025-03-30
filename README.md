@@ -1,5 +1,5 @@
 <p align="center">
-	<a href="https://discord.gg/QHnCdSPeEE" title="Join the Inconnu server"><img src="https://img.shields.io/discord/935219170176532580?color=5765F2&label=discord&logo=discord&logoColor=white" alt="Discord member count" /></a>
+	<a href="https://discord.gg/QHnCdSPeEE" title="Join the official server"><img src="https://img.shields.io/discord/935219170176532580?color=5765F2&label=discord&logo=discord&logoColor=white" alt="Discord member count" /></a>
 	<a href="https://www.patreon.com/tiltowait" title="Support me on Patreon!"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dtiltowait%26type%3Dpatrons&style=flat" alt="Patreon" /></a>
 	<br>
 	<a href="https://github.com/tiltowait/botch/blob/master/LICENSE" title="License"><img src="https://img.shields.io/github/license/tiltowait/botch" alt="MIT license" /></a>
@@ -7,36 +7,98 @@
 	<a href="https://app.codecov.io/gh/tiltowait/botch", title="Code coverage report"><img src="https://img.shields.io/codecov/c/github/tiltowait/botch" alt="Code coverage"></a>
 </p>
 
-# Botch & Beat
+# 🤖 Botch
 
-Botch and Beat are a pair of Discord bots for playing World of Darkness and Chronicles of Darkness games over Discord. They feature a dice roller incorporating character traits (so you can type `Strength + Brawl` instead of a non-descriptive number, *a la* my other bot, [Inconnu](https://github.com/tiltowait/inconnu)), plus character stats tracking and, for premium supporters, image uploads.
+**Botch** is a Discord bot for *World of Darkness* and *Chronicles of Darkness*. It features a dice roller incorporating character traits (so you can type e.g. `Strength + Brawl` instead of a non-descriptive number), plus character stats tracking and, for [premium supporters](https://patreon.com/tiltowait), image uploads.
 
-Botch and Beat are designed from the ground up to be modular and extensible, allowing them to support multiple World/Chronicles of Darkness game lines. Currently supported games are Vampire: The Masquerade (V20 and DAV20 sheet templates), Vampire: The Requiem, and Mummy: The Curse. Additional lines can be added, depending on community interest.
+## 🎲 Key features
 
-## Current status
+* Character sheet management via Discord application commands
+* Dice rolling with character sheet integration
+* Custom macros for common rolls
+* Willpower integration in rolls
+* Specialties and Custom Traits
+* Support for multiple WoD/CofD game systems
+* Premium features, including image uploads
+* Easy-to-use commands with natural syntax
+* Web-based character creation wizard
+* Comprehensive help menu
 
-Botch is currently in beta on the [official server](https://discord.gg/QHnCdSPeEE). For general release, [check the milestone](https://github.com/tiltowait/botch/milestone/2) to see current progress.
+A comprehensive reference is available in [the documentation](https://docs.botch.lol).
 
-**Need a bot now?** Check out [[Tzimisce]](https://tzimisce.app) for a basic X20 Wod/CofD dice bot without character tracking features. Or add [Inconnu](https://inconnu.app) for a fully-featured V5 dice bot and character manager.
+## ⌨️ Example commands
 
-## Background
+```
+/roll pool:dexterity+brawl difficulty:6
+/mroll macro:hunt
+/traits assign traits:Spelunking=3; Hot Air Ballooning=2
+```
 
-I'd call this the FAQ section, only that feels disingenuous when no one's asked me anything. So, to head off those potential questions ...
+## 🕹️ Supported games
 
-### Why not add this functionality to [Tzimisce]?
+The bot is designed from the ground-up to be modular and extensible, allowing it to support multiple game lines. Currently supported games are:
 
-[Tzimisce] is my first-ever bot, and my first "real" Python project. While I have a lot of nostalgia for it, it is ... a mess. Adding features is a challenge, modules are constructed strangely, and the effort to improve it to the point that it would work with Botch's planned feature set would be more work than simply starting over.
+### 🌒 World of Darkness
 
-There's also something to be said for familiarity—and not breaking it. A new bot allows me to create new interaction conventions that don't mesh well with [Tzimisce]'s design. [Tzimisce] has thousands of users. Inevitably, many of them will want to stick with what they know, and it wouldn't be fair to take away something that, from their perspective, already works just fine.
+* *Vampire: The Masquerade*
+	* Both Final Nights and Dark Ages variants
+	* Mortals, Ghouls, Vampires
 
-### Okay, so why not add to Inconnu?
+### 🌑 Chronicles of Darkness
 
-Inconnu's a far more advanced bot than [Tzimisce], and it has many of the features Botch will have. However, Inconnu isn't designed to handle multiple game lines. Like [Tzimisce], it would need substantial refactoring to get it to that point. There's also the fact that X20 and CofD have very different dice mechanics compared to V5. It just doesn't make sense to try to tack on two vastly different systems to a bot that's already in a healthy spot.
+* *Vampire: The Requiem*
+	* Mortals and Vampires
+* *Mummy: The Curse*
+	* Mummies
 
-### What's in a name?
+Due to the differences between the Storyteller and Storytelling systems, **Botch** is available in two flavors:
 
-Why Botch? Botches are bad! Yes, they are. Over the years, many users have contacted me to complain that botch too often. In reality, it's just confirmation bias at work: you remember the bad rolls more strongly than you remember the good rolls. It's human nature. In actuality, a good PRNG (programmable random number generator), like these bots use, is more random than any set of dice you'll buy at your FLGS.
+* **Botch**, for *World of Darkness* (20th Anniversary Edition)
+* **Beat**, for *Chronicles of Darkness* (2E)
 
-### Will it support `X`?
+### 🔎 Looking for V5?
 
-If your hypothetical game is a WoD20 or CofD 2E game, then: Maybe!
+Check out [Inconnu](https://github.com/tiltowait/inconnu)! It has many (and more!) of the same features.
+
+## 🚀 Getting started
+
+If you simply want to install either bot on your Discord server, you'll find installation links in [the official documentation](https://docs.botch.lol).
+
+If you want to run the bot(s) locally, either for personal use or to contribute, read on.
+
+### ✅ Requirements
+
+* [Poetry](https://python-poetry.org/)
+* A registered [Discord application](https://discord.com/developers/docs/intro)
+* A MongoDB database
+* Emojis (default set found in the `assets` directory) installed in the server on which the bot will run. (At present, the [Pycord](https://pycord.dev/) library on which the bot is based does not support application emojis.)
+
+### ⚙️ Environment variables
+
+This repo contains three environment template files:
+
+* `.env.template`
+* `.env.botch.template`
+* `.env.beat.template`
+
+Each contains documentation on the expected parameters. If you wish to do local testing, it's highly recommended to set the `DEBUG` variable.
+
+### 🏃‍♂️ Running
+
+1. Install dependencies: `poetry install`
+1. Copy `.env` templates and supply variables:
+	- `.env.template` → `.env`
+	- `.env.botch.template` → `.env.botch`
+	- `.env.beat.template` → `.env.beat`
+1. Run the bot: `poetry run botch` or `poetry run beat`
+
+## 🔮 Future plans
+
+* Web app
+* Convenience commands (such as a single command for Vampires to spend blood and heal)
+* More character templates
+
+### ❓ Will it support *X* game line?
+
+If *X* is a WoD20 or CofD 2E game, then: Maybe! It will depend on both personal and community interest.
+
