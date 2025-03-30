@@ -119,6 +119,9 @@ def build_embed(
     if not fields:
         fields = get_default_fields(character)
     for field in fields:
+        if field == DisplayField.EXPERIENCE:
+            # TODO: Re-enable if/when XP is implemented
+            continue
         add_display_field(embed, bot, character, field, emojis)
         # embed.add_field(
         #     name=get_field_name(character, field),

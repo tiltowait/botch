@@ -104,6 +104,9 @@ def test_build_emoji(use_emojis, bot_mock, wod_vamp):
     assert embed.footer.text == "Vampire"
 
     for i, field in enumerate(get_default_fields(wod_vamp)):
+        if field == DisplayField.EXPERIENCE:
+            # TODO: Re-enable if/when XP is implemented
+            continue
         expected_name = get_field_name(wod_vamp, field)
         expected_value = get_field_value(bot_mock, wod_vamp, field, False)
 
