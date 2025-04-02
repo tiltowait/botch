@@ -56,6 +56,8 @@ async def roll(
     character: Optional[str | Character],
     *,
     autos=0,
+    blessed=False,
+    blighted=False,
     owner: discord.Member | None = None,
 ):
     """Perform and display the specified roll. The roll is saved to the database."""
@@ -76,7 +78,17 @@ async def roll(
             raise errors.RollError(f"No characters able to roll `{pool}`.")
 
     rp.parse()
-    roll = Roll.from_parser(rp, ctx.guild.id, ctx.user.id, target, GAME_LINE, rote, autos).roll()
+    roll = Roll.from_parser(
+        rp,
+        ctx.guild.id,
+        ctx.user.id,
+        target,
+        GAME_LINE,
+        rote,
+        autos,
+        blessed,
+        blighted,
+    ).roll()
 
     extra_specs = []
     if specialties:
@@ -135,6 +147,10 @@ def build_embed(
         author_name = ctx.author.display_name
     if not icon:
         icon = botchcord.get_avatar(ctx.author)
+    if roll.blessed:
+        author_name += " • Blessed"
+    elif roll.blighted:
+        author_name += " • Blighted"
     if roll.rote:
         author_name += " • Rote"
     if roll.again < 10:

@@ -213,6 +213,8 @@ class Roll(Document):
         line: GameLine | str | None = GAME_LINE,
         rote=False,
         autos=0,
+        blessed=False,
+        blighted=False,
     ):
         """Create a roll from a RollParser and a target number."""
         if not line:
@@ -234,6 +236,8 @@ class Roll(Document):
             syntax=p.raw_syntax,
             autos=autos,
             character=p.character,
+            blessed=blessed,
+            blighted=blighted,
         )
 
     @staticmethod
