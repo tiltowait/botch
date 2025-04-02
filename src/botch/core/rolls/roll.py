@@ -197,7 +197,7 @@ class Roll(Document):
                 if self.wp:
                     explosions -= 3
                 if explosions > 0:
-                    readout += f" *+ [{explosions}]*"
+                    readout += f" *+ {explosions}X*"
                 if self.wp:
                     readout += " *+ WP*"
 

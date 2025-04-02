@@ -141,10 +141,10 @@ def test_selects_longer_roll(mock_d10: Mock, roll: Roll):
         ([5, 5, 5, 5, 5, 5, 5, 5], True, False, "5 *+ WP*"),
         ([5, 5, 5, 5, 5, 5, 5, 5, 5], True, True, "6 *+ WP*"),
         ([5, 5, 5, 5, 5, 5], False, True, "6"),
-        ([5, 5, 5, 5, 10, 5], False, False, "5 *+ [1]*"),
-        ([5, 5, 5, 5, 10, 5, 5, 10, 5, 5], True, False, "5 *+ [2]* *+ WP*"),
-        ([5, 5, 5, 5, 10, 5, 5], False, True, "6 *+ [1]*"),
-        ([5, 5, 5, 5, 10, 5, 5, 5, 5, 5], True, True, "6 *+ [1]* *+ WP*"),
+        ([5, 5, 5, 5, 10, 5], False, False, "5 *+ 1X*"),
+        ([5, 5, 5, 5, 10, 5, 5, 10, 5, 5], True, False, "5 *+ 2X* *+ WP*"),
+        ([5, 5, 5, 5, 10, 5, 5], False, True, "6 *+ 1X*"),
+        ([5, 5, 5, 5, 10, 5, 5, 5, 5, 5], True, True, "6 *+ 1X* *+ WP*"),
     ],
 )
 def test_dice_readout(
