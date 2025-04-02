@@ -3,9 +3,8 @@
 import re
 from typing import TYPE_CHECKING, Optional, TypeAlias, TypeVar, overload
 
-from beanie import Document, Insert
+from beanie import Document, Insert, before_event
 from beanie import Link as BeanieLink
-from beanie import before_event
 from numpy.random import default_rng
 from pydantic import Field
 
@@ -54,6 +53,8 @@ class Roll(Document):
     autos: int = 0
     specialties: Optional[list[str]] = Field(default_factory=list)
     rote: bool = False
+    blessed: bool = False
+    blighted: bool = False
     dice: list[int] = Field(default_factory=list)
     pool: Optional[list[str | int]] = None
     num_successes: int = 0
@@ -106,7 +107,7 @@ class Roll(Document):
     def successes(self) -> int:
         """The number of successes rolled."""
         if self.line == GameLine.COFD:
-            return sum(d >= 8 for d in self.dice) + self.autos
+            return self._cofd_successes(self.dice) + self.autos
 
         # WoD rolls have successes canceled by 1s
 
@@ -119,8 +120,13 @@ class Roll(Document):
 
         ones = sum(d == 1 for d in self.dice)
         if successes > 0 and ones > successes:
+            # A botch occurs if successes == 0 and ones > 0. If ones simply
+            # outnumber successes, then we want to record 0 successes instead
+            # of slipping into negatives.
             successes = 0
         else:
+            # A negative number indicates a botch. We record the magnitude of
+            # the botch for fun; RAW, a botch is a botch.
             successes -= ones
 
         if self.wp:
@@ -149,10 +155,16 @@ class Roll(Document):
             return "Failure"
 
         if self.line == GameLine.COFD:
+            # CofD has four roll outcomes (MtC 2E, p.175):
+            #  1. Failure (above)
+            #  2. Dramatic failure (not implemented here)
+            #  3. Success
+            #  4. Exceptional success
             if successes >= 5:
                 return "Exceptional!"
             return "Success"
 
+        # WoD roll outcomes from V20, p.249
         if successes == 1:
             return "Marginal"
         if successes == 2:
@@ -165,12 +177,21 @@ class Roll(Document):
 
     @property
     def dice_readout(self) -> str:
-        """Just the number of dice if WoD, or dice + WP if CofD and WP in use."""
+        """The numeric representation of the number of dice rolled.
+
+        WoD: Simply the number of dice.
+        CofD: The base number of dice for the roll, plus 1 if any specialties.
+              Then, any explosions are in brackets. Willpower is represented by
+              "+ WP".
+
+              Example: 8 + [2] + WP -> 8 dice (including specialties), 2
+                       explosions, and Willpower. The user will see 13 dice in
+                       the roll display."""
         match self.line:
             case GameLine.WOD:
                 readout = str(self.num_dice)
             case GameLine.COFD:
-                base_dice = self.num_dice + 1 if self.specialties else self.num_dice
+                base_dice = self.num_dice + (1 if self.specialties else 0)
                 readout = str(base_dice)
                 explosions = len(self.dice) - base_dice
                 if self.wp:
@@ -215,28 +236,80 @@ class Roll(Document):
             character=p.character,
         )
 
-    def roll(self):
-        """Roll the dice."""
-        if self.line == GameLine.WOD:
-            # WoD has no special dice rules
-            self.dice = d10(self.num_dice)
-        else:
-            # CofD is more complicated due to explosions
-            max_dice = self.num_dice
-            if self.wp:
-                max_dice += 3
-            if self.specialties:
-                max_dice += 1
+    @staticmethod
+    def _cofd_successes(dice: list[int]) -> int:
+        """Count CofD successes."""
+        return sum(die >= 8 for die in dice)
 
-            while len(self.dice) < max_dice:
-                self.dice.append(d10())
-                if self.dice[-1] >= self.target:
-                    # The die exploded
-                    max_dice += 1
-                elif self.rote:
-                    self.dice[-1] = d10()
+    def roll(self) -> "Roll":
+        """Roll the dice. WoD rolls get a simple d10 toss. CofD rolls, on the
+        other hand, are much more complex. This function handles the following
+        conditions, which occur in the listed order, per MtC 2E, p.124:
+
+        * Explosions
+        * Blessed actions (roll twice and select the better roll)
+        * Blighted actions (roll twice and select the worse roll)
+        * Rote actions (re-roll failing dice, once)
+
+        To accomplish CofD rolls, it makes use of the _roll_cofd() function,
+        which handles the explosions for us."""
+        if self.line == GameLine.WOD:
+            self.dice = d10(self.num_dice)
+        else:  # CofD
+            dice_count = self.num_dice
+            if self.wp:
+                dice_count += 3
+            if self.specialties:
+                dice_count += 1
+
+            if self.blessed or self.blighted:
+                roll_1 = self._roll_cofd(dice_count)
+                suxx_1 = self._cofd_successes(roll_1)
+
+                roll_2 = self._roll_cofd(dice_count)
+                suxx_2 = self._cofd_successes(roll_2)
+
+                if suxx_1 == suxx_2:
+                    # If the rolls are equal, then the user gets to choose.
+                    # There's no need to actually make them choose, however,
+                    # as the user will always opt for the most advantageous
+                    # pick.
+                    #
+                    # Normally, the choice is meaningless, as the rolls will
+                    # typically have the same number of successes and failures.
+                    # If one roll exploded and the other didn't, however, it
+                    # benefits the user to keep that roll. This holds for both
+                    # blessed and blighted rolls.
+                    dice = roll_1 if len(roll_1) > len(roll_2) else roll_2
+                elif self.blessed:
+                    dice = roll_1 if suxx_1 > suxx_2 else roll_2
+                else:  # blighted
+                    dice = roll_1 if suxx_1 < suxx_2 else roll_2
+            else:
+                # Neither blessed nor blighted
+                dice = self._roll_cofd(dice_count)
+
+            if self.rote:
+                # Re-roll failures once. This always happens after blessed
+                # or blighted qualities, if they apply. The re-rolled dice
+                # can explode, as usual.
+                failures = sum(die < 8 for die in dice)
+                rerolled = self._roll_cofd(failures)
+                dice = [die for die in dice if die >= 8] + rerolled
+
+            self.dice = dice
 
         return self
+
+    def _roll_cofd(self, count: int) -> list[int]:
+        """Roll dice, exploding if they meet or exceed self.target."""
+        dice = []
+        for _ in range(count):
+            dice.append(d10())
+            while dice[-1] >= self.target:
+                dice.append(d10())
+
+        return dice
 
     def add_specs(self, specs: list[str]):
         """Add a specialty."""
