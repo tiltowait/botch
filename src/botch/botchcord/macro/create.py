@@ -17,6 +17,8 @@ async def create(
     diff: int,
     comment: str | None,
     rote=False,
+    blessed=False,
+    blighted=False,
 ):
     """Create a macro and add it to the character."""
     # can_use_macro() is too complex for the @haven decorator
@@ -25,7 +27,7 @@ async def create(
             ctx, GAME_LINE, None, character, None, filter=lambda c: can_use_macro(c, pool)
         )
         char = await haven.get_match()
-        macro = create_macro(char, name, pool, diff, comment, rote)
+        macro = create_macro(char, name, pool, diff, comment, rote, blessed, blighted)
         char.add_macro(macro)
 
         embed = build_embed(ctx.bot, char, macro)
@@ -63,6 +65,8 @@ def create_macro(
     diff: int,
     comment: str | None,
     rote=False,
+    blessed=False,
+    blighted=False,
 ) -> Macro:
     """Create a macro."""
     rpp = RollParser(pool, char).parse()
@@ -73,6 +77,8 @@ def create_macro(
         keys=rpk.pool,
         target=diff,
         rote=rote,
+        blessed=blessed,
+        blighted=blighted,
         hunt=False,
         comment=comment,
     )

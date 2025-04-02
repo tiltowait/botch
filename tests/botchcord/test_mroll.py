@@ -47,7 +47,17 @@ async def test_mroll(
     await mroll(ctx, macro.name, diff, False, False, comment, char, autos=1)  # type: ignore
 
     roll_mock.assert_awaited_once_with(
-        ctx, macro.key_str, diff, None, False, False, comment, char, autos=1
+        ctx,
+        macro.key_str,
+        diff,
+        None,
+        False,
+        False,
+        comment,
+        char,
+        autos=1,
+        blessed=False,
+        blighted=False,
     )
 
 

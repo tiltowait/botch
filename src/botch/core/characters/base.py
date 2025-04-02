@@ -106,6 +106,8 @@ class Macro(BaseModel):
     keys: list[str | int]
     target: int = Field(ge=2, le=10)
     rote: bool
+    blessed: bool = False
+    blighted: bool = False
     hunt: bool
     comment: Optional[str]
 

@@ -16,6 +16,8 @@ async def mroll(
     character: str | None,
     *,
     autos=0,
+    blessed_override=False,
+    blighted_override=False,
 ):
     """Perform a macro roll.
 
@@ -30,6 +32,8 @@ async def mroll(
     difficulty = target_override or macro.target
     comment = comment_override or macro.comment
     rote = rote_override or macro.rote
+    blessed = blessed_override or macro.blessed
+    blighted = blighted_override or macro.blighted
 
     try:
         await botchcord.roll.roll(
@@ -42,6 +46,8 @@ async def mroll(
             comment,
             char,
             autos=autos,
+            blessed=blessed,
+            blighted=blighted,
         )
     except errors.RollError:
         await ctx.send_error(
