@@ -37,6 +37,12 @@ class MacrosCog(BotchCog, name="Macros"):
     @option("pool", description="The dice pool for the macro to use")
     @option("again", description="The number to explode at", choices=[10, 9, 8], default=10)
     @option("rote", description="Whether to always apply the Rote quality", default=False)
+    @option(
+        "advanced",
+        description="Whether to make it a Blessed or Blighted Action",
+        choices=["Blessed", "Blighted"],
+        required=False,
+    )
     @option("comment", description="A comment to apply by default when rolling", required=False)
     @options.character("The character receiving the macro")
     async def macro_create(
@@ -46,11 +52,22 @@ class MacrosCog(BotchCog, name="Macros"):
         pool: str,
         again: int,
         rote: bool,
+        advanced: str,
         comment: str,
         character: str,
     ):
         """Create a macro."""
-        await botchcord.macro.create(ctx, character, name, pool, again, comment, rote)
+        await botchcord.macro.create(
+            ctx,
+            character,
+            name,
+            pool,
+            again,
+            comment,
+            rote,
+            advanced == "Blessed",
+            advanced == "Blighted",
+        )
 
     @macro.command(name="list")
     @options.character("The character whose macros to display")
@@ -79,6 +96,12 @@ class MacrosCog(BotchCog, name="Macros"):
         description="Override the macro to use WP",
         default=False,
     )
+    @option(
+        "advanced",
+        description="Override Blessed/Blighted quality",
+        choices=["Blessed", "Blighted"],
+        required=False,
+    )
     @option("autos", description="Add automatic successes", choices=list(range(11)), default=0)
     @option("comment", description="Override the default comment", required=False)
     @options.character("The character performing the roll")
@@ -88,13 +111,25 @@ class MacrosCog(BotchCog, name="Macros"):
         name: str,
         again: int,
         rote: bool,
+        advanced: str,
         use_wp: bool,
         autos: int,
         comment: str,
         character: str,
     ):
         """Roll using a macro."""
-        await botchcord.mroll(ctx, name, again, use_wp, rote, comment, character, autos=autos)
+        await botchcord.mroll(
+            ctx,
+            name,
+            again,
+            use_wp,
+            rote,
+            comment,
+            character,
+            autos=autos,
+            blessed_override=advanced == "Blessed",
+            blighted_override=advanced == "Blighted",
+        )
 
 
 def setup(bot: BotchBot):

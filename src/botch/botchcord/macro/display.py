@@ -53,6 +53,14 @@ def create_macro_entry(macro: Macro) -> str:
     ]
     if is_cofd:
         lines.append(f"**Rote:** {'Yes' if macro.rote else 'No'}")
+
+        if macro.blessed:
+            advanced = "Blessed"
+        elif macro.blighted:
+            advanced = "Blighted"
+        else:
+            advanced = "No"
+        lines.append(f"**Advanced:** {advanced}")
     if macro.comment:
         lines.append(i(macro.comment))
 

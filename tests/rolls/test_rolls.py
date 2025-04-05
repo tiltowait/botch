@@ -61,13 +61,13 @@ def test_cofd_explosions():
         (GameLine.WOD, [5] * 5, ["a"], False, "5"),
         (GameLine.WOD, [5] * 5, None, True, "5"),
         (GameLine.COFD, [5] * 5, None, False, "5"),
-        (GameLine.COFD, [5] * 6, None, False, "5 *+ [1]*"),
-        (GameLine.COFD, [5] * 9, None, True, "5 *+ [1]* *+ WP*"),
+        (GameLine.COFD, [5] * 6, None, False, "5 *+ 1X*"),
+        (GameLine.COFD, [5] * 9, None, True, "5 *+ 1X* *+ WP*"),
         (GameLine.COFD, [5] * 8, None, True, "5 *+ WP*"),
         (GameLine.COFD, [5] * 6, ["a"], False, "6"),
-        (GameLine.COFD, [5] * 7, ["a"], False, "6 *+ [1]*"),
+        (GameLine.COFD, [5] * 7, ["a"], False, "6 *+ 1X*"),
         (GameLine.COFD, [5] * 9, ["a"], True, "6 *+ WP*"),
-        (GameLine.COFD, [5] * 10, ["a"], True, "6 *+ [1]* *+ WP*"),
+        (GameLine.COFD, [5] * 10, ["a"], True, "6 *+ 1X* *+ WP*"),
     ],
 )
 def test_dice_readout(

@@ -9,11 +9,20 @@ from cachetools import TTLCache
 
 from botch import core, errors
 from botch.bot import AppCtx
-from botch.botchcord.roll import DICE_CAP, DICE_CAP_MESSAGE, Color, add_wp, build_embed
+from botch.botchcord.roll import (
+    DICE_CAP,
+    DICE_CAP_MESSAGE,
+    Color,
+    add_wp,
+    build_embed,
+    embed_color,
+    embed_title,
+    emoji_name,
+    emojify_dice,
+    textify_dice,
+)
 from botch.botchcord.roll import chance as chance_cmd
-from botch.botchcord.roll import embed_color, embed_title, emoji_name, emojify_dice
 from botch.botchcord.roll import roll as roll_cmd
-from botch.botchcord.roll import textify_dice
 from botch.core.characters import Character, Damage, GameLine, Splat, Trait
 from botch.core.rolls import Roll
 from botch.core.rolls.parse import RollParser
@@ -263,6 +272,28 @@ def test_build_embed_rote_again():
     embed = build_embed(ctx, roll, None, None, True)
     assert embed.author is not None
     assert embed.author.name == "Jimmy Maxwell • Rote • 8-again"
+
+
+@pytest.mark.parametrize(
+    "blessed,blighted",
+    [
+        (True, False),
+        (False, True),
+    ],
+)
+def test_build_embed_blessed_blighted(blessed: bool, blighted: bool):
+    rp = RollParser("6", None).parse()
+    roll = Roll.from_parser(rp, 0, 0, 8, GameLine.COFD, True, blessed=blessed, blighted=blighted)
+
+    ctx = Mock()
+    ctx.author = Mock(spec=discord.User)  # Make it a User to finish testing get_avatar()
+    ctx.author.display_name = "Jimmy Maxwell"
+    ctx.author.display_avatar = "https://example.com/icon.png"
+
+    action = "Blessed" if blessed else "Blighted"
+    embed = build_embed(ctx, roll, None, None, True)
+    assert embed.author is not None
+    assert embed.author.name == f"Jimmy Maxwell • {action} • Rote • 8-again"
 
 
 @pytest.mark.parametrize(

@@ -29,6 +29,12 @@ class BasicCog(BotchCog, name="Basic"):
     @option("again", description="The number at which dice explode", choices=[10, 9, 8], default=10)
     @option("rote", description="Whether to apply the Rote quality", default=False)
     @option(
+        "advanced",
+        description="Whether it is a Blessed or Blighted Action",
+        choices=["Blessed", "Blighted"],
+        required=False,
+    )
+    @option(
         "specialty",
         description="A specialty to apply to the roll. You may also use trait.spec syntax in pool.",
         required=False,
@@ -49,6 +55,7 @@ class BasicCog(BotchCog, name="Basic"):
         use_wp: bool,
         again: int,
         rote: bool,
+        advanced: str,
         specialty: str,
         autos: int,
         comment: str,
@@ -56,8 +63,26 @@ class BasicCog(BotchCog, name="Basic"):
         owner: discord.Member,
     ):
         """Roll the dice! If you have a character, `pool` can be traits (e.g. `Strength + Brawl`)."""
+        blessed = False
+        blighted = False
+        if advanced == "Blessed":
+            blessed = True
+        elif advanced == "Blighted":
+            blighted = True
+
         await botchcord.roll.roll(
-            ctx, pool, again, specialty, use_wp, rote, comment, character, autos=autos, owner=owner
+            ctx,
+            pool,
+            again,
+            specialty,
+            use_wp,
+            rote,
+            comment,
+            character,
+            autos=autos,
+            blessed=blessed,
+            blighted=blighted,
+            owner=owner,
         )
 
     @slash_command()
