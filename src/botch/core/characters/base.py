@@ -161,7 +161,7 @@ class Trait(BaseModel, validate_assignment=True):
         subtraits: list[str]  # The list of subtraits selected
         category: str  # The Trait.Category. Must be str due to placement here
 
-    name: str = Field(min_length=1, max_length=20)
+    name: str = Field(min_length=1, max_length=30)
     rating: int
     category: Category
     subcategory: Subcategory
