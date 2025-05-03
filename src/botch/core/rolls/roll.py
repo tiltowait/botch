@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 else:
     Link = BeanieLink
 
+COFD_TARGET = 8
 _rng = default_rng()  # numpy's default RNG is PCG64 (superior to builtin)
 
 
@@ -243,7 +244,7 @@ class Roll(Document):
     @staticmethod
     def _cofd_successes(dice: list[int]) -> int:
         """Count CofD successes."""
-        return sum(die >= 8 for die in dice)
+        return sum(die >= COFD_TARGET for die in dice)
 
     def roll(self) -> Self:
         """Roll the dice. WoD rolls get a simple d10 toss. CofD rolls, on the
@@ -251,44 +252,22 @@ class Roll(Document):
         conditions, which occur in the listed order, per MtC 2E, p.124:
 
         * Explosions
-        * Blessed actions (roll twice and select the better roll)
-        * Blighted actions (roll twice and select the worse roll)
+        * Advanced actions:
+            * Blessed actions (roll twice and select the better roll)
+            * Blighted actions (roll twice and select the worse roll)
         * Rote actions (re-roll failing dice, once)
 
         To accomplish CofD rolls, it makes use of the _roll_cofd() function,
-        which handles the explosions for us."""
+        which handles the explosions.
+
+        Returns self."""
         if self.line == GameLine.WOD:
             self.dice = d10(self.num_dice)
         else:  # CofD
-            dice_count = self.num_dice
-            if self.wp:
-                dice_count += 3
-            if self.specialties:
-                dice_count += 1
+            dice_count = self._calculate_cofd_dice_count()
 
             if self.blessed or self.blighted:
-                roll_1 = self._roll_cofd(dice_count)
-                suxx_1 = self._cofd_successes(roll_1)
-
-                roll_2 = self._roll_cofd(dice_count)
-                suxx_2 = self._cofd_successes(roll_2)
-
-                if suxx_1 == suxx_2:
-                    # If the rolls are equal, then the user gets to choose.
-                    # There's no need to actually make them choose, however,
-                    # as the user will always opt for the most advantageous
-                    # pick.
-                    #
-                    # Normally, the choice is meaningless, as the rolls will
-                    # typically have the same number of successes and failures.
-                    # If one roll exploded and the other didn't, however, it
-                    # benefits the user to keep that roll. This holds for both
-                    # blessed and blighted rolls.
-                    dice = roll_1 if len(roll_1) > len(roll_2) else roll_2
-                elif self.blessed:
-                    dice = roll_1 if suxx_1 > suxx_2 else roll_2
-                else:  # blighted
-                    dice = roll_1 if suxx_1 < suxx_2 else roll_2
+                dice = self._perform_advanced_action(dice_count)
             else:
                 # Neither blessed nor blighted
                 dice = self._roll_cofd(dice_count)
@@ -297,13 +276,51 @@ class Roll(Document):
                 # Re-roll failures once. This always happens after blessed
                 # or blighted qualities, if they apply. The re-rolled dice
                 # can explode, as usual.
-                failures = sum(die < 8 for die in dice)
+                failures = sum(die < COFD_TARGET for die in dice)
                 rerolled = self._roll_cofd(failures)
-                dice = [die for die in dice if die >= 8] + rerolled
+                dice = [die for die in dice if die >= COFD_TARGET] + rerolled
 
             self.dice = dice
 
         return self
+
+    def _perform_advanced_action(self, dice_count: int) -> list[int]:
+        """Performs a Blessed/Blighted roll."""
+        roll_1 = self._roll_cofd(dice_count)
+        suxx_1 = self._cofd_successes(roll_1)
+
+        roll_2 = self._roll_cofd(dice_count)
+        suxx_2 = self._cofd_successes(roll_2)
+
+        if suxx_1 == suxx_2:
+            # If the rolls are equal, then the user gets to choose.
+            # There's no need to actually make them choose, however,
+            # as the user will always opt for the most advantageous
+            # pick.
+            #
+            # Normally, the choice is meaningless, as the rolls will
+            # typically have the same number of successes and failures.
+            # If one roll exploded and the other didn't, however, it
+            # benefits the user to keep that roll. This holds for both
+            # blessed and blighted rolls.
+            dice = roll_1 if len(roll_1) > len(roll_2) else roll_2
+        elif self.blessed:
+            dice = roll_1 if suxx_1 > suxx_2 else roll_2
+        else:  # blighted
+            dice = roll_1 if suxx_1 < suxx_2 else roll_2
+
+        return dice
+
+    def _calculate_cofd_dice_count(self) -> int:
+        """Calculate the actual number of dice being rolled, pre-explosions,
+        for CofD rolls."""
+        dice_count = self.num_dice
+        if self.wp:
+            dice_count += 3
+        if self.specialties:
+            dice_count += 1
+
+        return dice_count
 
     def _roll_cofd(self, count: int) -> list[int]:
         """Roll dice, exploding if they meet or exceed self.target."""
