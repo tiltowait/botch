@@ -1,7 +1,7 @@
 """Facility for logging user commands."""
 
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any, Optional, Self
 
 from beanie import Document
 from discord import ApplicationContext
@@ -21,9 +21,9 @@ class CommandRecord(Document):
     type: int
 
     @classmethod
-    def from_context(cls, ctx: ApplicationContext) -> "CommandRecord":
+    def from_context(cls, ctx: ApplicationContext) -> Self:
         """Create a record from an AppCtx."""
-        record = CommandRecord(
+        record = cls(
             command=ctx.command.qualified_name,
             options=ctx.selected_options,
             guild=ctx.guild.id if ctx.guild else None,

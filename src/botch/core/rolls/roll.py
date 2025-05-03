@@ -1,7 +1,7 @@
 """Dice rolls!"""
 
 import re
-from typing import TYPE_CHECKING, Optional, TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, Optional, Self, TypeAlias, TypeVar, overload
 
 from beanie import Document, Insert, before_event
 from beanie import Link as BeanieLink
@@ -245,7 +245,7 @@ class Roll(Document):
         """Count CofD successes."""
         return sum(die >= 8 for die in dice)
 
-    def roll(self) -> "Roll":
+    def roll(self) -> Self:
         """Roll the dice. WoD rolls get a simple d10 toss. CofD rolls, on the
         other hand, are much more complex. This function handles the following
         conditions, which occur in the listed order, per MtC 2E, p.124:

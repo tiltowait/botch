@@ -1,7 +1,7 @@
 """Base WoD character attributes."""
 
 from enum import StrEnum
-from typing import ClassVar
+from typing import ClassVar, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -119,7 +119,7 @@ class Pillar(BaseModel):
     subcategory: ClassVar[Trait.Subcategory] = Trait.Subcategory.PILLARS
 
     @model_validator(mode="after")
-    def set_temporary_on_init(self) -> "Pillar":
+    def set_temporary_on_init(self) -> Self:
         if self.temporary == -1:
             self.temporary = self.rating
         return self
@@ -159,7 +159,7 @@ class Mummy(Mortal):
     pillars: list[Pillar] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def initialize_pillars(self) -> "Mummy":
+    def initialize_pillars(self) -> Self:
         if not self.pillars:
             self.pillars = [Pillar(name=name.value, rating=0) for name in Mummy.Pillars]
         return self
