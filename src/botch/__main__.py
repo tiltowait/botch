@@ -1,5 +1,7 @@
 """Botch: A Discord dice bot and character manager for WoD and CofD."""
 
+import uvloop
+
 from botch import logconfig
 from botch.bot import BotchBot
 from botch.config import BOTCH_TOKEN, GAME_LINE
@@ -8,6 +10,7 @@ from botch.config import BOTCH_TOKEN, GAME_LINE
 def main():
     assert BOTCH_TOKEN is not None
     logconfig.configure_logging()
+    uvloop.install()
 
     bot = BotchBot()
     bot.load_cogs(["shared", GAME_LINE])
