@@ -47,15 +47,15 @@ def cmummy() -> Mummy:
 @pytest.mark.parametrize(
     "char_fixture,traits",
     [
-        ("wmortal", [("Courage", 2), ("SelfControl", 1), ("Conscience", 4)]),
-        ("cvampire", [("Blood Potency", 7), ("Potency", 7)]),
-        ("cmummy", [("Sekhem", 10), ("Ab", 1), ("Ba", 2), ("Ka", 3), ("Ren", 4), ("Sheut", 5)]),
+        ("wmortal", {"Courage": 2, "SelfControl": 1, "Conscience": 4}),
+        ("cvampire", {"Blood Potency": 7, "Potency": 7}),
+        ("cmummy", {"Sekhem": 10, "Ab": 1, "Ba": 2, "Ka": 3, "Ren": 4, "Sheut": 5}),
     ],
 )
-def test_traits(request, char_fixture: str, traits: list[tuple[str, int]]):
+def test_traits(request, char_fixture: str, traits: dict[str, int]):
     char: Character = request.getfixturevalue(char_fixture)
 
-    for trait_name, rating in traits:
+    for trait_name, rating in traits.items():
         found = char.match_traits(trait_name)
 
         assert len(found) == 1
