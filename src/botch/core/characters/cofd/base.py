@@ -1,5 +1,6 @@
 """Base WoD character attributes."""
 
+from copy import deepcopy
 from enum import StrEnum
 from functools import partial
 from typing import ClassVar, Self
@@ -211,3 +212,10 @@ class Mummy(Mortal):
             raise TraitAlreadyExists(f"**{titled}** is a Pillar! Use `/character adjust` instead.")
 
         return super().add_trait(name, rating, category, subcategory)
+
+    def _all_traits(self) -> list[Trait]:
+        traits = super()._all_traits()
+        pillars = [INNATE_FACTORY(name=p.name, rating=p.rating) for p in self.pillars]
+        sekhem = [INNATE_FACTORY(name="Sekhem", rating=self.sekhem)]
+
+        return traits + pillars + sekhem
