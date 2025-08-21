@@ -2,7 +2,7 @@
 
 import pytest
 
-from botch.core.characters.base import Character, GameLine, Splat
+from botch.core.characters.base import Character, GameLine, Grounding, Splat
 from botch.core.characters.cofd import Mummy, Vampire
 from botch.core.characters.cofd.base import Pillar
 from botch.core.characters.wod import Mortal, gen_virtues
@@ -12,7 +12,13 @@ from tests.characters import gen_char
 @pytest.fixture
 def wmortal() -> Mortal:
     virtues = gen_virtues({"Courage": 2, "SelfControl": 1, "Conscience": 4})
-    char = gen_char(GameLine.WOD, Splat.MORTAL, Mortal, virtues=virtues)
+    char = gen_char(
+        GameLine.WOD,
+        Splat.MORTAL,
+        Mortal,
+        virtues=virtues,
+        grounding=Grounding(path="Flippo", rating=5),
+    )
     return char
 
 
@@ -41,15 +47,16 @@ def cmummy() -> Mummy:
         Mummy,
         sekhem=10,
         pillars=pillars,
+        grounding=Grounding(path="Memory", rating=3),
     )
 
 
 @pytest.mark.parametrize(
     "char_fixture,traits",
     [
-        ("wmortal", {"Courage": 2, "SelfControl": 1, "Conscience": 4}),
-        ("cvampire", {"Blood Potency": 7, "Potency": 7}),
-        ("cmummy", {"Sekhem": 10, "Ab": 1, "Ba": 2, "Ka": 3, "Ren": 4, "Sheut": 5}),
+        ("wmortal", {"Courage": 2, "SelfControl": 1, "Conscience": 4, "Flippo": 5}),
+        ("cvampire", {"Blood Potency": 7, "Potency": 7, "Humanity": 7}),
+        ("cmummy", {"Sekhem": 10, "Ab": 1, "Ba": 2, "Ka": 3, "Ren": 4, "Sheut": 5, "Memory": 3}),
     ],
 )
 def test_traits(request, char_fixture: str, traits: dict[str, int]):

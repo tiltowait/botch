@@ -1,6 +1,5 @@
 """Base WoD character attributes."""
 
-from copy import deepcopy
 from enum import StrEnum
 from functools import partial
 from typing import ClassVar, Self
