@@ -1,6 +1,7 @@
 """Base WoD character attributes."""
 
 from enum import StrEnum
+from functools import partial
 from typing import ClassVar, Self
 
 from pydantic import BaseModel, Field, model_validator
@@ -8,6 +9,8 @@ from pydantic import BaseModel, Field, model_validator
 from botch.core.characters.base import Character, GameLine, Splat, Trait
 from botch.errors import TraitAlreadyExists
 from botch.utils import max_vtr_vitae
+
+INNATE_FACTORY = partial(Trait, category=Trait.Category.INNATE, subcategory=Trait.Subcategory.BLANK)
 
 
 class CofD(Character):
@@ -104,6 +107,15 @@ class Vampire(Mortal):
             self.blood_potency += 1
             self.max_vitae = max_vtr_vitae(self.blood_potency)
             self.vitae = min(self.vitae, self.max_vitae)
+
+    def _all_traits(self) -> list[Trait]:
+        """A copy of the vampire's traits, including innates."""
+        traits = super()._all_traits()
+        potency = [
+            INNATE_FACTORY(name="Blood Potency", rating=self.blood_potency),
+            INNATE_FACTORY(name="Potency", rating=self.blood_potency),
+        ]
+        return traits + potency
 
 
 class Pillar(BaseModel):
