@@ -1,5 +1,6 @@
 """Mortal character templates."""
 
+from copy import deepcopy
 from enum import StrEnum
 
 from pydantic import field_validator
@@ -46,6 +47,11 @@ class Mortal(WoD):
     def display_traits(self) -> list[Trait]:
         """The character's traits, plus Virtues."""
         return self.traits + self.virtues
+
+    def _all_traits(self) -> list[Trait]:
+        """A copy of the character's rollable traits."""
+        traits = super()._all_traits()
+        return traits + deepcopy(self.virtues)
 
 
 class Ghoul(Mortal):
