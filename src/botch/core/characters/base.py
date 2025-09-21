@@ -4,6 +4,7 @@ subclasses."""
 import bisect
 import copy
 from collections import Counter
+from copy import deepcopy
 from enum import StrEnum
 from itertools import product
 from typing import Annotated, Collection, Literal, Optional, overload
@@ -344,7 +345,7 @@ class Character(Document, validate_assignment=True):
                 subcategory=blank,
             ),
         ]
-        return self.traits + innates
+        return deepcopy(self.traits) + innates
 
     @before_event(Delete)
     async def prep_delete(self):
