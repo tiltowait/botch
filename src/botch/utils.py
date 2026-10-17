@@ -27,4 +27,4 @@ def max_vtr_vitae(potency: int) -> int:
 
 def format_join(collection: list, separator: str, f: str, alt="") -> str:
     """Join a collection by a separator, formatting each item."""
-    return separator.join(map(lambda c: f"{f}{c}{f}", collection)) or alt
+    return separator.join(f"{f}{c}{f}" for c in collection) or alt

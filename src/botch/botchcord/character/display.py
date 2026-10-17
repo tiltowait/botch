@@ -200,7 +200,7 @@ def get_field_value(
 
 def emojify_track(bot: bot.BotchBot, track: str) -> str:
     """Convert a track to emoji."""
-    return " ".join(map(lambda e: bot.find_emoji(Damage.emoji_name(e)), reversed(track)))
+    return " ".join(bot.find_emoji(Damage.emoji_name(e)) for e in reversed(track))
 
 
 def get_track_string(track: str) -> str:

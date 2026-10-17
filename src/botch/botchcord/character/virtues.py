@@ -64,7 +64,7 @@ async def update(ctx: AppCtx, character: Character, virtue_name: str, rating: in
 
 def build_embed(bot: BotchBot, char: Mortal) -> CEmbed:
     """Build the Virtues embed."""
-    desc = "\n".join(map(lambda v: f"**{v.name}:** {v.rating}", char.virtues))
+    desc = "\n".join(f"**{v.name}:** {v.rating}" for v in char.virtues)
     return CEmbed(bot, char, title="Virtues Updated", description=desc)
 
 

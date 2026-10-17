@@ -38,7 +38,7 @@ def build_embed(
 
 def describe_assignments(traits: list[Trait]) -> str:
     """Create the embed description for the trait assignments."""
-    return "\n".join(map(lambda t: f"{t.name}: {m(t.rating)}", traits))
+    return "\n".join(f"{t.name}: {m(t.rating)}" for t in traits)
 
 
 def assign_traits(

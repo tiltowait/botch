@@ -214,7 +214,6 @@ async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
         (" t=2", {"t": 2}),
         ("t =2", {"t": 2}),
         ("t= 2", {"t": 2}),
-        ("t=2", {"t": 2}),
         ("t = 2", {"t": 2}),
         ("t =   2 ", {"t": 2}),
         ("t=2; u=3", {"t": 2, "u": 3}),

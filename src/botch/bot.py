@@ -47,9 +47,9 @@ class BotchBot(discord.Bot):
 
     def __init__(self, *args, **kwargs):
         super().__init__(
+            *args,
             intents=discord.Intents(guilds=True, members=True),
             debug_guilds=DEBUG_GUILDS,
-            *args,
             **kwargs,
         )
         self.guild_cache = GuildCache()

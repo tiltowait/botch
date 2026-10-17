@@ -85,4 +85,4 @@ def categorize_traits(category: Trait.Category, traits: list[Trait]) -> dict[str
 
 def printout(traits: list[Trait]) -> str:
     """Create a list of traits."""
-    return "\n".join(map(lambda t: f"{b(t.name + ':')} {t.rating}", traits))
+    return "\n".join(f"{b(t.name + ':')} {t.rating}" for t in traits)

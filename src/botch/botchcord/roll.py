@@ -215,9 +215,9 @@ def emojify_dice(ctx: bot.AppCtx, roll: Roll) -> str:
     if roll.wod and roll.specialties:
         special = 10
 
-    emojis = []
-    for e in map(lambda d: emoji_name(d, roll.difficulty, special, roll.wod), roll.dice):
-        emojis.append(ctx.bot.find_emoji(e))
+    emojis = [
+        ctx.bot.find_emoji(emoji_name(d, roll.difficulty, special, roll.wod)) for d in roll.dice
+    ]
 
     return " ".join(emojis)
 

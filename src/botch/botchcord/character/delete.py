@@ -29,7 +29,7 @@ class DeletionModal(discord.ui.Modal):
     """A modal that requires the user to type their character's name."""
 
     def __init__(self, char_name: str, *args, **kwargs):
-        super().__init__(title=f"Delete {char_name}?", *args, **kwargs)
+        super().__init__(*args, title=f"Delete {char_name}?", **kwargs)
         self.should_delete = False
         self.expected = char_name.casefold()
         self.interaction: discord.Interaction | None = None

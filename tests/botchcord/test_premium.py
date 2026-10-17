@@ -77,16 +77,20 @@ def test_check_supporter_support_server_not_configured(ctx):
 def test_check_supporter_not_premium(ctx):
     ctx.bot.welcomed = True
     ctx.bot.get_guild.return_value = Mock()
-    with patch("botch.botchcord.premium.is_supporter", return_value=False):
-        with pytest.raises(errors.NotPremium):
-            _check_supporter(ctx)
+    with (
+        patch("botch.botchcord.premium.is_supporter", return_value=False),
+        pytest.raises(errors.NotPremium),
+    ):
+        _check_supporter(ctx)
 
 
 def test_check_supporter_not_premium_not_welcomed(ctx):
     ctx.bot.welcomed = False
-    with patch("botch.botchcord.premium.is_supporter", return_value=False):
-        with pytest.raises(errors.NotReady):
-            _check_supporter(ctx)
+    with (
+        patch("botch.botchcord.premium.is_supporter", return_value=False),
+        pytest.raises(errors.NotReady),
+    ):
+        _check_supporter(ctx)
 
 
 def test_premium_decorator():

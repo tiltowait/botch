@@ -71,17 +71,17 @@ async def check_name_validity(check: NameCheck):
 
     if len(check.name) > MAX_NAME_LEN:
         diff = len(check.name) - MAX_NAME_LEN
-        return dict(
-            valid=False,
-            details=f"{check.name} is too long by {diff}.",
-        )
+        return {
+            "valid": False,
+            "details": f"{check.name} is too long by {diff}.",
+        }
 
     already_exists = await core.cache.has_character(schema.guild_id, schema.user_id, check.name)
     if already_exists:
-        return dict(
-            valid=False,
-            details=f"You already have a character named {check.name}.",
-        )
+        return {
+            "valid": False,
+            "details": f"You already have a character named {check.name}.",
+        }
 
     return {"valid": True}
 

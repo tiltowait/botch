@@ -342,7 +342,7 @@ class PathModal(discord.ui.Modal):
     """A modal for changing a character's Path."""
 
     def __init__(self, char_name: str, current_path: str, *args, **kwargs):
-        super().__init__(title=f"Change {char_name}'s Path", *args, **kwargs)
+        super().__init__(*args, title=f"Change {char_name}'s Path", **kwargs)
         self.current_path = current_path
         self.interaction: discord.Interaction | None = None
         self.new_path = current_path
@@ -375,7 +375,7 @@ class VampAdjuster(Adjuster):
         return self.character.line == GameLine.COFD
 
     def _populate(self):
-        colors = dict(dec_color=ButtonStyle.danger, inc_color=ButtonStyle.success)
+        colors = {"dec_color": ButtonStyle.danger, "inc_color": ButtonStyle.success}
         if self.is_cofd:
             current_blood = "Vitae"
             max_blood = "Max Vitae"
