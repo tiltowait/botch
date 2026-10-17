@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import re
-from datetime import datetime
+import time
 from functools import partial
 from typing import Any
 from urllib.parse import urlparse
@@ -32,11 +32,11 @@ def measure(func):
 
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
-        start = datetime.now()
+        start = time.perf_counter()
         val = await func(*args, **kwargs)
-        end = datetime.now()
+        end = time.perf_counter()
 
-        logger.info("%s finished in %s", kwargs["path"], end - start)
+        logger.info("%s finished in %.3fs", kwargs["path"], end - start)
 
         return val
 
