@@ -14,8 +14,8 @@ class MacrosCog(BotchCog, name="Macros"):
     """Macros are shortcuts for your most commonly used rolls. For instance,\
     if you often roll `Wits + Composure`, you can create a macro called\
     `perception` that rolls those traits. You can also specify a comment to\
-    apply to all invocations, set the `rote` quality, and give it 9-again or\
-    8-again.
+    apply to all invocations, set the `rote` quality, and give it 9-again,\
+    8-again, or no-again.
 
     Macros are per-character, so you can have multiple macros by the same\
     name if they're all under different characters. However, if you use unique\
@@ -35,7 +35,12 @@ class MacrosCog(BotchCog, name="Macros"):
     @macro.command(name="create")
     @option("name", description="The new macro's name")
     @option("pool", description="The dice pool for the macro to use")
-    @option("again", description="The number to explode at", choices=[10, 9, 8], default=10)
+    @option(
+        "again",
+        description="The number to explode at",
+        choices=options.AGAIN_CHOICES,
+        default=10,
+    )
     @option("rote", description="Whether to always apply the Rote quality", default=False)
     @option(
         "advanced",
@@ -87,7 +92,7 @@ class MacrosCog(BotchCog, name="Macros"):
     @option(
         "again",
         description="Override the explosion threshold",
-        choices=[10, 9, 8],
+        choices=options.AGAIN_CHOICES,
         required=False,
     )
     @option("rote", description="Override the Rote quality", default=False)

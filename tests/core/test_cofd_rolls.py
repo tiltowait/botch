@@ -61,6 +61,7 @@ def test_plain_success_count(
         (8, [5, 5, 5, 7, 8, 5], 6),
         (8, [5, 5, 5, 9, 8, 5, 7], 7),
         (8, [5, 5, 5, 9, 8, 5, 10, 7], 8),
+        (11, [10, 10, 5, 5, 5], 5),
     ],
 )
 def test_explosions(mock_d10: Mock, roll: Roll, target: int, dice: list[str], expected: int):

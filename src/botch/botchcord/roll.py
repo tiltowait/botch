@@ -153,7 +153,9 @@ def build_embed(
         author_name += " • Blighted"
     if roll.rote:
         author_name += " • Rote"
-    if roll.again < 10:
+    if roll.cofd and roll.again > 10:
+        author_name += " • No-again"
+    elif roll.again < 10:
         author_name += f" • {roll.again}-again"
 
     if emojis:

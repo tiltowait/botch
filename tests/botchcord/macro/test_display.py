@@ -10,7 +10,7 @@ from botch.botchcord.macro.display import create_macro_entry, create_paginator
 from botch.botchcord.macro.display import display as display_cmd
 from botch.botchcord.macro.display import paginate_macros
 from botch.botchcord.utils.text import i, m
-from botch.core.characters import Character, Macro
+from botch.core.characters import Character, GameLine, Macro
 
 
 @pytest.fixture
@@ -44,6 +44,14 @@ def test_create_macro_entry(macro: Macro):
         i(macro.comment),
     ]
     assert entry == "\n".join(lines)
+
+
+@pytest.mark.parametrize("target,expected", [(8, "8"), (10, "10"), (11, "Never")])
+def test_create_macro_entry_cofd_again(macro: Macro, target: int, expected: str):
+    macro.target = target
+    with patch("botch.botchcord.macro.display.GAME_LINE", GameLine.COFD):
+        entry = create_macro_entry(macro)
+    assert f"**Again:** {expected}" in entry
 
 
 def test_paginate_macros(macro: Macro):

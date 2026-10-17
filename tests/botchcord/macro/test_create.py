@@ -3,6 +3,7 @@
 from unittest.mock import Mock, patch
 
 import pytest
+from pydantic import ValidationError
 
 from botch import errors
 from botch.bot import AppCtx
@@ -43,6 +44,16 @@ def test_create_macro(char):
     assert macro.pool == ["Strength", "+", "Brawl"]
     assert macro.target == 6
     assert macro.comment == "punch a guy"
+
+
+@pytest.mark.parametrize("target,valid", [(1, False), (2, True), (11, True), (12, False)])
+def test_create_macro_target_bounds(char: Character, target: int, valid: bool):
+    if valid:
+        macro = create_macro(char, "punch", "str+b", target, None)
+        assert macro.target == target
+    else:
+        with pytest.raises(ValidationError):
+            create_macro(char, "punch", "str+b", target, None)
 
 
 def test_create_with_specs(char: Character):

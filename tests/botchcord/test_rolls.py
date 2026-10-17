@@ -274,6 +274,25 @@ def test_build_embed_rote_again():
     assert embed.author.name == "Jimmy Maxwell • Rote • 8-again"
 
 
+def test_build_embed_no_again():
+    rp = RollParser("6", None).parse()
+    roll = Roll.from_parser(rp, 0, 0, 11, GameLine.COFD)
+
+    ctx = Mock()
+    ctx.author = Mock(spec=discord.User)
+    ctx.author.display_name = "Jimmy Maxwell"
+    ctx.author.display_avatar = "https://example.com/icon.png"
+
+    embed = build_embed(ctx, roll, None, None, True)
+    assert embed.author is not None
+    assert embed.author.name == "Jimmy Maxwell • No-again"
+
+
+def test_textify_no_again():
+    roll = Roll(line=GameLine.COFD, guild=0, user=0, num_dice=3, target=11, dice=[10, 8, 3])
+    assert textify_dice(roll) == "10, 8, ~~3~~"
+
+
 @pytest.mark.parametrize(
     "blessed,blighted",
     [
