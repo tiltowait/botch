@@ -1,7 +1,7 @@
 """User cache tests."""
 
+from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
-from typing import AsyncGenerator
 from unittest.mock import AsyncMock, patch
 
 import pytest

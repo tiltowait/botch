@@ -1,6 +1,6 @@
 """Web request/response models."""
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 import discord
 from pydantic import BaseModel, Field
@@ -14,7 +14,7 @@ class WizardSchema(BaseModel):
 
     # We have to use Annotated so Pyright stops complaining
     guild_name: Annotated[str, Field(alias="guildName")]
-    guild_icon: Annotated[Optional[str], Field(alias="guildIcon")]
+    guild_icon: Annotated[str | None, Field(alias="guildIcon")]
     guild_id: int
     user_id: int
     traits: TraitSchema
@@ -63,7 +63,7 @@ class CharacterData(BaseModel):
     health: int
     willpower: int
     traits: dict[str, int]
-    virtues: Optional[list[Virtue]] = None
+    virtues: list[Virtue] | None = None
     special: dict[str, str | int | dict[str, int]] = Field(default_factory=dict)
 
     @property

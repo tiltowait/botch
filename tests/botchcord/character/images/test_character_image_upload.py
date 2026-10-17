@@ -1,6 +1,7 @@
 """Character image upload tests."""
 
-from typing import AsyncGenerator, cast
+from collections.abc import AsyncGenerator
+from typing import cast
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest

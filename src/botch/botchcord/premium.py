@@ -1,4 +1,5 @@
-from typing import Callable, NoReturn, TypeVar
+from collections.abc import Callable
+from typing import NoReturn, TypeVar
 
 import discord
 from discord.ext import commands
@@ -53,10 +54,10 @@ def _check_supporter(ctx: AppCtx) -> bool:
         command = ctx.bot.cmd_mention(cmd_name) or f"`/{cmd_name}`"
         assert ctx.bot.user is not None
         raise errors.NotReady(
-            (
+            
                 f"{ctx.bot.user.mention} is currently rebooting. "
                 f"{command} will be available in a few minutes."
-            )
+            
         )
 
     # Waiting for the bot to be fully ready takes about 15 minutes. To speed

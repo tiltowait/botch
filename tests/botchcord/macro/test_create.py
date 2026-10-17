@@ -7,9 +7,8 @@ from pydantic import ValidationError
 
 from botch import errors
 from botch.bot import AppCtx
-from botch.botchcord.macro.create import build_embed, can_use_macro
+from botch.botchcord.macro.create import build_embed, can_use_macro, create_macro
 from botch.botchcord.macro.create import create as create_cmd
-from botch.botchcord.macro.create import create_macro
 from botch.botchcord.utils import CEmbed
 from botch.core.characters import Character
 

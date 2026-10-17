@@ -1,7 +1,8 @@
 """Pytest configuration."""
 
 import asyncio
-from typing import AsyncGenerator, cast
+from collections.abc import AsyncGenerator
+from typing import cast
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest

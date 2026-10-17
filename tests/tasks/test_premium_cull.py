@@ -1,8 +1,8 @@
 """Premium culler tests."""
 
+from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
 from functools import partial
-from typing import AsyncGenerator
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest

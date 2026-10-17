@@ -1,6 +1,7 @@
 """Character adjuster tests."""
 
-from typing import AsyncGenerator, cast
+from collections.abc import AsyncGenerator
+from typing import cast
 from unittest.mock import ANY, AsyncMock, MagicMock, Mock, call, patch
 
 import discord
@@ -691,7 +692,6 @@ def test_vtr_button_states(
     for idx, state in expected.items():
         assert adjuster.buttons[idx].disabled == state
 
-    pass
 
 
 @patch("botch.bot.AppCtx.respond", new_callable=AsyncMock)

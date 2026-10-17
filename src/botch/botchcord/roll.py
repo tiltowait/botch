@@ -2,7 +2,6 @@
 
 import re
 from enum import IntEnum
-from typing import Optional
 
 import discord
 
@@ -40,7 +39,7 @@ class Color(IntEnum):
 
 def add_wp(pool: str) -> str:
     """Add '+ WP' to the pool syntax if it's not there already."""
-    if not re.search(r"\bWP\b", pool, re.I):
+    if not re.search(r"\bWP\b", pool, re.IGNORECASE):
         return pool + " + WP"
     return pool
 
@@ -49,11 +48,11 @@ async def roll(
     ctx: bot.AppCtx,
     pool: str,
     target: int,
-    specialties: Optional[str],
+    specialties: str | None,
     wp: bool,
     rote: bool,
-    comment: Optional[str],
-    character: Optional[str | Character],
+    comment: str | None,
+    character: str | Character | None,
     *,
     autos=0,
     blessed=False,

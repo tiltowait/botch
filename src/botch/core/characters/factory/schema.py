@@ -2,7 +2,6 @@
 
 import json
 from enum import StrEnum
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -56,11 +55,11 @@ class SpecialTrait(BaseModel):
     label: str
     name: str
     type: SpecialTraitType
-    options: Optional[list[str] | list[int]] = None
-    default: Optional[str | int] = None
-    items: Optional[list[str]] = None
-    min: Optional[int] = None
-    max: Optional[int] = None
+    options: list[str] | list[int] | None = None
+    default: str | int | None = None
+    items: list[str] | None = None
+    min: int | None = None
+    max: int | None = None
 
 
 class Special(BaseModel):
@@ -81,8 +80,8 @@ class Schema(BaseModel):
     grounding: dict[Splat, str]
     inherent: TraitGroup
     learned: TraitGroup
-    virtues: Optional[list[list[str]]] = None
-    special: Optional[list[Special]] = None
+    virtues: list[list[str]] | None = None
+    special: list[Special] | None = None
 
     @classmethod
     def load(cls, loc: str):

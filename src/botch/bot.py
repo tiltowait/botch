@@ -93,7 +93,7 @@ class BotchBot(discord.Bot):
                         self.load_extension(cog_path)
                         logger.debug(f"Loaded cog: {cog_path}")
                     except Exception as e:
-                        logger.error(f"Failed to load cog {cog_path}: {str(e)}")
+                        logger.error(f"Failed to load cog {cog_path}: {e!s}")
 
     @overload
     def find_emoji(self, emoji_name: str) -> str: ...

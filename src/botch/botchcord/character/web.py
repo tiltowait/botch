@@ -1,7 +1,7 @@
 """Character web wizard command."""
 
-import importlib.resources as resources
 from datetime import timedelta
+from importlib import resources
 from pathlib import Path
 
 import discord

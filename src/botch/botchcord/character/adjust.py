@@ -22,8 +22,8 @@ __all__ = (
     "MummyPillarAdjuster",
     "MummySekhemAdjuster",
     "Toggler",
-    "WillpowerAdjuster",
     "VampAdjuster",
+    "WillpowerAdjuster",
 )
 
 VampireType = wod.Vampire | cofd.Vampire
@@ -43,7 +43,7 @@ class Toggler(View):
         super().__init__(timeout=180)
         self.ctx = ctx
         self.character = char
-        self.adjusters: list["Adjuster"] = []
+        self.adjusters: list[Adjuster] = []
         self.display_msg: discord.WebhookMessage | discord.Interaction | None = None
 
         self.selector: Select = Select(placeholder="Select a stat to adjust")

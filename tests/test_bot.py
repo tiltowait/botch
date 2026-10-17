@@ -1,6 +1,6 @@
 """Bot instance tests."""
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from unittest import mock
 from unittest.mock import ANY, AsyncMock, MagicMock, Mock, PropertyMock, patch
 

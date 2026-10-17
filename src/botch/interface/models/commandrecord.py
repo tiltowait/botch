@@ -1,7 +1,7 @@
 """Facility for logging user commands."""
 
 from datetime import UTC, datetime
-from typing import Any, Optional, Self
+from typing import Any, Self
 
 from beanie import Document
 from discord import ApplicationContext
@@ -13,10 +13,10 @@ class CommandRecord(Document):
     data as is info-logged to the console."""
 
     command: str
-    options: Optional[list[dict[str, Any]]]
-    guild: Optional[int]
+    options: list[dict[str, Any]] | None
+    guild: int | None
     user: int
-    locale: Optional[str]
+    locale: str | None
     date: datetime = Field(default_factory=lambda: datetime.now(UTC))
     type: int
 

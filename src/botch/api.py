@@ -118,14 +118,13 @@ async def _post(*, path: str, data: dict[str, Any] | str) -> str:
     logger.debug("POST to %s with %s", path, str(data))
     url = BASE_API + path.lstrip("/")
 
-    async with async_timeout.timeout(60):
-        async with aiohttp.ClientSession(headers=headers()) as session:
-            async with session.post(url, data=data) as response:
-                json = await response.json()
+    async with async_timeout.timeout(60), aiohttp.ClientSession(headers=headers()) as session:
+        async with session.post(url, data=data) as response:
+            json = await response.json()
 
-                if not response.ok:
-                    raise errors.ApiError(str(json))
-                return json
+            if not response.ok:
+                raise errors.ApiError(str(json))
+            return json
 
 
 @measure
@@ -134,11 +133,10 @@ async def _delete(*, path: str) -> str:
     logger.debug("DELETE to %s", path)
     url = BASE_API + path.lstrip("/")
 
-    async with async_timeout.timeout(60):
-        async with aiohttp.ClientSession(headers=headers()) as session:
-            async with session.delete(url) as response:
-                json = await response.json()
+    async with async_timeout.timeout(60), aiohttp.ClientSession(headers=headers()) as session:
+        async with session.delete(url) as response:
+            json = await response.json()
 
-                if not response.ok:
-                    raise errors.ApiError(str(json))
-                return json
+            if not response.ok:
+                raise errors.ApiError(str(json))
+            return json

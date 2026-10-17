@@ -4,10 +4,11 @@ subclasses."""
 import bisect
 import copy
 from collections import Counter
+from collections.abc import Collection
 from copy import deepcopy
 from enum import StrEnum
 from itertools import product
-from typing import Annotated, Collection, Literal, Optional, overload
+from typing import Annotated, Literal, overload
 
 import pymongo
 from beanie import Delete, Document, before_event
@@ -81,8 +82,8 @@ class Damage(StrEnum):
 class Profile(BaseModel, validate_assignment=True):
     """Contains the character's description, history, and image URLs."""
 
-    description: Optional[str] = Field(default=None, max_length=1500)
-    history: Optional[str] = Field(default=None, max_length=1500)
+    description: str | None = Field(default=None, max_length=1500)
+    history: str | None = Field(default=None, max_length=1500)
     images: list[HttpUrl] = Field(default_factory=list)
 
     @property
@@ -110,7 +111,7 @@ class Macro(BaseModel):
     blessed: bool = False
     blighted: bool = False
     hunt: bool
-    comment: Optional[str]
+    comment: str | None
 
     @property
     def pool_str(self) -> str:

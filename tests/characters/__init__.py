@@ -12,10 +12,10 @@ def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character: ...
 
 
 @overload
-def gen_char(line: GameLine, splat: Splat, cls: Type[T], **kwargs) -> T: ...
+def gen_char(line: GameLine, splat: Splat, cls: type[T], **kwargs) -> T: ...
 
 
-def gen_char(line: GameLine, splat: Splat, cls: Type[T] = Character, **kwargs) -> T:
+def gen_char(line: GameLine, splat: Splat, cls: type[T] = Character, **kwargs) -> T:
     """Create a basic character."""
     args = {
         "name": "Test",

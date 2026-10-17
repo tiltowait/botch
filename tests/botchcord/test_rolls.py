@@ -1,6 +1,5 @@
 """Discord roll tests."""
 
-from typing import Optional
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import discord
@@ -66,7 +65,7 @@ def dice() -> list[int]:
 def test_textify_dice(
     target: int,
     expected: str,
-    spec: Optional[list[str]],
+    spec: list[str] | None,
     line: GameLine,
     dice: list[int],
 ):
