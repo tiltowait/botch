@@ -15,7 +15,7 @@ from botch.core.rolls.parse import RollParser
 
 if TYPE_CHECKING:
     _T = TypeVar("_T", bound=Document)
-    Link: TypeAlias = _T
+    Link: TypeAlias = _T  # noqa: UP040 - type-checker shim for Beanie's Link
 else:
     Link = BeanieLink
 

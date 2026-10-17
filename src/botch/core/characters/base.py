@@ -594,7 +594,7 @@ class Character(Document, validate_assignment=True):
 
     class Settings:
         name = "characters"
-        indexes = [
+        indexes = [  # noqa: RUF012 - Beanie Settings convention
             [
                 ("guild", pymongo.ASCENDING),
                 ("user", pymongo.ASCENDING),
