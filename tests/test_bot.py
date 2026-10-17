@@ -5,7 +5,7 @@ from unittest import mock
 from unittest.mock import ANY, AsyncMock, MagicMock, Mock, PropertyMock, patch
 
 import pytest
-from discord import ApplicationCommandInvokeError, NotFound
+from discord import ApplicationCommandInvokeError, ExtensionFailed, NotFound
 
 from botch import config, errors
 from botch.bot import AppCtx, BotchBot
@@ -124,3 +124,19 @@ def test_cmd_mention(mock_get_cmd: Mock, bot: BotchBot, cmd: str, exists: bool):
         assert mention is not None
     else:
         assert mention is None
+
+
+@pytest.mark.parametrize("line", ["wod", "cofd"])
+def test_load_cogs(bot: BotchBot, line: str):
+    bot.load_cogs(["shared", line])
+    assert "Basic" in bot.cogs
+    assert bot.extensions
+
+
+def test_load_cogs_failure_raises(bot: BotchBot):
+    err = ExtensionFailed("botch.interface.shared.misc", RuntimeError("boom"))
+    with (
+        patch("botch.bot.BotchBot.load_extension", side_effect=err),
+        pytest.raises(ExtensionFailed),
+    ):
+        bot.load_cogs(["shared"])

@@ -89,11 +89,8 @@ class BotchBot(discord.Bot):
             for filename in os.listdir(cog_dir):
                 if filename.endswith(".py") and not filename.startswith("_"):
                     cog_path = f"botch.interface.{directory}.{filename[:-3]}"
-                    try:
-                        self.load_extension(cog_path)
-                        logger.debug(f"Loaded cog: {cog_path}")
-                    except Exception as e:
-                        logger.error(f"Failed to load cog {cog_path}: {e!s}")
+                    self.load_extension(cog_path)
+                    logger.debug(f"Loaded cog: {cog_path}")
 
     @overload
     def find_emoji(self, emoji_name: str) -> str: ...
