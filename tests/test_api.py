@@ -1,7 +1,7 @@
 """API tests."""
 
 import os
-from unittest.mock import AsyncMock, Mock, mock_open, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -56,22 +56,3 @@ async def test_delete_character_faceclaims(character: Mock):
 
         await api.delete_character_faceclaims(character)
         mock_delete.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_upload_logs():
-    with (
-        patch("glob.glob", return_value=["./logs/log1.txt", "./logs/log2.txt"]),
-        patch("builtins.open", mock_open(read_data="data")),
-        patch("aiohttp.ClientSession.post") as mock_post,
-        patch("os.unlink") as mock_unlink,
-    ):
-        mock_response = AsyncMock()
-        mock_response.ok = True
-        mock_response.json = AsyncMock(return_value="Uploaded")
-        mock_post.return_value.__aenter__.return_value = mock_response
-
-        result = await api.upload_logs()
-        assert result is True
-        assert mock_post.call_count == 2
-        mock_unlink.assert_called_once_with("./logs/log1.txt")

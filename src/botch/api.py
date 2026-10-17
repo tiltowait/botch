@@ -1,7 +1,6 @@
 """The Botch API endpoints."""
 
 import functools
-import glob
 import json
 import logging
 import os
@@ -82,34 +81,6 @@ async def delete_character_faceclaims(character: "core.characters.Character"):
     """Delete all of a character's faceclaims."""
     res = await _delete(path=f"/faceclaim/delete/{FC_BUCKET}/{character.id}/all")
     logger.info("%s", res)
-
-
-async def upload_logs():
-    """Upload log files."""
-    logger.info("Uploading logs")
-    try:
-        logs = sorted(glob.glob("./logs/*.txt"))
-        for log in logs:
-            with open(log, "rb") as handle:
-                payload = {"log_file": handle}
-                res = await _post(path="/log/upload", data=payload)
-                logger.info("%s", res)
-
-        if len(logs) > 1:
-            # Remove all but the most recent log file
-            for log in logs[:-1]:
-                logger.info("Deleting old log: %s", log)
-                os.unlink(log)
-        elif not logs:
-            logger.error("No log files found")
-            return False
-
-        # Logs all uploaded successfully
-        return True
-
-    except errors.ApiError as err:
-        logger.error("%s", str(err))
-        return False
 
 
 @measure
