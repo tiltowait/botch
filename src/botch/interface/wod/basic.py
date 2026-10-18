@@ -71,7 +71,8 @@ class BasicCog(BotchCog, name="Basic"):
     @slash_command(contexts={InteractionContextType.guild})
     async def botches(self, ctx: AppCtx):
         """How many botches have you rolled?"""
-        rolls = await Roll.find(dict(guild=ctx.guild.id, user=ctx.user.id, botched=True)).to_list()
+        query = {"guild": ctx.guild.id, "user": ctx.user.id, "botched": True}
+        rolls = await Roll.find(query).to_list()
         count = len(rolls)
 
         if count == 1:

@@ -1,6 +1,6 @@
 """Guild tests."""
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest

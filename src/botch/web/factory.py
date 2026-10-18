@@ -45,7 +45,7 @@ def fill_cofd(data: CharacterData, splat_args: dict[str, Any]) -> list[Trait]:
         splat_args["pillars"] = []
 
         for p, r in pillars.items():
-            pillar = dict(name=p, rating=r, temporary=r)
+            pillar = {"name": p, "rating": r, "temporary": r}
             splat_args["pillars"].append(pillar)
 
     return []
@@ -53,7 +53,7 @@ def fill_cofd(data: CharacterData, splat_args: dict[str, Any]) -> list[Trait]:
 
 def create_character(wizard: WizardSchema, data: CharacterData) -> Character:
     """Create and return the character from the wizard and data."""
-    splat_args: dict[str, Any] = dict(virtues=gen_virtues(data.virtues_dict))
+    splat_args: dict[str, Any] = {"virtues": gen_virtues(data.virtues_dict)}
     for special, value in data.special.items():
         splat_args[special.lower()] = value
 

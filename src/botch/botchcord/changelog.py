@@ -1,5 +1,6 @@
 """Fetch and display changelog from GitHub."""
 
+import logging
 import os
 
 import aiohttp
@@ -10,6 +11,8 @@ from discord.ext.pages import Paginator
 from botch.bot import AppCtx
 
 CHANGELOG = "https://github.com/tiltowait/botch/releases/latest"
+
+logger = logging.getLogger("CHANGELOG")
 
 
 async def show(ctx: AppCtx, version_warning: bool, hidden: bool):
@@ -47,7 +50,7 @@ async def show(ctx: AppCtx, version_warning: bool, hidden: bool):
         await paginator.respond(ctx.interaction, ephemeral=hidden)
 
     except (aiohttp.ClientError, KeyError) as err:
-        print(err)
+        logger.warning("Unable to fetch changelog: %s", err)
         await ctx.respond(
             f"Unable to fetch changelog. [Click this link to view on GitHub.]({CHANGELOG})",
             ephemeral=hidden,
@@ -57,12 +60,11 @@ async def show(ctx: AppCtx, version_warning: bool, hidden: bool):
 async def fetch_changelog() -> tuple[str, str]:
     """Fetch changelog data."""
     token = os.getenv("GITHUB_TOKEN", "")
-    print(token)
     header = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
 
-    async with aiohttp.ClientSession(headers=header, raise_for_status=True) as session:
-        async with session.get(
-            "https://api.github.com/repos/tiltowait/botch/releases/latest"
-        ) as res:
-            json = await res.json()
-            return json["tag_name"], json["body"]
+    async with (
+        aiohttp.ClientSession(headers=header, raise_for_status=True) as session,
+        session.get("https://api.github.com/repos/tiltowait/botch/releases/latest") as res,
+    ):
+        json = await res.json()
+        return json["tag_name"], json["body"]

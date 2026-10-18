@@ -1,7 +1,8 @@
 """Character selection utilities."""
 
 import functools
-from typing import Any, Callable, Concatenate, Coroutine, ParamSpec, TypeVar, cast
+from collections.abc import Callable, Coroutine
+from typing import Any, Concatenate, ParamSpec, TypeVar, cast
 
 import discord
 from discord import ButtonStyle

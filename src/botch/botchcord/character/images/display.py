@@ -289,13 +289,13 @@ class ImagePager(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction):
         """Ensure image management safety."""
         assert interaction.user is not None
-        if self.management_mode or self.manage_button.custom_id == interaction.custom_id:
+        managing = self.management_mode or self.manage_button.custom_id == interaction.custom_id
+        if managing and interaction.user.id != self.character.user:
             # Only the character's owner may access management mode.
-            if interaction.user.id != self.character.user:
-                await interaction.respond(
-                    "You may only manage your own characters' images.", ephemeral=True
-                )
-                return False
+            await interaction.respond(
+                "You may only manage your own characters' images.", ephemeral=True
+            )
+            return False
         if self.invoker_controls and interaction.user.id != self.ctx.user.id:
             # Prevent others from using buttons if the option was set
             await interaction.respond(

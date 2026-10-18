@@ -2,7 +2,7 @@
 
 import logging
 from datetime import UTC, datetime
-from typing import Annotated, Literal, Optional, overload
+from typing import Annotated, Literal, overload
 
 import discord
 from beanie import Document, Indexed
@@ -21,7 +21,7 @@ class Guild(Document):
     guild: Annotated[int, Indexed(unique=True)]
     name: str
     joined: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    left: Optional[datetime] = None
+    left: datetime | None = None
     settings: GuildSettings = Field(default_factory=GuildSettings)
 
     async def join(self):

@@ -1,7 +1,7 @@
 """Dice rolls!"""
 
 import re
-from typing import TYPE_CHECKING, Optional, Self, TypeAlias, TypeVar, overload
+from typing import TYPE_CHECKING, Self, TypeAlias, TypeVar, overload
 
 from beanie import Document, Insert, before_event
 from beanie import Link as BeanieLink
@@ -15,7 +15,7 @@ from botch.core.rolls.parse import RollParser
 
 if TYPE_CHECKING:
     _T = TypeVar("_T", bound=Document)
-    Link: TypeAlias = _T
+    Link: TypeAlias = _T  # noqa: UP040 - type-checker shim for Beanie's Link
 else:
     Link = BeanieLink
 
@@ -52,16 +52,16 @@ class Roll(Document):
     target: int  # WoD: Difficulty; CofD: "again"
     wp: bool = False
     autos: int = 0
-    specialties: Optional[list[str]] = Field(default_factory=list)
+    specialties: list[str] | None = Field(default_factory=list)
     rote: bool = False
     blessed: bool = False
     blighted: bool = False
     dice: list[int] = Field(default_factory=list)
-    pool: Optional[list[str | int]] = None
+    pool: list[str | int] | None = None
     num_successes: int = 0
     botched: bool = False
-    syntax: Optional[str] = None
-    character: Optional[Link[Character]] = None
+    syntax: str | None = None
+    character: Link[Character] | None = None
     use_in_stats: bool = True
 
     @before_event(Insert)

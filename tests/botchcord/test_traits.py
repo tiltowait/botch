@@ -214,7 +214,6 @@ async def test_display(bot_mock, char: Character, mixed_traits: list[Trait]):
         (" t=2", {"t": 2}),
         ("t =2", {"t": 2}),
         ("t= 2", {"t": 2}),
-        ("t=2", {"t": 2}),
         ("t = 2", {"t": 2}),
         ("t =   2 ", {"t": 2}),
         ("t=2; u=3", {"t": 2, "u": 3}),
@@ -286,11 +285,11 @@ def test_build_assignment_embed(bot_mock, skilled: Character):
     assert embed.author.name == skilled.name
 
 
-async def test_assign(ctx, skilled: Character):
+async def test_assign(ctx, skilled: Character, mock_respond: AsyncMock):
     with patch("botch.core.characters.Character.save", return_value=None):
         await assign.assign(ctx, skilled, "brawl=2")
 
-        ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+        mock_respond.assert_called_once_with(embed=ANY, ephemeral=True)
         skilled.save.assert_called_once()  # pyright: ignore
 
 
@@ -389,9 +388,9 @@ def test_build_removal_embed(found: list[str], missing: list[str], bot_mock, ski
         assert embed.color == discord.Color.red()
 
 
-async def test_remove(ctx, skilled: Character, mock_char_save):
+async def test_remove(ctx, skilled: Character, mock_char_save, mock_respond: AsyncMock):
     await remove.remove(ctx, skilled, "foo bar")
-    ctx.respond.assert_called_once_with(embed=ANY, ephemeral=True)
+    mock_respond.assert_called_once_with(embed=ANY, ephemeral=True)
     mock_char_save.assert_called_once()
 
 

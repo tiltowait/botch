@@ -8,12 +8,12 @@ from botch.botchcord.mroll import mroll
 __all__ = (
     "changelog",
     "character",
+    "get_avatar",
     "haven",
     "macro",
     "mroll",
     "roll",
     "settings",
-    "get_avatar",
 )
 
 

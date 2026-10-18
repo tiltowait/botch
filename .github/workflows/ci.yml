@@ -43,7 +43,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install Ruff
-        run: pip install ruff
+        run: pip install ruff==0.16.5
       - name: Lint with Ruff
         run: ruff check --output-format=github .
 

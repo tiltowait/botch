@@ -1,10 +1,8 @@
 """Shared helper functions."""
 
-from typing import Type, TypeVar, overload
+from typing import overload
 
 from botch.core.characters import Character, Damage, GameLine, Grounding, Splat
-
-T = TypeVar("T", bound=Character)
 
 
 @overload
@@ -12,10 +10,10 @@ def gen_char(line: GameLine, splat: Splat, **kwargs) -> Character: ...
 
 
 @overload
-def gen_char(line: GameLine, splat: Splat, cls: Type[T], **kwargs) -> T: ...
+def gen_char[T: Character](line: GameLine, splat: Splat, cls: type[T], **kwargs) -> T: ...
 
 
-def gen_char(line: GameLine, splat: Splat, cls: Type[T] = Character, **kwargs) -> T:
+def gen_char[T: Character](line: GameLine, splat: Splat, cls: type[T] = Character, **kwargs) -> T:
     """Create a basic character."""
     args = {
         "name": "Test",

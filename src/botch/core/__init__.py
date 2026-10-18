@@ -3,4 +3,4 @@
 from botch.core import characters, rolls
 from botch.core.cache import cache
 
-__all__ = ("rolls", "characters", "cache")
+__all__ = ("cache", "characters", "rolls")

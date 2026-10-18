@@ -1,4 +1,4 @@
-"""Command interface for basic WoD commands."""
+"""Command interface for basic CofD commands."""
 
 import discord
 from discord import option
@@ -26,7 +26,12 @@ class BasicCog(BotchCog, name="Basic"):
         description="Use WP on the roll. Can also add + WP to your pool",
         default=False,
     )
-    @option("again", description="The number at which dice explode", choices=[10, 9, 8], default=10)
+    @option(
+        "again",
+        description="The number at which dice explode",
+        choices=options.AGAIN_CHOICES,
+        default=10,
+    )
     @option("rote", description="Whether to apply the Rote quality", default=False)
     @option(
         "advanced",

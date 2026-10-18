@@ -1,7 +1,7 @@
 """Fixture config."""
 
 import re
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, Mock, PropertyMock, patch
 
 import discord

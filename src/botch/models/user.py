@@ -2,7 +2,7 @@
 
 import logging
 from datetime import UTC, datetime, timedelta
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from beanie import Document
 from pydantic import BaseModel, Field
@@ -21,7 +21,7 @@ class User(Document):
 
     user: int
     settings: UserSettings = Field(default_factory=UserSettings)
-    left_premium: Optional[datetime] = None
+    left_premium: datetime | None = None
 
     @property
     def should_purge(self) -> bool:

@@ -14,8 +14,6 @@ from botch.core.characters.base import (
 )
 
 __all__ = (
-    "cofd",
-    "wod",
     "Character",
     "Damage",
     "Experience",
@@ -25,4 +23,6 @@ __all__ = (
     "Splat",
     "Tracker",
     "Trait",
+    "cofd",
+    "wod",
 )

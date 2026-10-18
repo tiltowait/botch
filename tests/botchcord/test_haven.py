@@ -1,7 +1,8 @@
 """Test character haven class and decorator."""
 
+from collections.abc import Callable, Generator
 from functools import partial
-from typing import Callable, Generator, cast
+from typing import cast
 from unittest.mock import ANY, AsyncMock, Mock, PropertyMock, patch
 
 import discord

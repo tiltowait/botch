@@ -31,6 +31,7 @@ async def test_macro_not_found(ctx, char):
     [
         (None, None),
         (3, "Flip"),
+        (11, None),
     ],
 )
 @patch("botch.botchcord.roll.roll", new_callable=AsyncMock)

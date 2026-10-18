@@ -24,7 +24,7 @@ from tests.characters import gen_char
 @pytest.fixture
 def character() -> Character:
     char = gen_char(GameLine.WOD, Splat.VAMPIRE)
-    for trait, rating in dict(Brawl=1, Craft=2, Oblivion=3).items():
+    for trait, rating in {"Brawl": 1, "Craft": 2, "Oblivion": 3}.items():
         char.add_trait(trait, rating)
     return char
 
@@ -104,9 +104,7 @@ def test_add_specialties(syntax: str, expected: list, character: Character):
     traits = add_specialties(character, syntax)
     assert len(traits) == len(expected)
 
-    for trait, expected in zip(traits, expected):
-        trait, delta = trait
-        e_trait, e_specs, e_delta = expected
+    for (trait, delta), (e_trait, e_specs, e_delta) in zip(traits, expected, strict=True):
         assert trait.name == e_trait
         assert trait.subtraits == e_specs
         assert delta == e_delta
@@ -154,10 +152,7 @@ def test_remove_specialties(syntax: str, expected: list, specced: Character):
     traits = remove_specialties(specced, syntax)
     assert len(traits) == len(expected)
 
-    for trait, expected in zip(traits, expected):
-        trait, delta = trait
-        e_trait, e_specs, e_delta = expected
-
+    for (trait, delta), (e_trait, e_specs, e_delta) in zip(traits, expected, strict=True):
         assert trait.name == e_trait
         assert trait.subtraits == e_specs
         assert delta == e_delta

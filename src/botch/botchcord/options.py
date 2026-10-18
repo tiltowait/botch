@@ -10,6 +10,14 @@ from botch import core
 from botch.config import GAME_LINE
 from botch.core.characters.base import GameLine
 
+# CofD explosion thresholds. 11 is unreachable on a d10, so it means no-again.
+AGAIN_CHOICES = [
+    OptionChoice("10", 10),
+    OptionChoice("9", 9),
+    OptionChoice("8", 8),
+    OptionChoice("Never", 11),
+]
+
 
 def promoted_choice(
     param: str,

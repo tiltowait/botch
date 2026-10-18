@@ -2,7 +2,6 @@
 
 import re
 from enum import IntEnum
-from typing import Optional
 
 import discord
 
@@ -40,7 +39,7 @@ class Color(IntEnum):
 
 def add_wp(pool: str) -> str:
     """Add '+ WP' to the pool syntax if it's not there already."""
-    if not re.search(r"\bWP\b", pool, re.I):
+    if not re.search(r"\bWP\b", pool, re.IGNORECASE):
         return pool + " + WP"
     return pool
 
@@ -49,11 +48,11 @@ async def roll(
     ctx: bot.AppCtx,
     pool: str,
     target: int,
-    specialties: Optional[str],
+    specialties: str | None,
     wp: bool,
     rote: bool,
-    comment: Optional[str],
-    character: Optional[str | Character],
+    comment: str | None,
+    character: str | Character | None,
     *,
     autos=0,
     blessed=False,
@@ -153,7 +152,9 @@ def build_embed(
         author_name += " • Blighted"
     if roll.rote:
         author_name += " • Rote"
-    if roll.again < 10:
+    if roll.cofd and roll.again > 10:
+        author_name += " • No-again"
+    elif roll.again < 10:
         author_name += f" • {roll.again}-again"
 
     if emojis:
@@ -214,9 +215,9 @@ def emojify_dice(ctx: bot.AppCtx, roll: Roll) -> str:
     if roll.wod and roll.specialties:
         special = 10
 
-    emojis = []
-    for e in map(lambda d: emoji_name(d, roll.difficulty, special, roll.wod), roll.dice):
-        emojis.append(ctx.bot.find_emoji(e))
+    emojis = [
+        ctx.bot.find_emoji(emoji_name(d, roll.difficulty, special, roll.wod)) for d in roll.dice
+    ]
 
     return " ".join(emojis)
 

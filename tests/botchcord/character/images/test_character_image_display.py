@@ -1,7 +1,7 @@
 """Character image display tests."""
 
+from collections.abc import AsyncGenerator
 from random import randint
-from typing import AsyncGenerator
 from unittest.mock import ANY, AsyncMock, Mock, patch
 
 import pytest

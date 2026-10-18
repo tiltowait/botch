@@ -23,7 +23,7 @@ pyparsing = "^3.1.0"
 numpy = "^1.25.1"
 py-cord = {extras = ["speed"], version = "^2.6.1"}
 async-timeout = "^4.0.3"
-fastapi = "^0.115.2"
+fastapi = "^0.133.0"
 cachetools = "^5.5.0"
 uvicorn = "^0.32.0"
 beanie = "^1.29.0"
